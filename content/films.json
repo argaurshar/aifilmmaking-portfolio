@@ -1,17 +1,18 @@
 {
   "_comment": [
-    "All nine YouTube IDs below are REAL and confirmed. Everything else is a placeholder.",
+    "All nine YouTube IDs are REAL and confirmed.",
+    "",
+    "runtimeSeconds were read off the YouTube Studio list in Studio row order and are",
+    "UNCONFIRMED except film-03 (D0uKP6KAnOM = 0:11), which is verified. Confirm the rest",
+    "before publishing.",
     "",
     "Each entry is \"status\": \"draft\", so the build EXCLUDES it — nothing unfinished ships.",
     "Preview the layout locally with:  node build.mjs --drafts",
     "",
-    "To publish one film, fill in: title, year, type, logline, roles, runtimeSeconds,",
-    "then set \"status\": \"published\". Add a poster with scripts/make-posters.sh.",
-    "",
+    "To publish one film: fill in title, type and logline, then set \"status\": \"published\".",
     "type must be one of: narrative-short | brand-film | animation | music-video |",
     "documentary | experimental.  Field reference: docs/03-CONTENT-MODEL.md"
   ],
-
   "films": [
     {
       "id": "film-01",
@@ -19,10 +20,17 @@
       "year": 2026,
       "type": "narrative-short",
       "logline": "TODO: one sentence. What happens, concretely. No adjectives.",
-      "roles": ["Director"],
-      "video": { "platform": "youtube", "id": "BJRrA7PYngY", "hash": null, "startAt": null },
+      "roles": [
+        "Director"
+      ],
+      "video": {
+        "platform": "youtube",
+        "id": "BJRrA7PYngY",
+        "hash": null,
+        "startAt": null
+      },
       "poster": null,
-      "runtimeSeconds": null,
+      "runtimeSeconds": 91,
       "synopsis": null,
       "client": null,
       "collaborators": [],
@@ -39,10 +47,17 @@
       "year": 2026,
       "type": "narrative-short",
       "logline": "TODO: one sentence. What happens, concretely. No adjectives.",
-      "roles": ["Director"],
-      "video": { "platform": "youtube", "id": "XWB5ANfiVwM", "hash": null, "startAt": null },
+      "roles": [
+        "Director"
+      ],
+      "video": {
+        "platform": "youtube",
+        "id": "XWB5ANfiVwM",
+        "hash": null,
+        "startAt": null
+      },
       "poster": null,
-      "runtimeSeconds": null,
+      "runtimeSeconds": 67,
       "synopsis": null,
       "client": null,
       "collaborators": [],
@@ -59,10 +74,17 @@
       "year": 2026,
       "type": "narrative-short",
       "logline": "TODO: one sentence. What happens, concretely. No adjectives.",
-      "roles": ["Director"],
-      "video": { "platform": "youtube", "id": "D0uKP6KAnOM", "hash": null, "startAt": null },
+      "roles": [
+        "Director"
+      ],
+      "video": {
+        "platform": "youtube",
+        "id": "D0uKP6KAnOM",
+        "hash": null,
+        "startAt": null
+      },
       "poster": null,
-      "runtimeSeconds": null,
+      "runtimeSeconds": 11,
       "synopsis": null,
       "client": null,
       "collaborators": [],
@@ -79,10 +101,17 @@
       "year": 2026,
       "type": "narrative-short",
       "logline": "TODO: one sentence. What happens, concretely. No adjectives.",
-      "roles": ["Director"],
-      "video": { "platform": "youtube", "id": "fVl2v0zZtC8", "hash": null, "startAt": null },
+      "roles": [
+        "Director"
+      ],
+      "video": {
+        "platform": "youtube",
+        "id": "fVl2v0zZtC8",
+        "hash": null,
+        "startAt": null
+      },
       "poster": null,
-      "runtimeSeconds": null,
+      "runtimeSeconds": 78,
       "synopsis": null,
       "client": null,
       "collaborators": [],
@@ -99,10 +128,17 @@
       "year": 2026,
       "type": "narrative-short",
       "logline": "TODO: one sentence. What happens, concretely. No adjectives.",
-      "roles": ["Director"],
-      "video": { "platform": "youtube", "id": "PfIIjjRaVS0", "hash": null, "startAt": null },
+      "roles": [
+        "Director"
+      ],
+      "video": {
+        "platform": "youtube",
+        "id": "PfIIjjRaVS0",
+        "hash": null,
+        "startAt": null
+      },
       "poster": null,
-      "runtimeSeconds": null,
+      "runtimeSeconds": 107,
       "synopsis": null,
       "client": null,
       "collaborators": [],
@@ -119,10 +155,17 @@
       "year": 2026,
       "type": "narrative-short",
       "logline": "TODO: one sentence. What happens, concretely. No adjectives.",
-      "roles": ["Director"],
-      "video": { "platform": "youtube", "id": "PiR-v9rSx60", "hash": null, "startAt": null },
+      "roles": [
+        "Director"
+      ],
+      "video": {
+        "platform": "youtube",
+        "id": "PiR-v9rSx60",
+        "hash": null,
+        "startAt": null
+      },
       "poster": null,
-      "runtimeSeconds": null,
+      "runtimeSeconds": 79,
       "synopsis": null,
       "client": null,
       "collaborators": [],
@@ -139,10 +182,17 @@
       "year": 2026,
       "type": "narrative-short",
       "logline": "TODO: one sentence. What happens, concretely. No adjectives.",
-      "roles": ["Director"],
-      "video": { "platform": "youtube", "id": "apCOQYEtCw0", "hash": null, "startAt": null },
+      "roles": [
+        "Director"
+      ],
+      "video": {
+        "platform": "youtube",
+        "id": "apCOQYEtCw0",
+        "hash": null,
+        "startAt": null
+      },
       "poster": null,
-      "runtimeSeconds": null,
+      "runtimeSeconds": 61,
       "synopsis": null,
       "client": null,
       "collaborators": [],
@@ -159,10 +209,17 @@
       "year": 2026,
       "type": "narrative-short",
       "logline": "TODO: one sentence. What happens, concretely. No adjectives.",
-      "roles": ["Director"],
-      "video": { "platform": "youtube", "id": "tRPycHnRt9k", "hash": null, "startAt": null },
+      "roles": [
+        "Director"
+      ],
+      "video": {
+        "platform": "youtube",
+        "id": "tRPycHnRt9k",
+        "hash": null,
+        "startAt": null
+      },
       "poster": null,
-      "runtimeSeconds": null,
+      "runtimeSeconds": 65,
       "synopsis": null,
       "client": null,
       "collaborators": [],
@@ -179,10 +236,17 @@
       "year": 2026,
       "type": "narrative-short",
       "logline": "TODO: one sentence. What happens, concretely. No adjectives.",
-      "roles": ["Director"],
-      "video": { "platform": "youtube", "id": "b2TWgdEnqtY", "hash": null, "startAt": null },
+      "roles": [
+        "Director"
+      ],
+      "video": {
+        "platform": "youtube",
+        "id": "b2TWgdEnqtY",
+        "hash": null,
+        "startAt": null
+      },
       "poster": null,
-      "runtimeSeconds": null,
+      "runtimeSeconds": 112,
       "synopsis": null,
       "client": null,
       "collaborators": [],
