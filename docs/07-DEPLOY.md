@@ -51,6 +51,45 @@ any hardcoded root path that a normal build would not catch.
 
 ---
 
+## Vercel
+
+Vercel serves from a domain **root**, not a subpath, so the HTML committed for GitHub Pages (which
+hardcodes `/aifilmmaking-portfolio/`) would 404 on every asset. `vercel.json` solves this by having
+Vercel run the generator itself at deploy time:
+
+```
+BASE_PATH=/ SITE_ORIGIN="https://${VERCEL_PROJECT_PRODUCTION_URL:-$VERCEL_URL}" node build.mjs
+```
+
+`VERCEL_PROJECT_PRODUCTION_URL` is injected by Vercel, so canonical tags, Open Graph URLs, the
+sitemap and JSON-LD all point at the real production domain with nothing to configure.
+
+### Deploying
+
+1. Sign in at **vercel.com** with whichever account you want to own the project.
+2. **Add New → Project**.
+   - If that account is connected to GitHub, pick `aifilmmaking-portfolio` from the list.
+   - If not, use **Import Third-Party Git Repository** and paste the repo's HTTPS URL. This works
+     for a public repo without connecting a GitHub account at all — useful when the Vercel account
+     and the GitHub account are deliberately separate.
+3. Leave every build setting alone. `vercel.json` already sets the build command, the output
+   directory and an install step that does nothing, because there is nothing to install.
+4. **Deploy.**
+
+Live at `https://<project>.vercel.app/` in under a minute. Every push to `main` redeploys.
+
+### Two hosts at once
+
+Running Pages and Vercel together is fine, but pick one as primary. Each build stamps its own
+`SITE_ORIGIN` into the canonical tags, so the two copies declare different canonicals and search
+engines see duplicate content. Whichever you are not using, either take it down or point a custom
+domain at the one you keep.
+
+One thing Vercel does better: `robots.txt` and `llms.txt` are only honoured at an origin **root**.
+On Pages at a subpath they are advisory; on Vercel they are authoritative immediately.
+
+---
+
 ## Custom domain
 
 1. At your registrar, add a `CNAME` record for `www` → `argaurshar.github.io`.
