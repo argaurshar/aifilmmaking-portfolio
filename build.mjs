@@ -325,7 +325,6 @@ function validate(site, filmsDoc, processDoc, rep) {
     for (const [j, id] of (f.laurels ?? []).entries()) {
       if (!laurelIds.has(id)) rep.error(`${p}.laurels[${j}]`, `unknown laurel id "${id}" — add it to site.laurels`);
     }
-    if (f.poster === null) rep.warn(`${p}.poster`, `no poster — cut one with scripts/make-posters.sh`);
     if ((f.status ?? 'published') === 'published' && f.published == null) {
       rep.warn(`${p}.published`, `"${f.id}" will not be eligible for video rich results without a publish date`);
     }
@@ -450,6 +449,21 @@ async function imageSize(rel) {
 }
 
 const MAX_ASSET_BYTES = 300 * 1024;
+
+/**
+ * Convention over configuration: if a film has no `poster` in JSON, look for
+ * assets/stills/<id>-1920.jpg (or .jpeg/.png, or the bare <id>.<ext>).
+ * Drop a correctly-named file in and the build picks it up with no JSON edit.
+ */
+async function autoPoster(id, dir) {
+  for (const ext of ['jpg', 'jpeg', 'png']) {
+    for (const name of [`${id}-1920.${ext}`, `${id}.${ext}`]) {
+      const rel = `${dir}/${name}`;
+      if (await assetExists(rel)) return { src: rel, alt: '' };
+    }
+  }
+  return null;
+}
 
 /**
  * Resolve a poster into { src, srcset, width, height, alt } by probing which
@@ -1295,8 +1309,16 @@ async function buildOnce({ base, includeDrafts, strict, quiet }) {
   const ctx = { site, films, clips, u, ORIGIN: u.ORIGIN, rep, assets: {} };
 
   // Assets
-  for (const f of films) f.resolvedPoster = await resolvePoster(f.poster, ctx, `films[${f.id}].poster`);
-  for (const c of clips) c.resolvedPoster = await resolvePoster(c.poster, ctx, `process.clips[${c.id}].poster`);
+  for (const f of films) {
+    const poster = f.poster ?? await autoPoster(f.id, 'assets/stills');
+    if (!poster) rep.warn(`films[${f.id}].poster`, `no poster — add assets/stills/${f.id}-1920.jpg`);
+    f.resolvedPoster = await resolvePoster(poster, ctx, `films[${f.id}].poster`);
+  }
+  for (const c of clips) {
+    const poster = c.poster ?? await autoPoster(c.id, 'assets/process');
+    if (!poster) rep.warn(`process.clips[${c.id}].poster`, `no poster — add assets/process/${c.id}-1920.jpg`);
+    c.resolvedPoster = await resolvePoster(poster, ctx, `process.clips[${c.id}].poster`);
+  }
   if (site.identity.portrait) {
     if (!(await assetExists(site.identity.portrait.src))) {
       rep.error('site.identity.portrait.src', `asset not found (case-exact): ${site.identity.portrait.src}`);
