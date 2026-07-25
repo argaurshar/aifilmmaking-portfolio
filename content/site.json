@@ -1,0 +1,152 @@
+{
+  "site": {
+    "origin": "https://argaurshar.github.io",
+    "title": "Gaurav Sharma — Filmmaker",
+    "description": "Narrative shorts, brand films and animation by Gaurav Sharma.",
+    "locale": "en",
+    "updated": "2026-07-25",
+    "ogImage": "assets/og/default.jpg"
+  },
+
+  "identity": {
+    "name": "Gaurav Sharma",
+    "role": "Filmmaker",
+    "tagline": "I make short films. Some of them are for [[brands]].",
+    "location": null,
+    "shortBio": [
+      "TODO: two sentences on what you make and why. Written in first person. See docs/04-VOICE.md."
+    ],
+    "longBio": [
+      "TODO: your bio, three or four paragraphs. Where you started, what you are drawn to, what you are working on now.",
+      "TODO: keep it factual. No awards you have not won, no clients you have not worked with."
+    ],
+    "portrait": null
+  },
+
+  "contact": {
+    "email": "ar.gaurshar@gmail.com",
+    "responseTime": null,
+    "availability": null
+  },
+
+  "social": [],
+
+  "nav": [
+    { "label": "Work", "path": "work.html" },
+    { "label": "Process", "path": "process.html" },
+    { "label": "Hire", "path": "hire.html" },
+    { "label": "About", "path": "about.html" }
+  ],
+
+  "pages": {
+    "index": {
+      "heroKicker": "Narrative · Brand · Animation",
+      "heroHeadline": "Films made frame by frame, on a small budget and a short clock.",
+      "heroSub": [],
+      "metaDescription": "Narrative shorts, brand films and animation by Gaurav Sharma."
+    },
+    "work": {
+      "heading": "Work",
+      "intro": [
+        "Everything below is finished and watchable. Shorts first, then commissioned work."
+      ],
+      "metaDescription": "Films by Gaurav Sharma — narrative shorts, brand films and animation.",
+      "emptyState": "No films are published yet. They will appear here as they go up."
+    },
+    "process": {
+      "heading": "Process",
+      "intro": [
+        "Four short breakdowns of how a scene actually gets built — the problem, the approach, and what it cost."
+      ],
+      "metaDescription": "How the work gets made — four craft breakdowns by Gaurav Sharma."
+    },
+    "hire": {
+      "heading": "Hire me",
+      "intro": [
+        "I take on a small number of commissions at a time. Tell me what you need and roughly when."
+      ],
+      "metaDescription": "Commission a narrative short, brand film or animated piece from Gaurav Sharma."
+    },
+    "about": {
+      "heading": "About",
+      "metaDescription": "Gaurav Sharma is a filmmaker working in narrative shorts, brand films and animation."
+    },
+    "notFound": {
+      "heading": "Nothing here",
+      "body": [
+        "That page does not exist, or it moved."
+      ]
+    }
+  },
+
+  "services": [
+    {
+      "id": "narrative",
+      "title": "Narrative short",
+      "summary": "A story with a beginning and an end, usually one to five minutes.",
+      "deliverables": [
+        "TODO: what the client actually receives"
+      ],
+      "timeline": null,
+      "startingAt": null,
+      "order": 10
+    },
+    {
+      "id": "brand-film",
+      "title": "Brand film",
+      "summary": "A film for a product or a company that is watchable on its own.",
+      "deliverables": [
+        "TODO: what the client actually receives"
+      ],
+      "timeline": null,
+      "startingAt": null,
+      "order": 20
+    },
+    {
+      "id": "animation",
+      "title": "Animation",
+      "summary": "Moving image work that is not shot — sequences, titles, transitions, whole pieces.",
+      "deliverables": [
+        "TODO: what the client actually receives"
+      ],
+      "timeline": null,
+      "startingAt": null,
+      "order": 30
+    }
+  ],
+
+  "processSteps": [
+    {
+      "n": 1,
+      "title": "Work out what the film is",
+      "body": [
+        "TODO: rewrite in your own words. What happens before anything gets made — the idea, the reference, the one line the film has to land."
+      ]
+    },
+    {
+      "n": 2,
+      "title": "Find the look",
+      "body": [
+        "TODO: rewrite in your own words. How the visual language gets fixed before production starts."
+      ]
+    },
+    {
+      "n": 3,
+      "title": "Build the sequence",
+      "body": [
+        "TODO: rewrite in your own words. Shot by shot, and how continuity is held across them."
+      ]
+    },
+    {
+      "n": 4,
+      "title": "Cut, grade, finish",
+      "body": [
+        "TODO: rewrite in your own words. The edit, the sound, the grade, and what delivery looks like."
+      ]
+    }
+  ],
+
+  "laurels": [],
+
+  "credits": []
+}

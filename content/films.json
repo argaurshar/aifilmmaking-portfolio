@@ -1,0 +1,79 @@
+{
+  "_comment": [
+    "Every entry below is a TEMPLATE with \"status\": \"draft\". Drafts are EXCLUDED from the build,",
+    "so nothing here is ever generated or deployed. Preview them locally with:",
+    "    node build.mjs --drafts",
+    "",
+    "To publish a film: replace the placeholder values with real ones, put the video on YouTube or",
+    "Vimeo, put the BARE ID in video.id (never a URL), cut a poster with scripts/make-posters.sh,",
+    "then set \"status\": \"published\". Add \"featured\": true to put it on the home page.",
+    "",
+    "Field reference: docs/03-CONTENT-MODEL.md.  Upload steps: docs/06-MEDIA-PIPELINE.md."
+  ],
+
+  "films": [
+    {
+      "id": "film-one",
+      "title": "TODO: film title",
+      "year": 2026,
+      "type": "narrative-short",
+      "logline": "TODO: one sentence. What happens, concretely. No adjectives.",
+      "roles": ["Director"],
+      "video": { "platform": "youtube", "id": "AAAAAAAAAAA", "hash": null, "startAt": null },
+      "poster": null,
+
+      "runtimeSeconds": null,
+      "synopsis": null,
+      "client": null,
+      "collaborators": [],
+      "laurels": [],
+      "aspectRatio": "16:9",
+      "featured": true,
+      "order": 10,
+      "status": "draft",
+      "published": null
+    },
+    {
+      "id": "film-two",
+      "title": "TODO: film title",
+      "year": 2026,
+      "type": "brand-film",
+      "logline": "TODO: one sentence. What happens, concretely. No adjectives.",
+      "roles": ["Director", "Editor"],
+      "video": { "platform": "vimeo", "id": "000000000", "hash": null, "startAt": null },
+      "poster": null,
+
+      "runtimeSeconds": null,
+      "synopsis": null,
+      "client": "TODO: client name",
+      "collaborators": [],
+      "laurels": [],
+      "aspectRatio": "16:9",
+      "featured": false,
+      "order": 20,
+      "status": "draft",
+      "published": null
+    },
+    {
+      "id": "film-three",
+      "title": "TODO: film title",
+      "year": 2026,
+      "type": "animation",
+      "logline": "TODO: one sentence. What happens, concretely. No adjectives.",
+      "roles": ["Director", "Animator"],
+      "video": { "platform": "youtube", "id": "BBBBBBBBBBB", "hash": null, "startAt": null },
+      "poster": null,
+
+      "runtimeSeconds": null,
+      "synopsis": null,
+      "client": null,
+      "collaborators": [],
+      "laurels": [],
+      "aspectRatio": "16:9",
+      "featured": false,
+      "order": 30,
+      "status": "draft",
+      "published": null
+    }
+  ]
+}
