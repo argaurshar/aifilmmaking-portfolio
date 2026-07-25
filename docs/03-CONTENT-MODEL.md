@@ -100,7 +100,7 @@ the inline micro-markup: `[[emphasis]]` → accent `<em>`, `**strong**` → `<st
 ```
 
 **`type` enum:** `narrative-short`, `brand-film`, `animation`, `music-video`, `documentary`,
-`experimental`.
+`experimental`, `trailer`.
 
 ### Why `{ platform, id }` and not a URL
 

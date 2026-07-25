@@ -182,7 +182,7 @@ async function loadJson(rel) {
    4. Validation — collect every error, then throw once.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const FILM_TYPES = ['narrative-short', 'brand-film', 'animation', 'music-video', 'documentary', 'experimental'];
+const FILM_TYPES = ['narrative-short', 'brand-film', 'animation', 'music-video', 'documentary', 'experimental', 'trailer'];
 const CRAFTS = ['blocking', 'lighting', 'continuity', 'edit-rhythm', 'sound', 'grade'];
 const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
@@ -366,6 +366,7 @@ const BANNED = [
   'harness', 'leverage', 'passionate about', 'push the boundaries', 'bring your vision to life',
   'next level', 'game-changing', 'state-of-the-art', 'powered by', 'ai-powered', 'made with ai',
   'ai-driven', 'ai filmmaker', 'generative ai', 'best-in-class', 'world-class',
+  'ai-generated', 'ai-animated', 'ai animated', 'ai documentary', 'ai short', 'ai film',
 ];
 const TOOL_NAMES = ['midjourney', 'runway', 'sora', 'pika', 'kling', 'stable diffusion', 'veo', 'luma', 'dall-e'];
 
@@ -498,6 +499,7 @@ const TYPE_LABEL = {
   'music-video': 'Music video',
   'documentary': 'Documentary',
   'experimental': 'Experimental',
+  'trailer': 'Trailer',
 };
 
 function formatRuntime(seconds) {
@@ -558,7 +560,7 @@ function embedOrigin(platform) {
  * The lite-embed facade. The control stays a real <a href> to the watch page,
  * so it genuinely works with JS off; JS upgrades it in place. Never role=button.
  */
-function embed({ video, poster, title, ratio, runtimeSeconds, eager = false, caption = null }) {
+function embed({ video, poster, title, ratio, runtimeSeconds, eager = false, caption = null, noteGaps = false }) {
   const ratioCss = (ratio ?? '16:9').replace(':', ' / ');
   const spoken = spokenRuntime(runtimeSeconds);
   return html`<figure class="embed" data-embed
@@ -582,7 +584,7 @@ function embed({ video, poster, title, ratio, runtimeSeconds, eager = false, cap
         <span class="u-visually-hidden">${spoken ? `, ${spoken}` : ''}<span class="embed__nojs"> (opens on ${video.platform === 'youtube' ? 'YouTube' : 'Vimeo'})</span></span>
       </a>
     </div>
-    ${!poster ? placeholder(html`poster — cut one with <b>scripts/make-posters.sh</b>`) : ''}
+    ${!poster && noteGaps ? placeholder(html`poster — cut one with <b>scripts/make-posters.sh</b>`) : ''}
     ${caption ? html`<figcaption class="embed__caption">${inline(caption)}</figcaption>` : ''}
   </figure>`;
 }
@@ -631,6 +633,7 @@ function filmEntry(film, ctx, { eager = false, headingLevel = 'h2' } = {}) {
     ${embed({
       video: film.video, poster: film.resolvedPoster, title: film.title,
       ratio: film.aspectRatio, runtimeSeconds: film.runtimeSeconds, eager,
+      noteGaps: film.status === 'draft',
     })}
     <div class="film-entry__body l-stack">
       <${new Html(H)} class="film-entry__title">${film.title}</${new Html(H)}>
@@ -867,7 +870,7 @@ function pageIndex(ctx) {
 ${hero
       ? html`<section class="hero-reel u-bleed" aria-label="Featured film">
     <div class="l-container">
-      ${embed({ video: hero.video, poster: hero.resolvedPoster, title: hero.title, ratio: hero.aspectRatio, runtimeSeconds: hero.runtimeSeconds, eager: true })}
+      ${embed({ video: hero.video, poster: hero.resolvedPoster, title: hero.title, ratio: hero.aspectRatio, runtimeSeconds: hero.runtimeSeconds, eager: true, noteGaps: hero.status === 'draft' })}
       <p class="hero-reel__caption">
         <strong>${hero.title}</strong> — ${inline(hero.logline)}
       </p>
@@ -1003,7 +1006,7 @@ ${clips.length
   ${clips.map((c) => {
         const film = c.filmId ? films.find((f) => f.id === c.filmId) : null;
         return html`<article class="process-clip l-stack" id="${c.id}">
-      ${embed({ video: c.video, poster: c.resolvedPoster, title: c.title, ratio: c.aspectRatio, runtimeSeconds: c.durationSeconds })}
+      ${embed({ video: c.video, poster: c.resolvedPoster, title: c.title, ratio: c.aspectRatio, runtimeSeconds: c.durationSeconds, noteGaps: c.status === 'draft' })}
       <div class="process-clip__body l-stack">
         <h3 class="process-clip__title">${c.title}</h3>
         ${prose(c.summary)}

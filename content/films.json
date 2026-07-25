@@ -1,27 +1,27 @@
 {
   "_comment": [
-    "All nine YouTube IDs are REAL and confirmed.",
+    "Titles and loglines are Gaurav’s own words, taken from the YouTube titles and",
+    "descriptions he wrote, with the AI framing removed for the site per docs/04-VOICE.md",
+    "rule 6. The YouTube copy keeps its AI keywords for discovery; the site does not.",
     "",
-    "runtimeSeconds were read off the YouTube Studio list in Studio row order and are",
-    "UNCONFIRMED except film-03 (D0uKP6KAnOM = 0:11), which is verified. Confirm the rest",
-    "before publishing.",
+    "ID mapping is CONFIRMED: runtimes on the YouTube Studio list match this order exactly.",
     "",
-    "Each entry is \"status\": \"draft\", so the build EXCLUDES it — nothing unfinished ships.",
-    "Preview the layout locally with:  node build.mjs --drafts",
+    "Still missing: posters (poster: null on every film) and synopsis. Cut posters with",
+    "scripts/make-posters.sh, or paste the full YouTube descriptions for synopsis text.",
     "",
-    "To publish one film: fill in title, type and logline, then set \"status\": \"published\".",
-    "type must be one of: narrative-short | brand-film | animation | music-video |",
-    "documentary | experimental.  Field reference: docs/03-CONTENT-MODEL.md"
+    "Field reference: docs/03-CONTENT-MODEL.md"
   ],
   "films": [
     {
-      "id": "film-01",
-      "title": "TODO: title for youtu.be/BJRrA7PYngY",
+      "id": "the-architect-who-built-for-the-soul",
+      "title": "The Architect Who Built for the Soul",
       "year": 2026,
-      "type": "narrative-short",
-      "logline": "TODO: one sentence. What happens, concretely. No adjectives.",
+      "type": "documentary",
+      "logline": "A tribute to a master of humane Indian modernism — the architect who believed a house is not shelter but a precious thing.",
       "roles": [
-        "Director"
+        "Director",
+        "Writer",
+        "Editor"
       ],
       "video": {
         "platform": "youtube",
@@ -38,17 +38,19 @@
       "aspectRatio": "16:9",
       "featured": true,
       "order": 10,
-      "status": "draft",
-      "published": null
+      "status": "published",
+      "published": "2026-07-25"
     },
     {
-      "id": "film-02",
-      "title": "TODO: title for youtu.be/XWB5ANfiVwM",
+      "id": "the-beaver-who-had-no-crown",
+      "title": "The Beaver Who Had No Crown",
       "year": 2026,
-      "type": "narrative-short",
-      "logline": "TODO: one sentence. What happens, concretely. No adjectives.",
+      "type": "animation",
+      "logline": "Pip is the only beaver in the colony without a crown, and too afraid to jump off the great dam to earn one.",
       "roles": [
-        "Director"
+        "Director",
+        "Writer",
+        "Animator"
       ],
       "video": {
         "platform": "youtube",
@@ -65,17 +67,19 @@
       "aspectRatio": "16:9",
       "featured": false,
       "order": 20,
-      "status": "draft",
-      "published": null
+      "status": "published",
+      "published": "2026-07-25"
     },
     {
-      "id": "film-03",
-      "title": "TODO: title for youtu.be/D0uKP6KAnOM",
+      "id": "trapped-alone-in-space",
+      "title": "Trapped Alone in Space",
       "year": 2026,
-      "type": "narrative-short",
-      "logline": "TODO: one sentence. What happens, concretely. No adjectives.",
+      "type": "trailer",
+      "logline": "A scientist, a dying ship, no way home. When contact with Earth goes silent, he has to decide what is worth surviving for.",
       "roles": [
-        "Director"
+        "Director",
+        "Writer",
+        "Animator"
       ],
       "video": {
         "platform": "youtube",
@@ -92,17 +96,19 @@
       "aspectRatio": "16:9",
       "featured": false,
       "order": 30,
-      "status": "draft",
-      "published": null
+      "status": "published",
+      "published": "2026-07-25"
     },
     {
-      "id": "film-04",
-      "title": "TODO: title for youtu.be/fVl2v0zZtC8",
+      "id": "a-boy-drew-his-dream-on-a-ball",
+      "title": "A Boy Drew His Dream on a Ball",
       "year": 2026,
-      "type": "narrative-short",
-      "logline": "TODO: one sentence. What happens, concretely. No adjectives.",
+      "type": "animation",
+      "logline": "A boy in a small Indian backyard chalks the number 7 onto a rag ball and plays a World Cup final that only exists in his head.",
       "roles": [
-        "Director"
+        "Director",
+        "Writer",
+        "Animator"
       ],
       "video": {
         "platform": "youtube",
@@ -119,17 +125,19 @@
       "aspectRatio": "16:9",
       "featured": false,
       "order": 40,
-      "status": "draft",
-      "published": null
+      "status": "published",
+      "published": "2026-07-25"
     },
     {
-      "id": "film-05",
-      "title": "TODO: title for youtu.be/PfIIjjRaVS0",
+      "id": "the-strike",
+      "title": "The Strike",
       "year": 2026,
-      "type": "narrative-short",
-      "logline": "TODO: one sentence. What happens, concretely. No adjectives.",
+      "type": "animation",
+      "logline": "Under a full moon, the Nighthawk unit crosses an unnamed frontier for a surgical-strike mission deep in enemy territory.",
       "roles": [
-        "Director"
+        "Director",
+        "Writer",
+        "Animator"
       ],
       "video": {
         "platform": "youtube",
@@ -146,17 +154,19 @@
       "aspectRatio": "16:9",
       "featured": false,
       "order": 50,
-      "status": "draft",
-      "published": null
+      "status": "published",
+      "published": "2026-07-25"
     },
     {
-      "id": "film-06",
-      "title": "TODO: title for youtu.be/PiR-v9rSx60",
+      "id": "the-rakhi-that-never-breaks",
+      "title": "The Rakhi That Never Breaks",
       "year": 2026,
-      "type": "narrative-short",
-      "logline": "TODO: one sentence. What happens, concretely. No adjectives.",
+      "type": "animation",
+      "logline": "Every year the thread fades. This Raksha Bandhan, one sister decides to give her brother something that will not.",
       "roles": [
-        "Director"
+        "Director",
+        "Writer",
+        "Animator"
       ],
       "video": {
         "platform": "youtube",
@@ -173,17 +183,19 @@
       "aspectRatio": "16:9",
       "featured": false,
       "order": 60,
-      "status": "draft",
-      "published": null
+      "status": "published",
+      "published": "2026-07-25"
     },
     {
-      "id": "film-07",
-      "title": "TODO: title for youtu.be/apCOQYEtCw0",
+      "id": "he-tried-to-escape-his-fear",
+      "title": "He Tried to Escape His Fear",
       "year": 2026,
-      "type": "narrative-short",
-      "logline": "TODO: one sentence. What happens, concretely. No adjectives.",
+      "type": "animation",
+      "logline": "One man tries to outrun the thing he has been avoiding his whole life, and finds out what happens when hiding stops working.",
       "roles": [
-        "Director"
+        "Director",
+        "Writer",
+        "Animator"
       ],
       "video": {
         "platform": "youtube",
@@ -200,17 +212,19 @@
       "aspectRatio": "16:9",
       "featured": false,
       "order": 70,
-      "status": "draft",
-      "published": null
+      "status": "published",
+      "published": "2026-07-25"
     },
     {
-      "id": "film-08",
-      "title": "TODO: title for youtu.be/tRPycHnRt9k",
+      "id": "sonam-wangchuk",
+      "title": "Sonam Wangchuk: The Boy the System Failed",
       "year": 2026,
-      "type": "narrative-short",
-      "logline": "TODO: one sentence. What happens, concretely. No adjectives.",
+      "type": "documentary",
+      "logline": "He could not understand the language at school. His teachers called him slow. They were wrong.",
       "roles": [
-        "Director"
+        "Director",
+        "Writer",
+        "Editor"
       ],
       "video": {
         "platform": "youtube",
@@ -227,17 +241,19 @@
       "aspectRatio": "16:9",
       "featured": false,
       "order": 80,
-      "status": "draft",
-      "published": null
+      "status": "published",
+      "published": "2026-07-25"
     },
     {
-      "id": "film-09",
-      "title": "TODO: title for youtu.be/b2TWgdEnqtY",
+      "id": "the-lunchbox-that-kept-coming-back",
+      "title": "The Lunchbox That Kept Coming Back",
       "year": 2026,
-      "type": "narrative-short",
-      "logline": "TODO: one sentence. What happens, concretely. No adjectives.",
+      "type": "animation",
+      "logline": "Ramesh has delivered the same red tiffin to the same desk every day for years. Then one day it comes back untouched.",
       "roles": [
-        "Director"
+        "Director",
+        "Writer",
+        "Animator"
       ],
       "video": {
         "platform": "youtube",
@@ -254,8 +270,8 @@
       "aspectRatio": "16:9",
       "featured": false,
       "order": 90,
-      "status": "draft",
-      "published": null
+      "status": "published",
+      "published": "2026-07-25"
     }
   ]
 }
