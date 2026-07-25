@@ -22,7 +22,11 @@
       "I work with generative tools. They let one person build a scene that would otherwise need a crew, a location and a budget. That is all they are to me — how the work gets made. What I care about is whether a shot holds and whether a cut lands.",
       "TODO: one paragraph only you can write — where you are based, and what you were doing before the films."
     ],
-    "portrait": null
+    "portrait": {
+      "src": "assets/portrait.jpg",
+      "alt": "A digital billboard in Times Square, New York, showing Nitish Jain",
+      "caption": "TODO: one line saying what this is and when."
+    }
   },
   "contact": {
     "email": "nitish@xelionlabs.com",

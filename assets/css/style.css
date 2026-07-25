@@ -552,3 +552,17 @@ main > :last-child { margin-block-end: var(--space-section); }
   a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 9pt; word-break: break-all; }
   .film-entry, .process-clip { break-inside: avoid; }
 }
+
+/* Wide About image — a landscape frame reads as a banner, not a headshot column.
+   No `margin: 0` here: it would outrank both l-container's margin-inline:auto
+   and the `main > * + *` section spacing, un-centering the figure. */
+.about-figure img {
+  width: 100%; height: auto;
+  border-radius: var(--radius-md);
+  background: var(--c-bg-elev-2);
+}
+.about-figure figcaption {
+  margin-block-start: var(--space-xs);
+  font-size: var(--step--1); color: var(--c-text-dim);
+  max-width: var(--measure);
+}

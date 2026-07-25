@@ -1109,11 +1109,21 @@ function pageAbout(ctx) {
   <h1 class="page-head__title">${inline(p.heading)}</h1>
 </header>
 
+${site.identity.portrait && site.identity.portraitWide
+      ? html`<figure class="about-figure l-container">
+    <img src="${ctx.u.url(site.identity.portrait.src)}" alt="${site.identity.portrait.alt}"
+      width="${site.identity.portraitSize.width}" height="${site.identity.portraitSize.height}"
+      loading="lazy" decoding="async">
+    ${site.identity.portrait.caption
+        ? html`<figcaption>${inline(site.identity.portrait.caption)}</figcaption>` : ''}
+  </figure>`
+      : ''}
+
 <section class="section l-container about">
-  ${site.identity.portrait
+  ${site.identity.portrait && !site.identity.portraitWide
       ? html`<img class="about__portrait" src="${ctx.u.url(site.identity.portrait.src)}"
-          alt="${site.identity.portrait.alt}" width="${site.identity.portraitSize?.width ?? 800}"
-          height="${site.identity.portraitSize?.height ?? 800}" loading="lazy" decoding="async">`
+          alt="${site.identity.portrait.alt}" width="${site.identity.portraitSize.width}"
+          height="${site.identity.portraitSize.height}" loading="lazy" decoding="async">`
       : ''}
   <div class="about__body l-stack">
     ${prose(site.identity.longBio)}
@@ -1319,11 +1329,21 @@ async function buildOnce({ base, includeDrafts, strict, quiet }) {
     if (!poster) rep.warn(`process.clips[${c.id}].poster`, `no poster — add assets/process/${c.id}-1920.jpg`);
     c.resolvedPoster = await resolvePoster(poster, ctx, `process.clips[${c.id}].poster`);
   }
+  // Portrait follows the same convention as posters: assets/portrait.<ext> if
+  // nothing is set in JSON. A missing portrait warns; it never fails the build.
+  if (!site.identity.portrait) {
+    const found = await autoPoster('portrait', 'assets');
+    if (found) site.identity.portrait = { src: found.src, alt: '', caption: null };
+  }
   if (site.identity.portrait) {
     if (!(await assetExists(site.identity.portrait.src))) {
-      rep.error('site.identity.portrait.src', `asset not found (case-exact): ${site.identity.portrait.src}`);
+      rep.warn('site.identity.portrait.src', `not found, skipping: ${site.identity.portrait.src}`);
+      site.identity.portrait = null;
     } else {
       site.identity.portraitSize = await imageSize(site.identity.portrait.src);
+      // A landscape image in an 18rem column looks broken. Let the shape pick the layout.
+      site.identity.portraitWide =
+        site.identity.portraitSize.width / site.identity.portraitSize.height > 1.2;
     }
   }
   if (!(await assetExists('assets/css/style.css'))) rep.error('assets', 'assets/css/style.css is missing');

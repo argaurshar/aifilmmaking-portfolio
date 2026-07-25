@@ -44,3 +44,19 @@ the-strike-1920.jpg
 On github.com: open `assets/stills/`, click **Add file → Upload files**, drag the images in, then
 **Commit changes**. Rename them to match the table above first — the filename is what links each
 image to its film.
+
+---
+
+## The About image
+
+Not a still — it lives one level up:
+
+```
+assets/portrait.jpg
+```
+
+`.jpeg` and `.png` work too. The build reads its dimensions and picks the layout: anything wider
+than 1.2:1 renders as a full-width banner above the bio, anything squarer renders as a side column.
+Set `identity.portrait.alt` and `identity.portrait.caption` in `content/site.json`.
+
+A missing portrait warns and is skipped — it never fails the build.
