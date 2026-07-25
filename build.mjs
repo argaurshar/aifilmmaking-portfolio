@@ -1332,7 +1332,9 @@ async function buildOnce({ base, includeDrafts, strict, quiet }) {
   // Portrait follows the same convention as posters: assets/portrait.<ext> if
   // nothing is set in JSON. A missing portrait warns; it never fails the build.
   if (!site.identity.portrait) {
-    const found = await autoPoster('portrait', 'assets');
+    // assets/stills/ first, so every image in the site has one place to live.
+    const found = (await autoPoster('portrait', 'assets/stills'))
+      ?? (await autoPoster('portrait', 'assets'));
     if (found) site.identity.portrait = { src: found.src, alt: '', caption: null };
   }
   if (site.identity.portrait) {

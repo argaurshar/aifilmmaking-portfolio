@@ -19,14 +19,14 @@ the inline micro-markup: `[[emphasis]]` → accent `<em>`, `**strong**` → `<st
 {
   "site": {
     "origin": "https://argaurshar.github.io",  // no trailing slash; SITE_ORIGIN env overrides
-    "title": "Gaurav Sharma — Filmmaker",
+    "title": "Nitish Jain — Filmmaker",
     "description": "…",                        // ≤ 160 chars, validated
     "locale": "en",
     "updated": "2026-07-25",                   // ISO date; drives sitemap lastmod
     "ogImage": "assets/og/default.jpg"         // BASE-relative, NO leading slash
   },
   "identity": {
-    "name": "Gaurav Sharma",
+    "name": "Nitish Jain",
     "role": "Filmmaker",                       // NOT "AI filmmaker" — see 04-VOICE
     "tagline": "…",                            // supports [[emphasis]]
     "location": null,

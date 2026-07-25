@@ -29,7 +29,7 @@ File tree, generator design, and every page section by section.
 │   ├── laurels/              festival laurel SVGs
 │   └── og/default.jpg        social share image, ≥ 1200×630
 ├── scripts/
-│   ├── fetch-media.sh        yt-dlp — Gaurav's own uploads only
+│   ├── fetch-media.sh        yt-dlp — Nitish's own uploads only
 │   └── make-posters.sh       ffmpeg — cut stills from local masters
 ├── test/build.test.mjs       node --test, asserts over generated HTML
 ├── docs/                     these specs

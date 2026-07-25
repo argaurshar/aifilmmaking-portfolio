@@ -1,4 +1,4 @@
-# Gaurav Sharma — Filmmaker
+# Nitish Jain — Filmmaker
 
 Portfolio site. Narrative shorts, brand films and animation.
 

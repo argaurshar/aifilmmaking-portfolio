@@ -20,4 +20,4 @@ Then verify in a browser (Chromium is at `/opt/pw-browsers`; never run `playwrig
 - Every JSON-LD block parses
 - No page references a missing asset
 
-Report the content-gap list from the build so Gaurav can see what is still unfilled.
+Report the content-gap list from the build so Nitish can see what is still unfilled.

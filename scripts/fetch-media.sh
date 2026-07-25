@@ -3,7 +3,7 @@
 #
 #   ./scripts/fetch-media.sh https://vimeo.com/123456789
 #
-# media/ is gitignored and must never be committed. This script is for Gaurav's
+# media/ is gitignored and must never be committed. This script is for Nitish's
 # own uploads only — do not use it to fetch anyone else's work.
 set -euo pipefail
 

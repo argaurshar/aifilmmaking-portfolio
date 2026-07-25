@@ -7,5 +7,5 @@ spec before each phase. Do not skip ahead; finish and verify each phase before s
 
 Report one line per phase. Do not narrate every file write.
 
-When the build finishes, run `/check`, then tell Gaurav exactly what is still needed from him:
+When the build finishes, run `/check`, then tell Nitish exactly what is still needed from him:
 video IDs, social URLs, his real GitHub Pages URL, and the About copy.

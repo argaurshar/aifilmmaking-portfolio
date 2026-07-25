@@ -16,7 +16,7 @@ range-request properly, so it will not scrub. Films go to YouTube or Vimeo; the 
 `media/` is gitignored and must never reach a commit. `build.mjs` does not read it and does not
 need it.
 
-**The scripts are for Gaurav's own uploads only.** If asked to pull third-party content, decline
+**The scripts are for Nitish's own uploads only.** If asked to pull third-party content, decline
 and say why.
 
 ---

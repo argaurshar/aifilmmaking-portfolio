@@ -1,14 +1,14 @@
 {
   "site": {
     "origin": "https://argaurshar.github.io",
-    "title": "Gaurav Sharma — Filmmaker",
-    "description": "Narrative shorts, brand films and animation by Gaurav Sharma.",
+    "title": "Nitish Jain — Filmmaker",
+    "description": "Narrative shorts, brand films and animation by Nitish Jain.",
     "locale": "en",
     "updated": "2026-07-25",
     "ogImage": "assets/og/default.jpg"
   },
   "identity": {
-    "name": "Gaurav Sharma",
+    "name": "Nitish Jain",
     "role": "Filmmaker",
     "tagline": "I make short films. Some of them are for [[brands]].",
     "location": null,
@@ -23,7 +23,7 @@
       "TODO: one paragraph only you can write — where you are based, and what you were doing before the films."
     ],
     "portrait": {
-      "src": "assets/portrait.jpg",
+      "src": "assets/stills/portrait.jpg",
       "alt": "A digital billboard in Times Square, New York, showing Nitish Jain",
       "caption": "TODO: one line saying what this is and when."
     }
@@ -57,14 +57,14 @@
       "heroKicker": "Narrative · Brand · Animation",
       "heroHeadline": "Films made frame by frame, on a small budget and a short clock.",
       "heroSub": [],
-      "metaDescription": "Narrative shorts, brand films and animation by Gaurav Sharma."
+      "metaDescription": "Narrative shorts, brand films and animation by Nitish Jain."
     },
     "work": {
       "heading": "Work",
       "intro": [
         "Everything below is finished and watchable. Shorts first, then commissioned work."
       ],
-      "metaDescription": "Films by Gaurav Sharma — narrative shorts, brand films and animation.",
+      "metaDescription": "Films by Nitish Jain — narrative shorts, brand films and animation.",
       "emptyState": "No films are published yet. They will appear here as they go up."
     },
     "process": {
@@ -72,18 +72,18 @@
       "intro": [
         "Four short breakdowns of how a scene actually gets built — the problem, the approach, and what it cost."
       ],
-      "metaDescription": "How the work gets made — four craft breakdowns by Gaurav Sharma."
+      "metaDescription": "How the work gets made — four craft breakdowns by Nitish Jain."
     },
     "hire": {
       "heading": "Hire me",
       "intro": [
         "I take on a small number of commissions at a time. Tell me what you need and roughly when."
       ],
-      "metaDescription": "Commission a narrative short, brand film or animated piece from Gaurav Sharma."
+      "metaDescription": "Commission a narrative short, brand film or animated piece from Nitish Jain."
     },
     "about": {
       "heading": "About",
-      "metaDescription": "Gaurav Sharma is a filmmaker working in narrative shorts, brand films and animation."
+      "metaDescription": "Nitish Jain is a filmmaker working in narrative shorts, brand films and animation."
     },
     "notFound": {
       "heading": "Nothing here",

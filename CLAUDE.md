@@ -6,7 +6,7 @@ Project memory and build instructions for Claude Code.
 
 ## The project
 
-Personal portfolio site for **Gaurav Sharma**, AI filmmaker. Narrative shorts, brand films and animation made with generative video tools.
+Personal portfolio site for **Nitish Jain**, AI filmmaker. Narrative shorts, brand films and animation made with generative video tools.
 
 Two audiences, one site:
 
@@ -37,7 +37,7 @@ Work through the phases below in order. Do not skip ahead. Finish and verify eac
 
 Report at the end of each phase in one line. Do not narrate every file write.
 
-When the build finishes, tell Gaurav exactly what is still needed from him: video IDs, social URLs, his real GitHub Pages URL, and the About copy.
+When the build finishes, tell Nitish exactly what is still needed from him: video IDs, social URLs, his real GitHub Pages URL, and the About copy.
 
 ---
 
@@ -81,7 +81,7 @@ These hold for every task in this repo.
 1. **Zero dependencies.** No framework, no bundler, no npm package. The site must still build in five years with nothing but Node and a browser.
 2. **Never edit generated HTML.** Edit JSON or `build.mjs`.
 3. **Never host video from this repo.** Always embed from YouTube or Vimeo. `media/` is gitignored and must never reach a commit.
-4. **Never fetch video Gaurav did not create.** The media scripts are for his own uploads. If asked to pull third-party content, decline and say why.
+4. **Never fetch video Nitish did not create.** The media scripts are for his own uploads. If asked to pull third-party content, decline and say why.
 5. **Never invent facts.** No made-up film titles, credits, client names, festival selections or testimonials. If content is missing, leave the placeholder and say what is needed.
 6. **Never lead with the AI angle.** The films come first. AI is how they were made, not what they are. No tool logos, no "made with AI" badges.
 7. **Follow the voice rules** in `docs/04-VOICE.md` for any copy you write.

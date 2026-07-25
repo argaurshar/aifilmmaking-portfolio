@@ -9,6 +9,6 @@ description: Pre-flight then push to GitHub Pages
 5. Commit the regenerated HTML together with the content change that caused it.
 6. `git push -u origin <branch>`. On network failure retry up to 4 times with backoff.
 7. Open a draft PR if one is not already open for the branch.
-8. Report the live URL and remind Gaurav that Pages takes a minute or two.
+8. Report the live URL and remind Nitish that Pages takes a minute or two.
 
 See `docs/07-DEPLOY.md` for Pages settings and the custom-domain path.

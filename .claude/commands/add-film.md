@@ -15,7 +15,7 @@ Rules:
 - Convert runtime to `runtimeSeconds`.
 - `client` is required for a brand-film and must be null otherwise.
 - **Never invent** a synopsis, credit, laurel or client. Omit the field or leave a clear TODO.
-- Set `poster` to `assets/stills/<id>-1920.jpg` and remind Gaurav to cut it with
+- Set `poster` to `assets/stills/<id>-1920.jpg` and remind Nitish to cut it with
   `scripts/make-posters.sh` if it does not exist yet.
 - Leave `status` as `draft` until he confirms it is ready to be public.
 

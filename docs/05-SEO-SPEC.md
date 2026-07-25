@@ -168,7 +168,7 @@ apex domain lands.
 Markdown, generated from the same content so it cannot drift from the site.
 
 ```
-# Gaurav Sharma — Filmmaker
+# Nitish Jain — Filmmaker
 
 > Narrative shorts, brand films and animation.
 
