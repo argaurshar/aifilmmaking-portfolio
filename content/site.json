@@ -19,13 +19,12 @@
       "I make short films. Most run between one and two minutes. A tiffin that comes back untouched. A thread tied every year that always fades. A boy playing a World Cup final in a backyard with a rag ball and the number 7 chalked onto it.",
       "They tend to find the same thing from different directions: someone holding on to something small that matters more than it should. A beaver who thinks he is nothing without a crown. A man who has spent his life outrunning one fear. I am interested in the moment a person works out what they have been carrying.",
       "Two of the films are documentary. One is about Sonam Wangchuk, who built his own school in Ladakh after the system decided he was slow. One is a tribute to a master of humane Indian modernism, an architect who held that a house is not shelter but a precious thing. Both are about people who were underestimated for a long time.",
-      "I work with generative tools. They let one person build a scene that would otherwise need a crew, a location and a budget. That is all they are to me — how the work gets made. What I care about is whether a shot holds and whether a cut lands.",
-      "TODO: one paragraph only you can write — where you are based, and what you were doing before the films."
+      "I work with generative tools. They let one person build a scene that would otherwise need a crew, a location and a budget. That is all they are to me — how the work gets made. What I care about is whether a shot holds and whether a cut lands."
     ],
     "portrait": {
       "src": "assets/stills/portrait.jpg",
       "alt": "A digital billboard in Times Square, New York, showing Nitish Jain",
-      "caption": "TODO: one line saying what this is and when."
+      "caption": null
     }
   },
   "contact": {
