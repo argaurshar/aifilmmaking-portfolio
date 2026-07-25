@@ -1,0 +1,277 @@
+{
+  "_comment": [
+    "Titles and loglines are Gaurav’s own words, taken from the YouTube titles and",
+    "descriptions he wrote, with the AI framing removed for the site per docs/04-VOICE.md",
+    "rule 6. The YouTube copy keeps its AI keywords for discovery; the site does not.",
+    "",
+    "ID mapping is CONFIRMED: runtimes on the YouTube Studio list match this order exactly.",
+    "",
+    "Still missing: posters (poster: null on every film) and synopsis. Cut posters with",
+    "scripts/make-posters.sh, or paste the full YouTube descriptions for synopsis text.",
+    "",
+    "Field reference: docs/03-CONTENT-MODEL.md"
+  ],
+  "films": [
+    {
+      "id": "the-architect-who-built-for-the-soul",
+      "title": "The Architect Who Built for the Soul",
+      "year": 2026,
+      "type": "documentary",
+      "logline": "A tribute to a master of humane Indian modernism — the architect who believed a house is not shelter but a precious thing.",
+      "roles": [
+        "Director",
+        "Writer",
+        "Editor"
+      ],
+      "video": {
+        "platform": "youtube",
+        "id": "BJRrA7PYngY",
+        "hash": null,
+        "startAt": null
+      },
+      "poster": null,
+      "runtimeSeconds": 91,
+      "synopsis": null,
+      "client": null,
+      "collaborators": [],
+      "laurels": [],
+      "aspectRatio": "16:9",
+      "featured": true,
+      "order": 10,
+      "status": "published",
+      "published": "2026-07-25"
+    },
+    {
+      "id": "the-beaver-who-had-no-crown",
+      "title": "The Beaver Who Had No Crown",
+      "year": 2026,
+      "type": "animation",
+      "logline": "Pip is the only beaver in the colony without a crown, and too afraid to jump off the great dam to earn one.",
+      "roles": [
+        "Director",
+        "Writer",
+        "Animator"
+      ],
+      "video": {
+        "platform": "youtube",
+        "id": "XWB5ANfiVwM",
+        "hash": null,
+        "startAt": null
+      },
+      "poster": null,
+      "runtimeSeconds": 67,
+      "synopsis": null,
+      "client": null,
+      "collaborators": [],
+      "laurels": [],
+      "aspectRatio": "16:9",
+      "featured": false,
+      "order": 20,
+      "status": "published",
+      "published": "2026-07-25"
+    },
+    {
+      "id": "trapped-alone-in-space",
+      "title": "Trapped Alone in Space",
+      "year": 2026,
+      "type": "trailer",
+      "logline": "A scientist, a dying ship, no way home. When contact with Earth goes silent, he has to decide what is worth surviving for.",
+      "roles": [
+        "Director",
+        "Writer",
+        "Animator"
+      ],
+      "video": {
+        "platform": "youtube",
+        "id": "D0uKP6KAnOM",
+        "hash": null,
+        "startAt": null
+      },
+      "poster": null,
+      "runtimeSeconds": 11,
+      "synopsis": null,
+      "client": null,
+      "collaborators": [],
+      "laurels": [],
+      "aspectRatio": "16:9",
+      "featured": false,
+      "order": 30,
+      "status": "published",
+      "published": "2026-07-25"
+    },
+    {
+      "id": "a-boy-drew-his-dream-on-a-ball",
+      "title": "A Boy Drew His Dream on a Ball",
+      "year": 2026,
+      "type": "animation",
+      "logline": "A boy in a small Indian backyard chalks the number 7 onto a rag ball and plays a World Cup final that only exists in his head.",
+      "roles": [
+        "Director",
+        "Writer",
+        "Animator"
+      ],
+      "video": {
+        "platform": "youtube",
+        "id": "fVl2v0zZtC8",
+        "hash": null,
+        "startAt": null
+      },
+      "poster": null,
+      "runtimeSeconds": 78,
+      "synopsis": null,
+      "client": null,
+      "collaborators": [],
+      "laurels": [],
+      "aspectRatio": "16:9",
+      "featured": false,
+      "order": 40,
+      "status": "published",
+      "published": "2026-07-25"
+    },
+    {
+      "id": "the-strike",
+      "title": "The Strike",
+      "year": 2026,
+      "type": "animation",
+      "logline": "Under a full moon, the Nighthawk unit crosses an unnamed frontier for a surgical-strike mission deep in enemy territory.",
+      "roles": [
+        "Director",
+        "Writer",
+        "Animator"
+      ],
+      "video": {
+        "platform": "youtube",
+        "id": "PfIIjjRaVS0",
+        "hash": null,
+        "startAt": null
+      },
+      "poster": null,
+      "runtimeSeconds": 107,
+      "synopsis": null,
+      "client": null,
+      "collaborators": [],
+      "laurels": [],
+      "aspectRatio": "16:9",
+      "featured": false,
+      "order": 50,
+      "status": "published",
+      "published": "2026-07-25"
+    },
+    {
+      "id": "the-rakhi-that-never-breaks",
+      "title": "The Rakhi That Never Breaks",
+      "year": 2026,
+      "type": "animation",
+      "logline": "Every year the thread fades. This Raksha Bandhan, one sister decides to give her brother something that will not.",
+      "roles": [
+        "Director",
+        "Writer",
+        "Animator"
+      ],
+      "video": {
+        "platform": "youtube",
+        "id": "PiR-v9rSx60",
+        "hash": null,
+        "startAt": null
+      },
+      "poster": null,
+      "runtimeSeconds": 79,
+      "synopsis": null,
+      "client": null,
+      "collaborators": [],
+      "laurels": [],
+      "aspectRatio": "16:9",
+      "featured": false,
+      "order": 60,
+      "status": "published",
+      "published": "2026-07-25"
+    },
+    {
+      "id": "he-tried-to-escape-his-fear",
+      "title": "He Tried to Escape His Fear",
+      "year": 2026,
+      "type": "animation",
+      "logline": "One man tries to outrun the thing he has been avoiding his whole life, and finds out what happens when hiding stops working.",
+      "roles": [
+        "Director",
+        "Writer",
+        "Animator"
+      ],
+      "video": {
+        "platform": "youtube",
+        "id": "apCOQYEtCw0",
+        "hash": null,
+        "startAt": null
+      },
+      "poster": null,
+      "runtimeSeconds": 61,
+      "synopsis": null,
+      "client": null,
+      "collaborators": [],
+      "laurels": [],
+      "aspectRatio": "16:9",
+      "featured": false,
+      "order": 70,
+      "status": "published",
+      "published": "2026-07-25"
+    },
+    {
+      "id": "sonam-wangchuk",
+      "title": "Sonam Wangchuk: The Boy the System Failed",
+      "year": 2026,
+      "type": "documentary",
+      "logline": "He could not understand the language at school. His teachers called him slow. They were wrong.",
+      "roles": [
+        "Director",
+        "Writer",
+        "Editor"
+      ],
+      "video": {
+        "platform": "youtube",
+        "id": "tRPycHnRt9k",
+        "hash": null,
+        "startAt": null
+      },
+      "poster": null,
+      "runtimeSeconds": 65,
+      "synopsis": null,
+      "client": null,
+      "collaborators": [],
+      "laurels": [],
+      "aspectRatio": "16:9",
+      "featured": false,
+      "order": 80,
+      "status": "published",
+      "published": "2026-07-25"
+    },
+    {
+      "id": "the-lunchbox-that-kept-coming-back",
+      "title": "The Lunchbox That Kept Coming Back",
+      "year": 2026,
+      "type": "animation",
+      "logline": "Ramesh has delivered the same red tiffin to the same desk every day for years. Then one day it comes back untouched.",
+      "roles": [
+        "Director",
+        "Writer",
+        "Animator"
+      ],
+      "video": {
+        "platform": "youtube",
+        "id": "b2TWgdEnqtY",
+        "hash": null,
+        "startAt": null
+      },
+      "poster": null,
+      "runtimeSeconds": 112,
+      "synopsis": null,
+      "client": null,
+      "collaborators": [],
+      "laurels": [],
+      "aspectRatio": "16:9",
+      "featured": false,
+      "order": 90,
+      "status": "published",
+      "published": "2026-07-25"
+    }
+  ]
+}

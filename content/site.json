@@ -1,0 +1,161 @@
+{
+  "site": {
+    "origin": "https://argaurshar.github.io",
+    "title": "Gaurav Sharma — Filmmaker",
+    "description": "Narrative shorts, brand films and animation by Gaurav Sharma.",
+    "locale": "en",
+    "updated": "2026-07-25",
+    "ogImage": "assets/og/default.jpg"
+  },
+  "identity": {
+    "name": "Gaurav Sharma",
+    "role": "Filmmaker",
+    "tagline": "I make short films. Some of them are for [[brands]].",
+    "location": null,
+    "shortBio": [
+      "I make short films — animation and documentary, most of them one to two minutes, and most of them about India."
+    ],
+    "longBio": [
+      "I make short films. Most run between one and two minutes. A tiffin that comes back untouched. A thread tied every year that always fades. A boy playing a World Cup final in a backyard with a rag ball and the number 7 chalked onto it.",
+      "They tend to find the same thing from different directions: someone holding on to something small that matters more than it should. A beaver who thinks he is nothing without a crown. A man who has spent his life outrunning one fear. I am interested in the moment a person works out what they have been carrying.",
+      "Two of the films are documentary. One is about Sonam Wangchuk, who built his own school in Ladakh after the system decided he was slow. One is a tribute to a master of humane Indian modernism, an architect who held that a house is not shelter but a precious thing. Both are about people who were underestimated for a long time.",
+      "I work with generative tools. They let one person build a scene that would otherwise need a crew, a location and a budget. That is all they are to me — how the work gets made. What I care about is whether a shot holds and whether a cut lands.",
+      "TODO: one paragraph only you can write — where you are based, and what you were doing before the films."
+    ],
+    "portrait": null
+  },
+  "contact": {
+    "email": "ar.gaurshar@gmail.com",
+    "responseTime": null,
+    "availability": null
+  },
+  "social": [],
+  "nav": [
+    {
+      "label": "Work",
+      "path": "work.html"
+    },
+    {
+      "label": "Process",
+      "path": "process.html"
+    },
+    {
+      "label": "Hire",
+      "path": "hire.html"
+    },
+    {
+      "label": "About",
+      "path": "about.html"
+    }
+  ],
+  "pages": {
+    "index": {
+      "heroKicker": "Narrative · Brand · Animation",
+      "heroHeadline": "Films made frame by frame, on a small budget and a short clock.",
+      "heroSub": [],
+      "metaDescription": "Narrative shorts, brand films and animation by Gaurav Sharma."
+    },
+    "work": {
+      "heading": "Work",
+      "intro": [
+        "Everything below is finished and watchable. Shorts first, then commissioned work."
+      ],
+      "metaDescription": "Films by Gaurav Sharma — narrative shorts, brand films and animation.",
+      "emptyState": "No films are published yet. They will appear here as they go up."
+    },
+    "process": {
+      "heading": "Process",
+      "intro": [
+        "Four short breakdowns of how a scene actually gets built — the problem, the approach, and what it cost."
+      ],
+      "metaDescription": "How the work gets made — four craft breakdowns by Gaurav Sharma."
+    },
+    "hire": {
+      "heading": "Hire me",
+      "intro": [
+        "I take on a small number of commissions at a time. Tell me what you need and roughly when."
+      ],
+      "metaDescription": "Commission a narrative short, brand film or animated piece from Gaurav Sharma."
+    },
+    "about": {
+      "heading": "About",
+      "metaDescription": "Gaurav Sharma is a filmmaker working in narrative shorts, brand films and animation."
+    },
+    "notFound": {
+      "heading": "Nothing here",
+      "body": [
+        "That page does not exist, or it moved."
+      ]
+    }
+  },
+  "services": [
+    {
+      "id": "narrative",
+      "title": "Narrative short",
+      "summary": "A story with a beginning and an end, usually one to five minutes.",
+      "deliverables": [
+        "Finished film, graded and mixed",
+        "Master file plus a web-ready export"
+      ],
+      "timeline": null,
+      "startingAt": null,
+      "order": 10
+    },
+    {
+      "id": "brand-film",
+      "title": "Brand film",
+      "summary": "A film for a product or a company that is watchable on its own.",
+      "deliverables": [
+        "Finished film, graded and mixed",
+        "Cutdowns for social if you need them"
+      ],
+      "timeline": null,
+      "startingAt": null,
+      "order": 20
+    },
+    {
+      "id": "animation",
+      "title": "Animation",
+      "summary": "Moving image work that is not shot — sequences, titles, transitions, whole pieces.",
+      "deliverables": [
+        "Finished sequence, graded",
+        "Master file plus a web-ready export"
+      ],
+      "timeline": null,
+      "startingAt": null,
+      "order": 30
+    }
+  ],
+  "processSteps": [
+    {
+      "n": 1,
+      "title": "Work out what the film is",
+      "body": [
+        "Before anything gets made, one sentence has to hold: what happens, and to whom. If it does not survive being said out loud, no amount of craft rescues it later."
+      ]
+    },
+    {
+      "n": 2,
+      "title": "Find the look",
+      "body": [
+        "Reference first, then a small set of rules — palette, lens, how light behaves in this world. Fixing that early is what stops a sequence drifting apart in the middle."
+      ]
+    },
+    {
+      "n": 3,
+      "title": "Build the sequence",
+      "body": [
+        "Shot by shot, in order, held against continuity: the same face, the same room, the same time of day. This is the slow part, and it is where most of the work goes."
+      ]
+    },
+    {
+      "n": 4,
+      "title": "Cut, grade, finish",
+      "body": [
+        "The edit decides the rhythm — where it breathes and where it moves. Then sound, then grade, then delivery in the format the film is actually going to be watched in."
+      ]
+    }
+  ],
+  "laurels": [],
+  "credits": []
+}

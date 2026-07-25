@@ -1,0 +1,86 @@
+{
+  "_comment": [
+    "The four craft breakdown clips. Same rules as films.json — drafts are excluded from the build.",
+    "Each clip should show ONE problem and how it was solved. Craft, not tooling: see docs/04-VOICE.md.",
+    "Preview with: node build.mjs --drafts"
+  ],
+
+  "clips": [
+    {
+      "id": "blocking",
+      "order": 1,
+      "title": "Blocking a scene",
+      "craft": "blocking",
+      "summary": [
+        "TODO: what the shot needed, and how you got the geometry to hold across takes."
+      ],
+      "video": { "platform": "youtube", "id": "CCCCCCCCCCC", "hash": null, "startAt": null },
+      "poster": null,
+      "beats": [
+        { "label": "The problem", "body": "TODO" },
+        { "label": "The approach", "body": "TODO" },
+        { "label": "What it cost", "body": "TODO" }
+      ],
+      "filmId": null,
+      "durationSeconds": null,
+      "status": "draft"
+    },
+    {
+      "id": "lighting",
+      "order": 2,
+      "title": "Lighting a face",
+      "craft": "lighting",
+      "summary": [
+        "TODO: the look you were after and how you held it from shot to shot."
+      ],
+      "video": { "platform": "youtube", "id": "DDDDDDDDDDD", "hash": null, "startAt": null },
+      "poster": null,
+      "beats": [
+        { "label": "The problem", "body": "TODO" },
+        { "label": "The approach", "body": "TODO" },
+        { "label": "What it cost", "body": "TODO" }
+      ],
+      "filmId": null,
+      "durationSeconds": null,
+      "status": "draft"
+    },
+    {
+      "id": "continuity",
+      "order": 3,
+      "title": "Holding continuity",
+      "craft": "continuity",
+      "summary": [
+        "TODO: keeping a face, a costume or a room the same across a sequence."
+      ],
+      "video": { "platform": "youtube", "id": "EEEEEEEEEEE", "hash": null, "startAt": null },
+      "poster": null,
+      "beats": [
+        { "label": "The problem", "body": "TODO" },
+        { "label": "The approach", "body": "TODO" },
+        { "label": "What it cost", "body": "TODO" }
+      ],
+      "filmId": null,
+      "durationSeconds": null,
+      "status": "draft"
+    },
+    {
+      "id": "edit-rhythm",
+      "order": 4,
+      "title": "Finding the cut",
+      "craft": "edit-rhythm",
+      "summary": [
+        "TODO: where the scene wanted to breathe, and where it wanted to move."
+      ],
+      "video": { "platform": "youtube", "id": "FFFFFFFFFFF", "hash": null, "startAt": null },
+      "poster": null,
+      "beats": [
+        { "label": "The problem", "body": "TODO" },
+        { "label": "The approach", "body": "TODO" },
+        { "label": "What it cost", "body": "TODO" }
+      ],
+      "filmId": null,
+      "durationSeconds": null,
+      "status": "draft"
+    }
+  ]
+}

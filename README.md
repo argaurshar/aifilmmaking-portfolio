@@ -1,75 +1,102 @@
-# Portfolio Site Build Kit
+# Gaurav Sharma — Filmmaker
 
-Instruction files for Claude Code. Drop this into an empty folder, open it in VS Code, and Claude Code builds the whole site.
+Portfolio site. Narrative shorts, brand films and animation.
+
+Static HTML, CSS and vanilla JS. **No framework, no bundler, no dependencies.** Node runs one
+generator script; the output is committed and served free by GitHub Pages.
 
 ---
 
-## Use it
+## Run it
 
-1. Put these files in an empty folder
-2. Open the folder in VS Code
-3. Open Claude Code
-4. Type `/build-site`
-
-It reads `CLAUDE.md`, works through the specs in `docs/`, and produces the complete site. Takes a few minutes.
-
-Then tell it what to fill in:
-
-```
-/add-film The Long Way Home, 2026, 1:32, narrative short,
-a woman returns to a demolished house and finds it standing,
-https://youtube.com/watch?v=YOUR_ID
+```bash
+node build.mjs                 # regenerate all HTML from content/
+python3 -m http.server 8000    # preview at localhost:8000
 ```
 
----
-
-## What is here
-
-| File | Purpose |
-|---|---|
-| `CLAUDE.md` | Project memory. Claude Code reads this automatically every session. |
-| `docs/01-BUILD-SPEC.md` | File tree, generator design, every page section by section |
-| `docs/02-DESIGN-SYSTEM.md` | Exact colours, type scale, components, JS behaviour |
-| `docs/03-CONTENT-MODEL.md` | The three JSON schemas |
-| `docs/04-VOICE.md` | Copy rules with worked before and after examples |
-| `docs/05-SEO-SPEC.md` | Schema markup, llms.txt, robots.txt, AI citability |
-| `docs/06-MEDIA-PIPELINE.md` | Video handling, scripts, ffmpeg recipes, the reel structure |
-| `docs/07-DEPLOY.md` | GitHub Pages, custom domain, pre-flight |
-
----
-
-## Commands
+There is no install step. There is no `package.json`, so there is nothing to `npm install`.
 
 | Command | Does |
 |---|---|
-| `/build-site` | Builds everything from scratch, eight phases |
-| `/add-film` | Adds a film and rebuilds |
-| `/new-page` | Adds a page the correct way, through the generator |
-| `/check` | Full verification pass |
-| `/deploy` | Pre-flight then push to GitHub Pages |
+| `node build.mjs` | Build. Draft films are excluded. |
+| `node build.mjs --drafts` | Include drafts, to preview layout locally. **Never commit this output.** |
+| `node build.mjs --check` | Build, then rebuild at a probe base to catch hardcoded paths. |
+| `node build.mjs --strict` | Promote warnings to errors. Use once the content is complete. |
+| `node --test` | Markup and accessibility assertions over the generated HTML. |
+
+Slash commands for Claude Code live in `.claude/commands/`: `/build-site`, `/add-film`,
+`/new-page`, `/check`, `/deploy`.
 
 ---
 
-## What it produces
+## How it works
 
-A five-page static site. Index, Work, Process, Hire, About. Dark and typographic, video-forward, no framework and no dependencies.
+Content lives in JSON. HTML is generated. Never the other way round.
 
-Content lives in three JSON files. One Node script generates the HTML. Adding a film is a JSON edit and one command.
+```
+content/site.json      identity, copy, services, process steps, laurels
+content/films.json     the films
+content/process.json   the four craft breakdown clips
+        ↓
+   build.mjs           the generator; page templates live here
+        ↓
+   *.html + sitemap.xml + robots.txt + llms.txt
+```
 
-It also generates the machine-readable layer that almost no filmmaker portfolio has: Person and VideoObject schema, a sitemap, an `llms.txt`, and a `robots.txt` that explicitly welcomes GPTBot, ClaudeBot and PerplexityBot. That is what makes the site citable when someone asks an AI assistant for AI filmmakers.
+**Never edit the generated `.html` files** — they are overwritten on every build. Change content in
+`content/*.json`. Change structure or markup in `build.mjs`.
+
+Safe to hand-edit: `content/*.json`, `assets/css/style.css`, `assets/js/main.js`, `build.mjs`,
+`docs/*`, `CLAUDE.md`.
 
 ---
 
-## You will need
+## Adding a film
 
-Node, to run the generator. Git, to deploy. That is all.
+1. Upload it to YouTube (Unlisted is fine) or Vimeo. **Not** to this repo — video is never hosted here.
+2. Cut a poster: `./scripts/make-posters.sh media/<file> <film-id> <timestamp>`
+3. Add an entry to `content/films.json` with the **bare video ID**, not a pasted URL.
+4. Set `"status": "published"` when it is ready.
+5. `node build.mjs`, then commit both the JSON and the regenerated HTML.
 
-For the media scripts, `yt-dlp` and `ffmpeg`, but only when you want to pull your own films down for editing.
+The validator catches a pasted URL and tells you the exact ID to use. Full field reference:
+`docs/03-CONTENT-MODEL.md`. Upload steps: `docs/06-MEDIA-PIPELINE.md`.
 
 ---
 
-## Editing the kit
+## Deploying
 
-The docs are the source of truth. If you want a different colour, change it in `docs/02-DESIGN-SYSTEM.md` rather than in the generated CSS, then ask Claude Code to rebuild. Same for structure, voice and anything else.
+Generated HTML is committed and Pages serves it from the branch, so `git push` is the deploy.
+**Always run `node build.mjs` before committing** — a content edit without a rebuild ships nothing.
 
-Keep `CLAUDE.md` lean. It loads into every conversation, so detail belongs in `docs/` where it is read on demand.
+Live at `https://argaurshar.github.io/aifilmmaking-portfolio/`. Setup and the custom-domain path
+are in `docs/07-DEPLOY.md`.
+
+---
+
+## Docs
+
+| File | Covers |
+|---|---|
+| `docs/01-BUILD-SPEC.md` | File tree, generator design, every page section by section |
+| `docs/02-DESIGN-SYSTEM.md` | Colour, type, spacing, components, motion policy |
+| `docs/03-CONTENT-MODEL.md` | The three JSON schemas |
+| `docs/04-VOICE.md` | Copy rules with before/after examples |
+| `docs/05-SEO-SPEC.md` | Schema markup, llms.txt, robots.txt, AI citability |
+| `docs/06-MEDIA-PIPELINE.md` | Video handling, scripts, ffmpeg recipes |
+| `docs/07-DEPLOY.md` | GitHub Pages, custom domain, pre-flight |
+
+> The seven `docs/` files are **reconstructed** — the originals were not supplied. Each is marked at
+> the top. Replace any of them with the original and rebuild.
+
+---
+
+## What the site also ships
+
+The machine-readable layer that almost no filmmaker portfolio has: `Person` and `VideoObject`
+schema, `ItemList`, `BreadcrumbList`, a sitemap, an `llms.txt`, and a `robots.txt` that explicitly
+welcomes GPTBot, ClaudeBot and PerplexityBot. That is what makes the site citable when someone asks
+an AI assistant for filmmakers.
+
+Films embed behind a lite facade — a poster and a play control, with the iframe injected only on
+click — so a Work page with a dozen films loads zero iframes until someone actually wants to watch.
