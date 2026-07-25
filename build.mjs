@@ -478,7 +478,9 @@ async function resolvePoster(poster, ctx, whereForErrors) {
   }
   const info = await stat(path.join(ROOT, poster.src));
   if (info.size > MAX_ASSET_BYTES) {
-    ctx.rep.error(whereForErrors, `${poster.src} is ${Math.round(info.size / 1024)} KB; budget is ${MAX_ASSET_BYTES / 1024} KB`);
+    // A warning, not an error: an oversized upload should never block the build.
+    // Shrink it with scripts/make-posters.sh or any exporter.
+    ctx.rep.warn(whereForErrors, `${poster.src} is ${Math.round(info.size / 1024)} KB; aim for under ${MAX_ASSET_BYTES / 1024} KB`);
   }
   const { width, height } = await imageSize(poster.src);
 
