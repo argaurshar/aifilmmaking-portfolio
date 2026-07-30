@@ -1324,11 +1324,18 @@ async function buildOnce({ base, includeDrafts, strict, quiet }) {
   for (const f of films) {
     const poster = f.poster ?? await autoPoster(f.id, 'assets/stills');
     if (!poster) rep.warn(`films[${f.id}].poster`, `no poster — add assets/stills/${f.id}-1920.jpg`);
+    // Write the auto-detected poster back, so page templates reading `poster.src`
+    // for ogImagePath see it too. Without this, every film relying on filename
+    // detection has poster === null and every page falls back to site.ogImage.
+    // Must be the raw repo-relative path: resolveOg() does its own assetExists()
+    // and url(), so a BASE-prefixed resolvedPoster.src would silently fail.
+    f.poster = poster;
     f.resolvedPoster = await resolvePoster(poster, ctx, `films[${f.id}].poster`);
   }
   for (const c of clips) {
     const poster = c.poster ?? await autoPoster(c.id, 'assets/process');
     if (!poster) rep.warn(`process.clips[${c.id}].poster`, `no poster — add assets/process/${c.id}-1920.jpg`);
+    c.poster = poster;
     c.resolvedPoster = await resolvePoster(poster, ctx, `process.clips[${c.id}].poster`);
   }
   // Portrait follows the same convention as posters: assets/portrait.<ext> if
