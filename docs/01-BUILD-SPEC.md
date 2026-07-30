@@ -27,7 +27,7 @@ File tree, generator design, and every page section by section.
 │   ├── stills/               film posters: <film-id>-{960,1440,1920}.jpg
 │   ├── process/              process clip posters
 │   ├── laurels/              festival laurel SVGs
-│   └── og/default.jpg        social share image, ≥ 1200×630
+│   └── og/nitish-jain-card-v2.jpg        social share image, ≥ 1200×630
 ├── scripts/
 │   ├── fetch-media.sh        yt-dlp — Nitish's own uploads only
 │   └── make-posters.sh       ffmpeg — cut stills from local masters

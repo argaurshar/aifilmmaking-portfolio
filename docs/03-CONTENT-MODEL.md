@@ -23,7 +23,7 @@ the inline micro-markup: `[[emphasis]]` → accent `<em>`, `**strong**` → `<st
     "description": "…",                        // ≤ 160 chars, validated
     "locale": "en",
     "updated": "2026-07-25",                   // ISO date; drives sitemap lastmod
-    "ogImage": "assets/og/default.jpg"         // BASE-relative, NO leading slash
+    "ogImage": "assets/og/nitish-jain-card-v2.jpg"         // BASE-relative, NO leading slash
   },
   "identity": {
     "name": "Nitish Jain",
