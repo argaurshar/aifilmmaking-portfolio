@@ -4,6 +4,9 @@
 
 ## Work
 
+- [Ramayana (2026, Trailer, 1:39)](https://argaurshar.github.io/aifilmmaking-portfolio/work.html#film-ramayana): What if the Ramayana was made today? That was the whole question.
+- [What If Hampi Could Live Again? (2026, Documentary, 2:27)](https://argaurshar.github.io/aifilmmaking-portfolio/work.html#film-what-if-hampi-could-live-again): Some cities disappear. Some survive. And some wait centuries to tell their story again.
+- [Foam Festival — Yamuna, 2026 (2026, Documentary, 0:57)](https://argaurshar.github.io/aifilmmaking-portfolio/work.html#film-foam-festival-yamuna): Every year during Chhath Puja, thousands wade into the Yamuna at sunrise. Every year, the river is covered in a thick white foam that looks like fresh snow.
 - [The Architect Who Built for the Soul (2026, Documentary, 1:31)](https://argaurshar.github.io/aifilmmaking-portfolio/work.html#film-the-architect-who-built-for-the-soul): A tribute to a master of humane Indian modernism — the architect who believed a house is not shelter but a precious thing.
 - [The Beaver Who Had No Crown (2026, Animation, 1:07)](https://argaurshar.github.io/aifilmmaking-portfolio/work.html#film-the-beaver-who-had-no-crown): Pip is the only beaver in the colony without a crown, and too afraid to jump off the great dam to earn one.
 - [Trapped Alone in Space (2026, Trailer, 0:11)](https://argaurshar.github.io/aifilmmaking-portfolio/work.html#film-trapped-alone-in-space): A scientist, a dying ship, no way home. When contact with Earth goes silent, he has to decide what is worth surviving for.
@@ -13,9 +16,6 @@
 - [He Tried to Escape His Fear (2026, Animation, 1:01)](https://argaurshar.github.io/aifilmmaking-portfolio/work.html#film-he-tried-to-escape-his-fear): One man tries to outrun the thing he has been avoiding his whole life, and finds out what happens when hiding stops working.
 - [Sonam Wangchuk: The Boy the System Failed (2026, Documentary, 1:05)](https://argaurshar.github.io/aifilmmaking-portfolio/work.html#film-sonam-wangchuk): He could not understand the language at school. His teachers called him slow. They were wrong.
 - [The Lunchbox That Kept Coming Back (2026, Animation, 1:52)](https://argaurshar.github.io/aifilmmaking-portfolio/work.html#film-the-lunchbox-that-kept-coming-back): Ramesh has delivered the same red tiffin to the same desk every day for years. Then one day it comes back untouched.
-- [Ramayana (2026, Trailer, 1:39)](https://argaurshar.github.io/aifilmmaking-portfolio/work.html#film-ramayana): What if the Ramayana was made today? That was the whole question.
-- [What If Hampi Could Live Again? (2026, Documentary, 2:27)](https://argaurshar.github.io/aifilmmaking-portfolio/work.html#film-what-if-hampi-could-live-again): Some cities disappear. Some survive. And some wait centuries to tell their story again.
-- [Foam Festival — Yamuna, 2026 (2026, Documentary, 0:57)](https://argaurshar.github.io/aifilmmaking-portfolio/work.html#film-foam-festival-yamuna): Every year during Chhath Puja, thousands wade into the Yamuna at sunrise. Every year, the river is covered in a thick white foam that looks like fresh snow.
 
 ## Services
 

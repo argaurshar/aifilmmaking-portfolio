@@ -38,7 +38,7 @@
       "laurels": [],
       "aspectRatio": "16:9",
       "featured": true,
-      "order": 10,
+      "order": 40,
       "status": "published",
       "published": "2026-07-25"
     },
@@ -67,7 +67,7 @@
       "laurels": [],
       "aspectRatio": "16:9",
       "featured": false,
-      "order": 20,
+      "order": 50,
       "status": "published",
       "published": "2026-07-25"
     },
@@ -96,7 +96,7 @@
       "laurels": [],
       "aspectRatio": "16:9",
       "featured": false,
-      "order": 30,
+      "order": 60,
       "status": "published",
       "published": "2026-07-25"
     },
@@ -125,7 +125,7 @@
       "laurels": [],
       "aspectRatio": "16:9",
       "featured": false,
-      "order": 40,
+      "order": 70,
       "status": "published",
       "published": "2026-07-25"
     },
@@ -154,7 +154,7 @@
       "laurels": [],
       "aspectRatio": "16:9",
       "featured": false,
-      "order": 50,
+      "order": 80,
       "status": "published",
       "published": "2026-07-25"
     },
@@ -183,7 +183,7 @@
       "laurels": [],
       "aspectRatio": "16:9",
       "featured": false,
-      "order": 60,
+      "order": 90,
       "status": "published",
       "published": "2026-07-25"
     },
@@ -212,7 +212,7 @@
       "laurels": [],
       "aspectRatio": "16:9",
       "featured": false,
-      "order": 70,
+      "order": 100,
       "status": "published",
       "published": "2026-07-25"
     },
@@ -241,7 +241,7 @@
       "laurels": [],
       "aspectRatio": "16:9",
       "featured": false,
-      "order": 80,
+      "order": 110,
       "status": "published",
       "published": "2026-07-25"
     },
@@ -270,7 +270,7 @@
       "laurels": [],
       "aspectRatio": "16:9",
       "featured": false,
-      "order": 90,
+      "order": 120,
       "status": "published",
       "published": "2026-07-25"
     },
@@ -299,7 +299,7 @@
       "laurels": [],
       "aspectRatio": "16:9",
       "featured": false,
-      "order": 100,
+      "order": 10,
       "status": "published",
       "published": "2026-08-24"
     },
@@ -328,7 +328,7 @@
       "laurels": [],
       "aspectRatio": "16:9",
       "featured": false,
-      "order": 110,
+      "order": 20,
       "status": "published",
       "published": "2026-08-24"
     },
@@ -364,7 +364,7 @@
       "laurels": [],
       "aspectRatio": "16:9",
       "featured": false,
-      "order": 120,
+      "order": 30,
       "status": "published",
       "published": "2026-08-24"
     }
