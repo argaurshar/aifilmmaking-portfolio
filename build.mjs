@@ -20,6 +20,10 @@ import path from 'node:path';
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const DEFAULT_BASE = '/aifilmmaking-portfolio/';
+// Where generated files land. Defaults to the repo root, which is what GitHub
+// Pages serves. Vercel sets OUT_DIR=dist so it gets a clean directory holding
+// only the site, rather than the whole repo.
+const OUT = process.env.OUT_DIR ? path.resolve(ROOT, process.env.OUT_DIR) : ROOT;
 
 /* ═══════════════════════════════════════════════════════════════════════════
    1. HTML — escaping is the load-bearing part of this file.
@@ -449,6 +453,17 @@ async function imageSize(rel) {
 }
 
 const MAX_ASSET_BYTES = 300 * 1024;
+
+/** Recursive directory copy. Built on readdir rather than fs.cp for stability. */
+async function copyDir(from, to) {
+  await mkdir(to, { recursive: true });
+  for (const e of await readdir(from, { withFileTypes: true })) {
+    const src = path.join(from, e.name);
+    const dst = path.join(to, e.name);
+    if (e.isDirectory()) await copyDir(src, dst);
+    else if (e.isFile()) await writeFile(dst, await readFile(src));
+  }
+}
 
 /**
  * Convention over configuration: if a film has no `poster` in JSON, look for
@@ -1448,18 +1463,25 @@ async function main() {
     console.log('✓ probe build at /__probe__/ passed — no hardcoded root paths');
   }
 
-  await mkdir(path.join(ROOT, 'assets'), { recursive: true });
-  for (const { d, out } of rendered) {
-    await writeFile(path.join(ROOT, d.path || 'index.html'), out, 'utf8');
+  await mkdir(OUT, { recursive: true });
+  if (OUT !== ROOT) {
+    // A separate output dir needs the static assets carried across; serving
+    // HTML without them is the classic "site loads but has no styling".
+    await copyDir(path.join(ROOT, 'assets'), path.join(OUT, 'assets'));
+    await writeFile(path.join(OUT, '.nojekyll'), '', 'utf8');
   }
-  await writeFile(path.join(ROOT, 'sitemap.xml'), sitemap(descriptors, ctx), 'utf8');
-  await writeFile(path.join(ROOT, 'robots.txt'), robots(ctx), 'utf8');
-  await writeFile(path.join(ROOT, 'llms.txt'), llmsTxt(ctx), 'utf8');
+  for (const { d, out } of rendered) {
+    await writeFile(path.join(OUT, d.path || 'index.html'), out, 'utf8');
+  }
+  await writeFile(path.join(OUT, 'sitemap.xml'), sitemap(descriptors, ctx), 'utf8');
+  await writeFile(path.join(OUT, 'robots.txt'), robots(ctx), 'utf8');
+  await writeFile(path.join(OUT, 'llms.txt'), llmsTxt(ctx), 'utf8');
 
   // ---- report
   const pageCount = rendered.length;
   console.log(`✓ ${pageCount} pages, ${films.length} film${films.length === 1 ? '' : 's'}, ${clips.length} process clip${clips.length === 1 ? '' : 's'}`);
   console.log(`  base ${ctx.u.BASE}   origin ${ctx.ORIGIN}`);
+  if (OUT !== ROOT) console.log(`  output ${path.relative(ROOT, OUT) || '.'}/`);
   if (includeDrafts) console.log('  ⚠ --drafts: draft entries are INCLUDED. Do not commit this output.');
 
   if (rep.warnings.length) {
