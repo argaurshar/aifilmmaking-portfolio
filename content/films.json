@@ -8,8 +8,6 @@
     "confirmed directly against its video-details page (lLeEsLxh3LA, 0:57).",
     "",
     "Outstanding: ramayana and what-if-hampi-could-live-again have no synopsis, and all three",
-    "of the newest films have no \"published\" date, so the build warns they are not eligible",
-    "for video rich results.",
     "",
     "Preview drafts locally with:  node build.mjs --drafts",
     "Field reference: docs/03-CONTENT-MODEL.md"
@@ -303,7 +301,7 @@
       "featured": false,
       "order": 100,
       "status": "published",
-      "published": null
+      "published": "2026-08-24"
     },
     {
       "id": "what-if-hampi-could-live-again",
@@ -332,7 +330,7 @@
       "featured": false,
       "order": 110,
       "status": "published",
-      "published": null
+      "published": "2026-08-24"
     },
     {
       "id": "foam-festival-yamuna",
@@ -368,7 +366,7 @@
       "featured": false,
       "order": 120,
       "status": "published",
-      "published": null
+      "published": "2026-08-24"
     }
   ]
 }
