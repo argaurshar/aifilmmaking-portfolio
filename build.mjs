@@ -1397,7 +1397,12 @@ async function buildOnce({ base, includeDrafts, strict, quiet }) {
 
   const newestFilm = films.map((f) => f.published).filter(Boolean).sort().at(-1);
   for (const d of descriptors) {
-    if (d.path === 'work.html' && newestFilm) d.lastmod = newestFilm;
+    // Work's lastmod is the newest film publish date, but never older than
+    // site.updated — films added without a `published` date still changed the
+    // page, and reporting a stale date tells crawlers not to bother re-reading.
+    if (d.path === 'work.html') {
+      d.lastmod = [newestFilm, site.site.updated].filter(Boolean).sort().at(-1);
+    }
     d.ogImage = await resolveOg(d.ogImagePath, d.title);
   }
 

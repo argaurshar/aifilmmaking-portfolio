@@ -80,13 +80,16 @@ assets/stills/<film-id>-1920.jpg
 a complete responsive-images story with zero build tooling. One file is enough to start; add the
 others later and the build picks them up with no content edit.
 
-`poster.src` in `films.json` points at the **largest** one.
+**No JSON edit is needed.** Leave `poster` as `null` and the generator finds
+`assets/stills/<film-id>-1920.jpg` by filename. Set `poster.src` explicitly only to point somewhere
+that breaks the convention.
 
 Pick a frame that reads at thumbnail size: a face, a strong silhouette, one clear subject. Avoid a
 frame mid-camera-move, and avoid your title card — the title is already next to it in the markup.
 
-Budget: keep each JPEG under 300 KB. The build fails past that. Twelve 400 KB stills is a 5 MB page
-and no dependency here can resize them for you.
+Budget: aim under 300 KB per JPEG. Past that the build **warns** but still succeeds — an oversized
+upload should never block a deploy. Twelve 400 KB stills is a 5 MB page, so shrink them when you
+can; `scripts/make-posters.sh` does it in one command.
 
 ---
 

@@ -83,7 +83,7 @@ the inline micro-markup: `[[emphasis]]` → accent `<em>`, `**strong**` → `<st
       "hash": null,                    //   Vimeo unlisted only; rejected for youtube
       "startAt": null                  //   seconds
     },
-    "poster": { "src": "assets/stills/the-long-quiet-1920.jpg", "alt": "…" },  // REQ or explicit null
+    "poster": null,                    // OPT — see auto-detection below
 
     "runtimeSeconds": 412,             // OPT
     "synopsis": ["…"],                 // OPT, array of paragraphs
@@ -123,7 +123,7 @@ cannot be mistyped or drift.
 |---|---|
 | `runtimeSeconds` | Runtime chip omitted; JSON-LD `duration` omitted. Never estimated. |
 | `synopsis` | The whole `<details>` block is dropped — no empty heading. |
-| `poster: null` | Loud dashed `placeholder` naming the expected file. Never a stock image, never a YouTube-hosted thumbnail. |
+| `poster` | Auto-detected from `assets/stills/<id>-1920.jpg` (also `.jpeg`/`.png`, also the bare `<id>.<ext>`). If nothing is found: a quiet striped block, plus a build warning naming the exact file it wanted. The loud dashed `placeholder` shows for **drafts only** — nine of them on a client-facing page read as broken. Never a stock image, never a YouTube-hosted thumbnail. |
 | `aspectRatio` | Defaults to `16:9` **with a warning**, so a vertical film is never silently letterboxed. |
 | `laurels` | Laurel row omitted. |
 | `published` | JSON-LD `uploadDate` omitted, plus a named warning that the film loses video rich-result eligibility. |

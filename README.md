@@ -3,7 +3,8 @@
 Portfolio site. Narrative shorts, brand films and animation.
 
 Static HTML, CSS and vanilla JS. **No framework, no bundler, no dependencies.** Node runs one
-generator script; the output is committed and served free by GitHub Pages.
+generator script. Deployed on Vercel, which runs the generator itself, and on GitHub Pages, which
+serves the committed output.
 
 ---
 
@@ -14,7 +15,8 @@ node build.mjs                 # regenerate all HTML from content/
 python3 -m http.server 8000    # preview at localhost:8000
 ```
 
-There is no install step. There is no `package.json`, so there is nothing to `npm install`.
+There is no install step: `package.json` declares no dependencies, so `npm install` has nothing
+to fetch.
 
 | Command | Does |
 |---|---|
@@ -84,7 +86,7 @@ are in `docs/07-DEPLOY.md`.
 | `docs/04-VOICE.md` | Copy rules with before/after examples |
 | `docs/05-SEO-SPEC.md` | Schema markup, llms.txt, robots.txt, AI citability |
 | `docs/06-MEDIA-PIPELINE.md` | Video handling, scripts, ffmpeg recipes |
-| `docs/07-DEPLOY.md` | GitHub Pages, custom domain, pre-flight |
+| `docs/07-DEPLOY.md` | Vercel, GitHub Pages, custom domain, pre-flight |
 
 > The seven `docs/` files are **reconstructed** — the originals were not supplied. Each is marked at
 > the top. Replace any of them with the original and rebuild.

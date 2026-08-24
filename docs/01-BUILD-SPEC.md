@@ -33,7 +33,9 @@ File tree, generator design, and every page section by section.
 │   └── make-posters.sh       ffmpeg — cut stills from local masters
 ├── test/build.test.mjs       node --test, asserts over generated HTML
 ├── docs/                     these specs
-└── .claude/commands/         slash commands
+├── .claude/commands/         slash commands
+├── package.json              NO dependencies — scripts and engines only
+└── vercel.json               build command + headers for the Vercel deploy
 
 GENERATED — never hand-edit:
   index.html work.html process.html hire.html about.html 404.html
@@ -41,8 +43,10 @@ GENERATED — never hand-edit:
   sitemap.xml robots.txt llms.txt
 ```
 
-**No `package.json`.** `.mjs` already gives module semantics; its absence means there is nothing to
-`npm install`. This is the strictest reading of the zero-dependency rule.
+**`package.json` declares no dependencies and no devDependencies.** `npm install` has nothing to
+fetch, so the zero-dependency rule holds; it exists only to give `npm run build` / `npm test` as
+conventional entry points and to stop tooling assuming the project is broken rather than
+deliberately plain.
 
 ---
 
