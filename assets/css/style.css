@@ -271,6 +271,30 @@ main > :last-child { margin-block-end: var(--space-section); }
 .page-head__note { color: var(--c-text-dim); font-size: var(--step--1); }
 
 .section { --stack-space: var(--space-l); }
+
+/* Label-left / content-right editorial grid for light sections. The rule
+   moves to the section's top edge; the heading loses its own. */
+.section--split { border-block-start: 1px solid var(--c-line); padding-block-start: var(--space-l); }
+.section--split > * + * { margin-block-start: var(--space-m); }
+.section--split > .section__heading { border: 0; padding: 0; }
+@media (min-width: 60rem) {
+  .section--split {
+    display: grid;
+    grid-template-columns: minmax(13rem, 1fr) 2.6fr;
+    column-gap: var(--space-xl); row-gap: var(--space-m);
+    align-items: start;
+  }
+  .section--split > * { margin-block-start: 0; }
+  .section--split > .section__heading { grid-column: 1; grid-row: 1; }
+  .section--split > :not(.section__heading) { grid-column: 2; }
+}
+
+/* A lede: the first paragraph of a marked prose block speaks at display size. */
+.prose--lede > p:first-child {
+  font-size: var(--step-1);
+  color: var(--c-text);
+  letter-spacing: -0.01em;
+}
 .section__heading {
   font-family: var(--font-display);
   font-size: var(--step--1); color: var(--c-text-dim);
@@ -311,12 +335,19 @@ main > :last-child { margin-block-end: var(--space-section); }
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: var(--space-xs);
   text-decoration: none; color: var(--c-text);
+  /* At rest the film gets the stage: a whisper of grounding at the bottom
+     edge, nothing over the frame itself. The scrim deepens only on intent. */
   background: linear-gradient(to top,
-    color-mix(in oklch, var(--c-bg) 72%, transparent),
-    color-mix(in oklch, var(--c-bg) 12%, transparent) 55%);
+    color-mix(in oklch, var(--c-bg) 40%, transparent),
+    transparent 24%);
   transition: background var(--dur) var(--ease-out);
 }
-.embed__play:hover { color: var(--c-text); background: color-mix(in oklch, var(--c-bg) 45%, transparent); }
+.embed__play:hover, .embed__play:focus-visible {
+  color: var(--c-text);
+  background: linear-gradient(to top,
+    color-mix(in oklch, var(--c-bg) 62%, transparent),
+    color-mix(in oklch, var(--c-bg) 10%, transparent) 60%);
+}
 .embed__icon {
   display: grid; place-items: center;
   width: 4.5rem; height: 4.5rem;
@@ -333,11 +364,15 @@ main > :last-child { margin-block-end: var(--space-section); }
   box-shadow: 0 0 0 8px color-mix(in oklch, var(--c-accent) 18%, transparent),
               0 8px 40px -8px color-mix(in oklch, var(--c-accent) 55%, transparent);
 }
+/* The label duplicated the title sitting right beside every poster, twelve
+   times over on Work. It stays in the accessible name; visually, the play
+   icon is the affordance and the film is the image. */
 .embed__label {
-  font-size: var(--step--1); letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--c-text-muted);
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip-path: inset(50%); white-space: nowrap;
 }
-.embed__label i { font-style: normal; color: var(--c-text); }
+.embed__label i { font-style: normal; }
 .embed__caption { margin-block-start: var(--space-xs); font-size: var(--step--1); color: var(--c-text-dim); }
 
 /* "opens on YouTube" is only true before JS upgrades the control. */
@@ -354,6 +389,11 @@ main > :last-child { margin-block-end: var(--space-section); }
 
 @media (min-width: 60rem) {
   .film-entry { grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); align-items: start; gap: var(--space-l); }
+  /* The index opens on a statement, not a spreadsheet row: the first film
+     runs full width with its title a register up. */
+  .film-list__item:first-child .film-entry { grid-template-columns: 1fr; }
+  .film-list__item:first-child .film-entry__title { font-size: var(--step-3); }
+  .film-list__item:first-child .film-entry__logline { font-size: var(--step-1); }
 }
 
 .film-entry__details { margin-block-start: var(--space-s); }
@@ -386,7 +426,7 @@ main > :last-child { margin-block-end: var(--space-section); }
 }
 .film-card__noposter { display: block; width: 100%; height: 100%;
   background: repeating-linear-gradient(45deg, var(--c-bg-elev-1) 0 8px, var(--c-bg-elev-2) 8px 16px); }
-.film-card__title { font-weight: 600; }
+.film-card__title { font-family: var(--font-display); font-size: var(--step-1); font-weight: 600; letter-spacing: -0.01em; }
 .film-card__meta { font-size: var(--step--1); color: var(--c-text-dim); }
 
 /* ── Chips, laurels, meta ───────────────────────────────────────────────── */
@@ -424,10 +464,11 @@ main > :last-child { margin-block-end: var(--space-section); }
 .filter-bar ul { --gap: var(--space-xs); }
 .filter-bar a {
   display: inline-block;
+  font-family: var(--font-display);
   font-size: var(--step--1); text-decoration: none; color: var(--c-text-dim);
   text-transform: uppercase; letter-spacing: 0.1em;
-  padding: var(--space-3xs) var(--space-xs);
-  border: 1px solid transparent; border-radius: var(--radius-full);
+  padding: 0.5em 1em;
+  border: 1px solid var(--c-line); border-radius: var(--radius-full);
 }
 .filter-bar a:hover { color: var(--c-text); border-color: var(--c-line); }
 .filter-bar a[aria-current="page"] {
@@ -444,7 +485,17 @@ main > :last-child { margin-block-end: var(--space-section); }
 }
 .process-step__title { font-size: var(--step-1); margin-block-end: var(--space-2xs); }
 .process-steps--compact { --stack-space: var(--space-s); }
-.process-steps--compact .process-step__title { font-size: var(--step-0); margin-block-end: 0; }
+.process-steps--compact .process-step {
+  display: block;
+  border-block-start: 1px solid var(--c-line);
+  padding-block-start: var(--space-s);
+}
+.process-steps--compact .process-step__n { display: block; margin-block-end: var(--space-2xs); }
+.process-steps--compact .process-step__title { font-size: var(--step-1); margin-block-end: 0; }
+@media (min-width: 60rem) {
+  .process-steps--compact { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-l); }
+  .process-steps--compact > * + * { margin-block-start: 0; }
+}
 
 .process-clip { --stack-space: var(--space-m); }
 .process-clip + .process-clip { margin-block-start: var(--space-2xl); }
@@ -484,6 +535,9 @@ main > :last-child { margin-block-end: var(--space-section); }
 .callout__heading { font-size: var(--step-2); }
 .callout__note { color: var(--c-text-dim); font-size: var(--step--1); }
 .callout__social { justify-content: center; --gap: var(--space-m); font-size: var(--step--1); }
+/* main.js adds .l-cluster around the email + copy pair; without this the pair
+   pinned left under a centred heading — a visible layout bug on every page. */
+.callout .l-cluster { justify-content: center; }
 
 .btn {
   font-family: var(--font-display);
@@ -497,16 +551,10 @@ main > :last-child { margin-block-end: var(--space-section); }
   transition: background var(--dur) var(--ease-out), color var(--dur) var(--ease-out),
               border-color var(--dur) var(--ease-out);
 }
-.btn { position: relative; overflow: hidden; }
-.btn--primary { background: linear-gradient(115deg, var(--ink-a), var(--ink-b)); color: var(--c-accent-ink); }
-.btn--primary::after {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(115deg, transparent 30%, rgb(255 255 255 / 0.35) 50%, transparent 70%);
-  translate: -110% 0;
-  transition: translate 0.6s var(--ease-out);
-}
-.btn--primary:hover { color: var(--c-accent-ink); }
-.btn--primary:hover::after { translate: 110% 0; }
+/* The gradient ink belongs to the hero signature alone — spent on every
+   button it stops being a signature. Primary stays solid, disciplined amber. */
+.btn--primary { background: var(--c-accent); color: var(--c-accent-ink); }
+.btn--primary:hover { background: color-mix(in oklch, var(--c-accent) 84%, white); color: var(--c-accent-ink); }
 .btn--ghost { border-color: var(--c-line-strong); color: var(--c-text); }
 .btn--ghost:hover { border-color: var(--c-text); color: var(--c-text); background: var(--c-bg-elev-1); }
 
@@ -521,10 +569,8 @@ main > :last-child { margin-block-end: var(--space-section); }
 }
 .about__portrait { border-radius: var(--radius-md); width: 100%; object-fit: cover; }
 
-/* Without a side portrait the body spans the full container, but .prose caps at
-   the readable measure — so centre it, or the text hugs the left edge and leaves
-   the rest of the row empty. */
-.about:not(.about--split) .about__body { margin-inline: auto; max-width: var(--measure); }
+/* With the wide banner, the bio lives in a label-left editorial split
+   (see .section--split) — no centring needed; the label column fills the row. */
 
 /* ── Founders ───────────────────────────────────────────────────────────── */
 
@@ -589,6 +635,9 @@ main > :last-child { margin-block-end: var(--space-section); }
     color: var(--c-accent);
     animation: ink-drift 14s linear infinite;
   }
+}
+@media (min-width: 24rem) {
+  .hero__headline .u-accent { white-space: nowrap; }
 }
 @keyframes ink-drift {
   from { background-position: 0% 50%; }

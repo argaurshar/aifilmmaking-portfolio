@@ -949,7 +949,7 @@ function pageIndex(ctx) {
   ${prose(p.heroSub, 'hero__sub')}
   <p class="hero__actions l-cluster">
     <a class="btn btn--primary" href="${u.url('work.html')}">See the work</a>
-    <a class="btn btn--ghost" href="${u.url('hire.html')}">Hire me</a>
+    <a class="btn btn--ghost" href="${u.url('hire.html')}">Work with us</a>
   </p>
 </section>
 
@@ -974,13 +974,13 @@ ${rest.length
     <p class="u-muted">${site.pages.work.emptyState}</p>
   </section>`}
 
-<section class="section l-container l-stack" aria-labelledby="process-teaser">
+<section class="section section--split l-container" aria-labelledby="process-teaser">
   <h2 class="section__heading" id="process-teaser">How it gets made</h2>
-  ${prose(site.pages.process.intro)}
+  ${prose(site.pages.process.intro, 'prose prose--lede')}
   <p><a class="btn btn--ghost" href="${u.url('process.html')}">Read the breakdowns</a></p>
 </section>
 
-<section class="section l-container l-stack" aria-labelledby="services-teaser">
+<section class="section section--split l-container" aria-labelledby="services-teaser">
   <h2 class="section__heading" id="services-teaser">Commissions</h2>
   <ul class="l-cluster chips">${site.services.map((s) => chip(s.title))}</ul>
   <p><a class="btn btn--ghost" href="${u.url('hire.html')}">What it costs and how long</a></p>
@@ -1139,7 +1139,7 @@ function pageHire(ctx) {
 </header>
 
 <section class="section l-container l-stack" aria-labelledby="services-heading">
-  <h2 class="section__heading" id="services-heading">What I make</h2>
+  <h2 class="section__heading" id="services-heading">What we make</h2>
   <ul class="l-grid l-grid--services">
     ${site.services.map((s) => html`<li class="service-card l-stack">
       <h3 class="service-card__title">${s.title}</h3>
@@ -1191,17 +1191,23 @@ ${site.identity.portrait && site.identity.portraitWide
   </figure>`
       : ''}
 
-<section class="section l-container about${site.identity.portrait && !site.identity.portraitWide ? ' about--split' : ''}">
-  ${site.identity.portrait && !site.identity.portraitWide
-      ? html`<img class="about__portrait" src="${ctx.u.url(site.identity.portrait.src)}"
-          alt="${site.identity.portrait.alt}" width="${site.identity.portraitSize.width}"
-          height="${site.identity.portraitSize.height}" loading="lazy" decoding="async">`
-      : ''}
+${site.identity.portrait && !site.identity.portraitWide
+      ? html`<section class="section l-container about about--split">
+  <img class="about__portrait" src="${ctx.u.url(site.identity.portrait.src)}"
+      alt="${site.identity.portrait.alt}" width="${site.identity.portraitSize.width}"
+      height="${site.identity.portraitSize.height}" loading="lazy" decoding="async">
   <div class="about__body l-stack">
     ${prose(site.identity.longBio)}
     ${site.identity.location ? html`<p class="u-muted">Based in ${site.identity.location}.</p>` : ''}
   </div>
-</section>
+</section>`
+      : html`<section class="section section--split l-container" aria-labelledby="studio-heading">
+  <h2 class="section__heading" id="studio-heading">The studio</h2>
+  <div class="about__body l-stack">
+    ${prose(site.identity.longBio, 'prose prose--lede')}
+    ${site.identity.location ? html`<p class="u-muted">Based in ${site.identity.location}.</p>` : ''}
+  </div>
+</section>`}
 
 ${site.identity.founders?.length
       ? html`<section class="section l-container l-stack" aria-labelledby="founders-heading">
