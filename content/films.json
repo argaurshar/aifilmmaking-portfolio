@@ -3,18 +3,20 @@
     "Titles and loglines are Nitish's own words, taken from the YouTube titles and",
     "descriptions he wrote, with the AI framing removed for the site per docs/04-VOICE.md rule 6.",
     "",
-    "ID mapping is CONFIRMED for the twelve published films. The first nine were confirmed by",
+    "ID mapping is CONFIRMED for fifteen of the sixteen films. The first nine were confirmed by",
     "matching runtimes on the Studio list to the order the links were sent; foam-festival-yamuna",
-    "was confirmed directly against its video-details page (lLeEsLxh3LA, 0:57).",
+    "was confirmed against its video-details page. Of the four architecture explainers, three",
+    "(inside-antilia, new-parliament-triangle, qutub-minar) match the id prefixes legible in the",
+    "Studio screenshots.",
     "",
-    "The four architecture explainers at order 130-160 are STAGED, not published. Everything is",
-    "captured except the video id: the Studio screenshots truncate it, and an id is not something",
-    "to guess. Each entry records the visible prefix under _pendingIdPrefix. Open the video, copy",
-    "the 11 characters after /shorts/, put them in video.id and set status to \"published\".",
-    "A film with video.id null is held out of every build, --drafts included.",
+    "UNVERIFIED: coastal-tower-320m is mapped to TZkgZfRywCs BY ELIMINATION. The prefix read off",
+    "the screenshot was \"dXGC1q\", which does not match; the other three links anchored exactly, so",
+    "this is the remaining one. Open the film on the site and check the video matches the title.",
     "",
-    "Outstanding: ramayana and what-if-hampi-could-live-again have no synopsis.",
+    "Outstanding: ramayana and what-if-hampi-could-live-again have no synopsis. The four explainers",
+    "have no posters — drop vertical stills into assets/stills/<id>-1080.jpg and rebuild.",
     "",
+    "A draft may carry video.id: null; it is then held out of every build. See docs/03-CONTENT-MODEL.md.",
     "Preview drafts locally with:  node build.mjs --drafts",
     "Field reference: docs/03-CONTENT-MODEL.md"
   ],
@@ -387,7 +389,7 @@
       ],
       "video": {
         "platform": "youtube",
-        "id": null,
+        "id": "YCaNOrv0AkE",
         "hash": null,
         "startAt": null
       },
@@ -400,9 +402,8 @@
       "aspectRatio": "9:16",
       "featured": false,
       "order": 130,
-      "status": "draft",
-      "published": "2026-08-24",
-      "_pendingIdPrefix": "YCaNOr"
+      "status": "published",
+      "published": "2026-08-24"
     },
     {
       "id": "new-parliament-triangle",
@@ -417,7 +418,7 @@
       ],
       "video": {
         "platform": "youtube",
-        "id": null,
+        "id": "IRKanNg7khQ",
         "hash": null,
         "startAt": null
       },
@@ -432,9 +433,8 @@
       "aspectRatio": "9:16",
       "featured": false,
       "order": 140,
-      "status": "draft",
-      "published": "2026-08-24",
-      "_pendingIdPrefix": "IRKanN"
+      "status": "published",
+      "published": "2026-08-24"
     },
     {
       "id": "qutub-minar",
@@ -449,7 +449,7 @@
       ],
       "video": {
         "platform": "youtube",
-        "id": null,
+        "id": "UNeK57lbVl0",
         "hash": null,
         "startAt": null
       },
@@ -462,9 +462,8 @@
       "aspectRatio": "9:16",
       "featured": false,
       "order": 150,
-      "status": "draft",
-      "published": "2026-08-24",
-      "_pendingIdPrefix": "UNeK5"
+      "status": "published",
+      "published": "2026-08-24"
     },
     {
       "id": "coastal-tower-320m",
@@ -479,7 +478,7 @@
       ],
       "video": {
         "platform": "youtube",
-        "id": null,
+        "id": "TZkgZfRywCs",
         "hash": null,
         "startAt": null
       },
@@ -492,9 +491,8 @@
       "aspectRatio": "9:16",
       "featured": false,
       "order": 160,
-      "status": "draft",
-      "published": "2026-08-24",
-      "_pendingIdPrefix": "dXGC1q"
+      "status": "published",
+      "published": "2026-08-24"
     }
   ]
 }
