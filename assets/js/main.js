@@ -246,7 +246,63 @@ init('header-height', () => {
   new ResizeObserver(set).observe(header);
 });
 
-// Reduced motion is honoured by CSS for everything above. Nothing here
-// animates on its own, so there is no JS motion to gate — but the query is
-// exported in spirit: any future reveal effect must check it before running.
-void reduceMotion;
+/* ══════════════════════════════════════════════════════════════════════════
+   Scroll reveal — cinematic-subtle.
+
+   The .reveal class is added HERE, never in markup, so with JS off (or under
+   prefers-reduced-motion, where we bail before touching the DOM) every
+   element is simply visible. Siblings stagger by 70ms within their parent.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+init('reveal', () => {
+  if (reduceMotion.matches) return;
+  if (!('IntersectionObserver' in window)) return;
+
+  const targets = document.querySelectorAll(
+    '.film-list__item, .film-card, .service-card, .founder, .process-step, ' +
+    '.process-clip, .callout, .section__heading, .hero-reel .embed'
+  );
+  if (!targets.length) return;
+
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (!e.isIntersecting) continue;
+      e.target.classList.add('in');
+      io.unobserve(e.target);
+      pending.delete(e.target);
+    }
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.1 });
+
+  const pending = new Set();
+  for (const el of targets) {
+    // Never hide what the visitor can already see — reveals are for content
+    // that has yet to scroll in, not a curtain over the first paint.
+    if (el.getBoundingClientRect().top < innerHeight * 0.92) continue;
+    const siblings = el.parentElement ? [...el.parentElement.children] : [el];
+    const among = siblings.filter((n) => n.matches?.('.film-card, .service-card, .founder'));
+    const idx = Math.max(0, among.indexOf(el));
+    el.style.setProperty('--reveal-delay', `${Math.min(idx, 5) * 70}ms`);
+    el.classList.add('reveal');
+    pending.add(el);
+    io.observe(el);
+  }
+
+  // Failsafe: a teleport (find-in-page, fragment jump, history restore) can
+  // move PAST an element without it ever intersecting — the observer sees
+  // below-viewport → above-viewport as no change and stays silent, leaving a
+  // permanent hole. On each scroll, reveal anything already scrolled past.
+  let raf = 0;
+  const sweep = () => {
+    raf = 0;
+    for (const el of pending) {
+      if (el.getBoundingClientRect().bottom < 0) {
+        el.classList.add('in');
+        io.unobserve(el);
+        pending.delete(el);
+      }
+    }
+    if (!pending.size) removeEventListener('scroll', onScroll);
+  };
+  const onScroll = () => { if (!raf) raf = requestAnimationFrame(sweep); };
+  addEventListener('scroll', onScroll, { passive: true });
+});

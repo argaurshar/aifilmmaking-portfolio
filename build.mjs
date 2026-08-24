@@ -743,6 +743,7 @@ ${page.ogVideo
 <meta property="og:video:height" content="720">`
     : ''}
 <meta name="twitter:card" content="summary_large_image">
+<link rel="preload" as="font" type="font/woff2" href="${u.url('assets/fonts/space-grotesk-var.woff2')}" crossorigin>
 <link rel="icon" href="${u.url('assets/favicon.svg')}" type="image/svg+xml">
 <link rel="stylesheet" href="${u.url(`assets/css/style.css?v=${assets.cssHash}`)}">
 ${jsonLdScript(page.jsonLd ?? [])}`;

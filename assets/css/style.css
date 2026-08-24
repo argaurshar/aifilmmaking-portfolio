@@ -49,25 +49,24 @@
 
   --font-text: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  --font-display: 'Space Grotesk', var(--font-text);
+
+  /* the generative signature: a slow-breathing warm gradient, used sparingly */
+  --ink-a: oklch(0.82 0.15 78);
+  --ink-b: oklch(0.78 0.16 45);
+  --ink-c: oklch(0.80 0.14 110);
 }
 
-/*
-  Self-hosted variable woff2 goes here. Drop the files into assets/fonts/,
-  uncomment, and MEASURE the fallback overrides against the real face — a
-  guessed override is worse than none. See docs/02-DESIGN-SYSTEM.md.
-
-  @font-face {
-    font-family: 'Text';
-    src: url('../fonts/text-var.woff2') format('woff2-variations');
-    font-weight: 100 900; font-style: normal; font-display: swap;
-  }
-  @font-face {
-    font-family: 'Text Fallback';
-    src: local('Arial'), local('Helvetica'), local('Liberation Sans');
-    size-adjust: 100%; ascent-override: 90%; descent-override: 22.5%; line-gap-override: 0%;
-  }
-  :root { --font-text: 'Text', 'Text Fallback', system-ui, sans-serif; }
-*/
+/* Space Grotesk (variable, 300–700) — self-hosted, OFL. One 22KB file.
+   Display voice only: headlines, brand, labels. Body stays on the system
+   stack for speed and reading comfort. */
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('../fonts/space-grotesk-var.woff2') format('woff2-variations');
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
 
 /* ── Reset ──────────────────────────────────────────────────────────────── */
 
@@ -94,7 +93,11 @@ input, button, textarea, select { font: inherit; color: inherit; }
 button { background: none; border: 0; cursor: pointer; }
 ul, ol { list-style: none; padding: 0; }
 
-h1, h2, h3, h4 { line-height: 1.1; font-weight: 600; text-wrap: balance; letter-spacing: -0.02em; }
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  line-height: 1.06; font-weight: 600; text-wrap: balance; letter-spacing: -0.015em;
+  font-optical-sizing: auto;
+}
 p, li { text-wrap: pretty; }
 
 a { color: inherit; text-decoration-color: color-mix(in oklch, currentColor 40%, transparent);
@@ -167,10 +170,12 @@ main > :last-child { margin-block-end: var(--space-section); }
   text-decoration: none;
 }
 .site-header__name {
+  font-family: var(--font-display);
   font-size: var(--step--1); font-weight: 600;
   text-transform: uppercase; letter-spacing: 0.12em;
 }
 .site-header__role {
+  font-family: var(--font-display);
   font-size: var(--step--1); color: var(--c-text-dim);
   text-transform: uppercase; letter-spacing: 0.12em;
 }
@@ -178,15 +183,20 @@ main > :last-child { margin-block-end: var(--space-section); }
 .site-nav__toggle { display: none; }
 .site-nav__panel { display: flex; gap: var(--space-m); }
 .site-nav__panel a {
+  font-family: var(--font-display);
   font-size: var(--step--1);
   text-transform: uppercase; letter-spacing: 0.1em;
   text-decoration: none; color: var(--c-text-muted);
   padding-block: var(--space-2xs);
 }
-.site-nav__panel a:hover { color: var(--c-text); }
+.site-nav__panel a {
+  background: linear-gradient(var(--c-accent), var(--c-accent)) bottom left / 0% 1px no-repeat;
+  transition: background-size var(--dur) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.site-nav__panel a:hover { color: var(--c-text); background-size: 100% 1px; }
 .site-nav__panel a[aria-current="page"] {
   color: var(--c-text);
-  box-shadow: inset 0 -1px 0 0 var(--c-accent);
+  background-size: 100% 1px;
 }
 
 @media (max-width: 46rem) {
@@ -221,15 +231,28 @@ main > :last-child { margin-block-end: var(--space-section); }
 
 /* ── Hero ───────────────────────────────────────────────────────────────── */
 
-.hero { --stack-space: var(--space-m); max-width: var(--measure-wide); }
+.hero { --stack-space: var(--space-m); max-width: var(--measure-wide); position: relative; }
+/* Static ambient glow — depth without motion. Sits behind the hero only. */
+.page--index main::before {
+  content: '';
+  position: absolute; inset: 0 0 auto 0; height: 90vh;
+  background:
+    radial-gradient(90% 55% at 70% -10%, color-mix(in oklch, var(--c-accent) 9%, transparent), transparent 70%),
+    radial-gradient(60% 40% at 10% 10%, color-mix(in oklch, var(--ink-c) 5%, transparent), transparent 70%);
+  pointer-events: none;
+}
+.page--index main { position: relative; }
+.page--index main > * { position: relative; }
 .hero__kicker {
+  font-family: var(--font-display);
   font-size: var(--step--1); color: var(--c-text-dim);
   text-transform: uppercase; letter-spacing: 0.16em;
 }
 .hero__headline {
   font-size: var(--step-5);
   max-width: 18ch;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.03em;
+  font-weight: 640;
 }
 .hero__sub { font-size: var(--step-1); color: var(--c-text-muted); max-width: var(--measure); }
 .hero__actions { --gap: var(--space-s); margin-block-start: var(--space-l); }
@@ -249,6 +272,7 @@ main > :last-child { margin-block-end: var(--space-section); }
 
 .section { --stack-space: var(--space-l); }
 .section__heading {
+  font-family: var(--font-display);
   font-size: var(--step--1); color: var(--c-text-dim);
   text-transform: uppercase; letter-spacing: 0.16em; font-weight: 600;
   padding-block-end: var(--space-xs);
@@ -303,7 +327,12 @@ main > :last-child { margin-block-end: var(--space-section); }
   transition: transform var(--dur) var(--ease-out), background var(--dur) var(--ease-out);
 }
 .embed__icon svg { translate: 2px 0; }
-.embed__play:hover .embed__icon { transform: scale(1.06); background: var(--c-accent); color: var(--c-accent-ink); }
+.embed__play:hover .embed__icon {
+  transform: scale(1.08);
+  background: var(--c-accent); color: var(--c-accent-ink);
+  box-shadow: 0 0 0 8px color-mix(in oklch, var(--c-accent) 18%, transparent),
+              0 8px 40px -8px color-mix(in oklch, var(--c-accent) 55%, transparent);
+}
 .embed__label {
   font-size: var(--step--1); letter-spacing: 0.08em; text-transform: uppercase;
   color: var(--c-text-muted);
@@ -347,8 +376,14 @@ main > :last-child { margin-block-end: var(--space-section); }
   border-radius: var(--radius-sm); background: var(--c-bg-elev-2);
 }
 .film-card__media img { width: 100%; height: 100%; object-fit: cover;
-  transition: scale var(--dur-slow) var(--ease-out); }
-.film-card__link:hover .film-card__media img { scale: 1.03; }
+  transition: scale var(--dur-slow) var(--ease-out), filter var(--dur-slow) var(--ease-out); }
+.film-card__link { transition: translate var(--dur) var(--ease-out); }
+.film-card__link:hover { translate: 0 -4px; }
+.film-card__link:hover .film-card__media img { scale: 1.045; filter: brightness(1.06); }
+.film-card__media { transition: box-shadow var(--dur) var(--ease-out); }
+.film-card__link:hover .film-card__media {
+  box-shadow: 0 12px 32px -12px color-mix(in oklch, var(--c-accent) 25%, transparent);
+}
 .film-card__noposter { display: block; width: 100%; height: 100%;
   background: repeating-linear-gradient(45deg, var(--c-bg-elev-1) 0 8px, var(--c-bg-elev-2) 8px 16px); }
 .film-card__title { font-weight: 600; }
@@ -451,6 +486,7 @@ main > :last-child { margin-block-end: var(--space-section); }
 .callout__social { justify-content: center; --gap: var(--space-m); font-size: var(--step--1); }
 
 .btn {
+  font-family: var(--font-display);
   display: inline-flex; align-items: center; gap: var(--space-2xs);
   padding: 0.65em 1.4em;
   border-radius: var(--radius-full);
@@ -461,8 +497,16 @@ main > :last-child { margin-block-end: var(--space-section); }
   transition: background var(--dur) var(--ease-out), color var(--dur) var(--ease-out),
               border-color var(--dur) var(--ease-out);
 }
-.btn--primary { background: var(--c-accent); color: var(--c-accent-ink); }
-.btn--primary:hover { background: color-mix(in oklch, var(--c-accent) 82%, white); color: var(--c-accent-ink); }
+.btn { position: relative; overflow: hidden; }
+.btn--primary { background: linear-gradient(115deg, var(--ink-a), var(--ink-b)); color: var(--c-accent-ink); }
+.btn--primary::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(115deg, transparent 30%, rgb(255 255 255 / 0.35) 50%, transparent 70%);
+  translate: -110% 0;
+  transition: translate 0.6s var(--ease-out);
+}
+.btn--primary:hover { color: var(--c-accent-ink); }
+.btn--primary:hover::after { translate: 110% 0; }
 .btn--ghost { border-color: var(--c-line-strong); color: var(--c-text); }
 .btn--ghost:hover { border-color: var(--c-text); color: var(--c-text); background: var(--c-bg-elev-1); }
 
@@ -532,6 +576,29 @@ main > :last-child { margin-block-end: var(--space-section); }
 /* ── Utilities ──────────────────────────────────────────────────────────── */
 
 .u-accent { color: var(--c-accent); font-style: normal; }
+/* The one overt nod to generative work: a word whose ink slowly re-renders
+   itself. Falls back to solid amber where clip:text is unsupported; freezes
+   under reduced motion via the global block; solid again in forced colors. */
+@supports (-webkit-background-clip: text) {
+  .hero__headline .u-accent {
+    background: linear-gradient(100deg, var(--ink-a), var(--ink-b) 40%, var(--ink-c) 70%, var(--ink-a));
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: var(--c-accent);
+    animation: ink-drift 14s linear infinite;
+  }
+}
+@keyframes ink-drift {
+  from { background-position: 0% 50%; }
+  to   { background-position: 300% 50%; }
+}
+@media (forced-colors: active) {
+  .hero__headline .u-accent {
+    background: none; -webkit-text-fill-color: currentColor; color: CanvasText;
+  }
+}
 .u-muted { color: var(--c-text-muted); }
 .u-visually-hidden {
   position: absolute !important; width: 1px; height: 1px;
@@ -539,6 +606,20 @@ main > :last-child { margin-block-end: var(--space-section); }
   clip-path: inset(50%); white-space: nowrap; border: 0;
 }
 .u-bleed { width: 100%; }
+
+/* ── Scroll reveal ───────────────────────────────────────────────────────
+   .reveal is applied by main.js, never by markup, so content is fully
+   visible with JS off and under prefers-reduced-motion (the JS bails). */
+.reveal {
+  opacity: 0;
+  translate: 0 18px;
+}
+.reveal.in {
+  opacity: 1;
+  translate: 0 0;
+  transition: opacity 0.65s var(--ease-out), translate 0.65s var(--ease-out);
+  transition-delay: var(--reveal-delay, 0ms);
+}
 
 /* ── Reduced motion ─────────────────────────────────────────────────────── */
 

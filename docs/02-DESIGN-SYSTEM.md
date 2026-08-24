@@ -61,6 +61,11 @@ Measure: `--measure: 38rem` for prose, `--measure-wide: 76rem` for page width.
 
 ### Fonts
 
+**In use: Space Grotesk (variable, 300–700), self-hosted at `assets/fonts/space-grotesk-var.woff2`,
+OFL-licensed (licence committed alongside).** It is the display voice only — headlines, brand,
+kickers, nav, buttons. Body copy stays on the system stack for speed and reading comfort. The
+single latin file is 22KB and is preloaded from the document head.
+
 **Self-hosted variable woff2 in `assets/fonts/`.** Not a system stack — the type *is* the design on
 a site judged on craft, and a portfolio that renders in Segoe UI on one machine and SF on another
 has no typographic identity. Not Google Fonts — a render-blocking third-party request, a privacy
@@ -188,3 +193,18 @@ the user just clicked."
 | Autoplaying hero reel | **Never shipped**, same reason. Hero is a still + play facade. |
 | Scroll reveal, parallax | Suppressed by the global block; the JS never runs. |
 | Hover scale, focus transitions | Collapsed to `.01ms`. |
+
+### The motion system that shipped
+
+- **Scroll reveal** — film entries, cards, founders, steps and section headings fade-rise 18px with
+  a 70ms sibling stagger. The `.reveal` class is added by `main.js` only: with JS off or under
+  `prefers-reduced-motion` nothing is ever hidden. Elements already in the viewport at load are
+  skipped — reveals are for content that scrolls in, never a curtain over first paint.
+- **Gradient ink** — one word of the hero headline (`[[…]]` in content) carries a slow 14s
+  drifting warm gradient. Solid amber fallback without `background-clip: text` support; solid
+  `CanvasText` under forced colors; frozen under reduced motion.
+- **Hover** — cards lift 4px with an amber-tinted shadow, posters scale 1.045 and brighten,
+  the play button gains a glow ring, primary buttons run a single sheen sweep, nav links grow a
+  1px amber underline. All transform/opacity/background-size — nothing that triggers layout.
+- **Ambient** — a static two-point radial glow behind the home hero. No animation, no texture
+  loops; depth comes from light, not movement.
