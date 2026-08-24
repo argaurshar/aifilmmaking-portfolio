@@ -277,13 +277,15 @@
       "published": "2026-07-25"
     },
     {
-      "id": "new-film-01",
-      "title": "TODO: title for youtu.be/US1ts3jG0Ak",
+      "id": "ramayana",
+      "title": "Ramayana",
       "year": 2026,
-      "type": "animation",
-      "logline": "TODO: one sentence. What happens, concretely. No adjectives.",
+      "type": "trailer",
+      "logline": "What if the Ramayana was made today? That was the whole question.",
       "roles": [
-        "Director"
+        "Director",
+        "Writer",
+        "Animator"
       ],
       "video": {
         "platform": "youtube",
@@ -292,7 +294,7 @@
         "startAt": null
       },
       "poster": null,
-      "runtimeSeconds": null,
+      "runtimeSeconds": 99,
       "synopsis": null,
       "client": null,
       "collaborators": [],
@@ -300,17 +302,19 @@
       "aspectRatio": "16:9",
       "featured": false,
       "order": 100,
-      "status": "draft",
+      "status": "published",
       "published": null
     },
     {
-      "id": "new-film-02",
-      "title": "TODO: title for youtu.be/ECdd56qfn94",
+      "id": "what-if-hampi-could-live-again",
+      "title": "What If Hampi Could Live Again?",
       "year": 2026,
-      "type": "animation",
-      "logline": "TODO: one sentence. What happens, concretely. No adjectives.",
+      "type": "documentary",
+      "logline": "Some cities disappear. Some survive. And some wait centuries to tell their story again.",
       "roles": [
-        "Director"
+        "Director",
+        "Writer",
+        "Editor"
       ],
       "video": {
         "platform": "youtube",
@@ -319,7 +323,7 @@
         "startAt": null
       },
       "poster": null,
-      "runtimeSeconds": null,
+      "runtimeSeconds": 147,
       "synopsis": null,
       "client": null,
       "collaborators": [],
@@ -327,17 +331,19 @@
       "aspectRatio": "16:9",
       "featured": false,
       "order": 110,
-      "status": "draft",
+      "status": "published",
       "published": null
     },
     {
-      "id": "new-film-03",
-      "title": "TODO: title for youtu.be/lLeEsLxh3LA",
+      "id": "foam-festival-yamuna",
+      "title": "Foam Festival — Yamuna, 2026",
       "year": 2026,
-      "type": "animation",
-      "logline": "TODO: one sentence. What happens, concretely. No adjectives.",
+      "type": "documentary",
+      "logline": "No dialogue, one minute, on the Yamuna during Chhath Puja.",
       "roles": [
-        "Director"
+        "Director",
+        "Writer",
+        "Editor"
       ],
       "video": {
         "platform": "youtube",
@@ -346,7 +352,7 @@
         "startAt": null
       },
       "poster": null,
-      "runtimeSeconds": null,
+      "runtimeSeconds": 57,
       "synopsis": null,
       "client": null,
       "collaborators": [],
@@ -354,7 +360,7 @@
       "aspectRatio": "16:9",
       "featured": false,
       "order": 120,
-      "status": "draft",
+      "status": "published",
       "published": null
     }
   ]
