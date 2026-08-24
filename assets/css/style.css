@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   Nitish Jain — Filmmaker
+   Xelion Labs — Film Studio
    Cinema black. See docs/02-DESIGN-SYSTEM.md.
 
    Order matters: tokens → reset → base → layout → components → utilities → media.
@@ -476,6 +476,28 @@ main > :last-child { margin-block-end: var(--space-section); }
   .about--split { grid-template-columns: minmax(0, 18rem) minmax(0, 1fr); align-items: start; }
 }
 .about__portrait { border-radius: var(--radius-md); width: 100%; object-fit: cover; }
+
+/* Without a side portrait the body spans the full container, but .prose caps at
+   the readable measure — so centre it, or the text hugs the left edge and leaves
+   the rest of the row empty. */
+.about:not(.about--split) .about__body { margin-inline: auto; max-width: var(--measure); }
+
+/* ── Founders ───────────────────────────────────────────────────────────── */
+
+.founders { --col-min: 16rem; --gap: var(--space-m); }
+.founder {
+  --stack-space: var(--space-2xs);
+  padding: var(--space-m);
+  background: var(--c-bg-elev-1);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-md);
+}
+.founder__name { font-size: var(--step-1); }
+.founder__role {
+  font-size: var(--step--1); color: var(--c-accent);
+  text-transform: uppercase; letter-spacing: 0.1em;
+}
+.founder__bio { color: var(--c-text-muted); }
 
 /* ── Footer ─────────────────────────────────────────────────────────────── */
 

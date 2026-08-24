@@ -23,13 +23,22 @@
     ],
     "portrait": {
       "src": "assets/stills/portrait.jpg",
-      "alt": "A digital billboard in Times Square, New York, showing Nitish Jain of Xelion Labs",
+      "alt": "A digital billboard in Times Square, New York, showing Nitish Jain",
       "caption": null
     },
-    "person": {
-      "name": "Nitish Jain",
-      "role": "Director"
-    }
+    "founders": [
+      {
+        "name": "Nitish Jain",
+        "role": "Director",
+        "bio": "Directs, writes and cuts. Credited on every film on this site.",
+        "director": true
+      },
+      {
+        "name": "Gaurav Sharma",
+        "role": "Co-founder",
+        "bio": "Co-founded Xelion Labs with Nitish Jain."
+      }
+    ]
   },
   "contact": {
     "email": "nitish@xelionlabs.com",

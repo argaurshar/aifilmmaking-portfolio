@@ -811,6 +811,8 @@ ${footer(ctx)}
    9. SEO builders
    ═══════════════════════════════════════════════════════════════════════════ */
 
+const slugify = (n) => String(n).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
 /**
  * The site's own identity. An Organization when identity.person is set (the
  * site belongs to a studio), a Person when it is not (a solo filmmaker).
@@ -818,14 +820,14 @@ ${footer(ctx)}
  */
 function identityNode(ctx) {
   const { site, u } = ctx;
-  const isOrg = Boolean(site.identity.person);
+  const isOrg = Boolean(site.identity.founders?.length);
   const node = {
     '@type': isOrg ? 'Organization' : 'Person',
     '@id': u.absUrl('about.html') + '#identity',
     name: site.identity.name,
     url: u.absUrl(''),
   };
-  if (isOrg) node.founder = personRef(ctx);
+  if (isOrg) node.founder = site.identity.founders.map((f) => founderRef(ctx, f));
   else {
     node.jobTitle = site.identity.role;
     node.knowsAbout = ['Directing', 'Editing', 'Narrative short film', 'Brand film', 'Animation'];
@@ -844,21 +846,42 @@ const identityRef = (ctx) => ({ '@id': ctx.u.absUrl('about.html') + '#identity' 
  * so an Organization cannot fill that slot — and festivals credit a director,
  * not a studio. Falls back to the identity when the site is one person.
  */
-function personNode(ctx) {
+const founderRef = (ctx, f) => ({ '@id': ctx.u.absUrl('about.html') + '#' + slugify(f.name) });
+
+/** One Person node per founder, each linked back to the studio. */
+function founderNodes(ctx) {
   const { site, u } = ctx;
-  if (!site.identity.person) return identityNode(ctx);
-  return {
-    '@type': 'Person',
-    '@id': u.absUrl('about.html') + '#person',
-    name: site.identity.person.name,
-    jobTitle: site.identity.person.role ?? 'Director',
-    worksFor: identityRef(ctx),
-    knowsAbout: ['Directing', 'Editing', 'Narrative short film', 'Brand film', 'Animation'],
-  };
+  return (site.identity.founders ?? []).map((f) => {
+    const node = {
+      '@type': 'Person',
+      '@id': u.absUrl('about.html') + '#' + slugify(f.name),
+      name: f.name,
+      jobTitle: f.role,
+      worksFor: identityRef(ctx),
+    };
+    if (f.bio) node.description = f.bio;
+    if (f.director) node.knowsAbout = ['Directing', 'Editing', 'Narrative short film', 'Brand film', 'Animation'];
+    return node;
+  });
 }
 
-const personRef = (ctx) =>
-  ({ '@id': ctx.u.absUrl('about.html') + (ctx.site.identity.person ? '#person' : '#identity') });
+/**
+ * Who gets the VideoObject.director credit. A studio cannot direct — schema.org
+ * wants a Person there — so this resolves to the founder flagged as director,
+ * falling back to the first, and to the identity itself for a solo site.
+ */
+function personNode(ctx) {
+  const nodes = founderNodes(ctx);
+  return nodes.length ? nodes : identityNode(ctx);
+}
+
+const personRef = (ctx) => {
+  const fs = ctx.site.identity.founders ?? [];
+  const director = fs.find((f) => f.director) ?? fs[0];
+  return director
+    ? { '@id': ctx.u.absUrl('about.html') + '#' + slugify(director.name) }
+    : { '@id': ctx.u.absUrl('about.html') + '#identity' };
+};
 
 function videoObject(film, ctx) {
   const { u } = ctx;
@@ -906,7 +929,7 @@ function pageIndex(ctx) {
   const jsonLd = [
     { '@type': 'WebSite', '@id': u.absUrl('') + '#website', url: u.absUrl(''), name: site.site.title, publisher: identityRef(ctx) },
     identityNode(ctx),
-    personNode(ctx),
+    ...[personNode(ctx)].flat(),
     ...(hero ? [videoObject(hero, ctx)] : []),
   ];
 
@@ -1007,7 +1030,7 @@ function pageWork(ctx) {
     description: p.metaDescription,
     ogImagePath: films[0]?.poster?.src ?? null,
     jsonLd: [
-      identityNode(ctx), personNode(ctx),
+      identityNode(ctx), ...[personNode(ctx)].flat(),
       {
         '@type': 'ItemList',
         itemListElement: films.map((f, i) => ({
@@ -1029,7 +1052,7 @@ function pageWorkFiltered(ctx, type) {
     title: `${TYPE_LABEL[type]} — ${site.identity.name}`,
     description: `${TYPE_LABEL[type]} work by ${site.identity.name}.`,
     ogImagePath: list[0]?.poster?.src ?? null,
-    jsonLd: [identityNode(ctx), personNode(ctx), ...list.map((f) => videoObject(f, ctx))],
+    jsonLd: [identityNode(ctx), ...[personNode(ctx)].flat(), ...list.map((f) => videoObject(f, ctx))],
     body: workBody(ctx, list, type),
   };
 }
@@ -1042,7 +1065,7 @@ function pageProcess(ctx) {
     title: `Process — ${site.identity.name}`,
     description: p.metaDescription,
     ogImagePath: clips[0]?.poster?.src ?? null,
-    jsonLd: [identityNode(ctx), personNode(ctx), breadcrumb({ path: 'process.html', title: 'Process' }, ctx)],
+    jsonLd: [identityNode(ctx), ...[personNode(ctx)].flat(), breadcrumb({ path: 'process.html', title: 'Process' }, ctx)],
     body: html`
 <header class="page-head l-container l-stack">
   <h1 class="page-head__title">${inline(p.heading)}</h1>
@@ -1106,7 +1129,7 @@ function pageHire(ctx) {
     title: `Hire — ${site.identity.name}`,
     description: p.metaDescription,
     ogImagePath: null,
-    jsonLd: [seller, personNode(ctx), breadcrumb({ path: 'hire.html', title: 'Hire' }, ctx)],
+    jsonLd: [seller, ...[personNode(ctx)].flat(), breadcrumb({ path: 'hire.html', title: 'Hire' }, ctx)],
     body: html`
 <header class="page-head l-container l-stack">
   <h1 class="page-head__title">${inline(p.heading)}</h1>
@@ -1151,7 +1174,7 @@ function pageAbout(ctx) {
     title: `About — ${site.identity.name}`,
     description: p.metaDescription,
     ogImagePath: site.identity.portrait?.src ?? null,
-    jsonLd: [identityNode(ctx), personNode(ctx), breadcrumb({ path: 'about.html', title: 'About' }, ctx)],
+    jsonLd: [identityNode(ctx), ...[personNode(ctx)].flat(), breadcrumb({ path: 'about.html', title: 'About' }, ctx)],
     body: html`
 <header class="page-head l-container l-stack">
   <h1 class="page-head__title">${inline(p.heading)}</h1>
@@ -1178,6 +1201,19 @@ ${site.identity.portrait && site.identity.portraitWide
     ${site.identity.location ? html`<p class="u-muted">Based in ${site.identity.location}.</p>` : ''}
   </div>
 </section>
+
+${site.identity.founders?.length
+      ? html`<section class="section l-container l-stack" aria-labelledby="founders-heading">
+  <h2 class="section__heading" id="founders-heading">Founders</h2>
+  <ul class="founders l-grid">
+    ${site.identity.founders.map((f) => html`<li class="founder l-stack" id="${slugify(f.name)}">
+      <h3 class="founder__name">${f.name}</h3>
+      <p class="founder__role">${f.role}</p>
+      ${f.bio ? html`<p class="founder__bio">${inline(f.bio)}</p>` : ''}
+    </li>`)}
+  </ul>
+</section>`
+      : ''}
 
 ${site.credits?.length
       ? html`<section class="section l-container l-stack" aria-labelledby="credits-heading">
