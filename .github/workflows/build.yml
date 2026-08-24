@@ -1,0 +1,70 @@
+# Regenerate the site whenever content changes.
+#
+# Pages serves the committed HTML, so a content edit that is not followed by a
+# rebuild ships nothing. Editing content/films.json in the GitHub web UI used to
+# be exactly that trap. This workflow closes it: change the content, and the
+# HTML that Pages serves is regenerated and committed for you.
+#
+# Nothing about the Pages setup changes — source stays "Deploy from a branch".
+# Building locally still works and is still the faster loop. This is the safety
+# net for edits made from a browser.
+
+name: Build site
+
+on:
+  push:
+    branches: [main]
+    # Deliberately NOT *.html. The commit this workflow makes touches only
+    # generated HTML, so it cannot match these paths and cannot retrigger.
+    paths:
+      - 'content/**'
+      - 'assets/**'
+      - 'build.mjs'
+      - '.github/workflows/build.yml'
+  workflow_dispatch:
+
+# Two pushes in quick succession would race to commit the same files. Let the
+# newer one win rather than have both fight over main.
+concurrency:
+  group: build-site
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # Belt and braces with the paths filter above: never react to our own commit.
+    if: github.actor != 'github-actions[bot]'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      # No cache, no install step. The site has no dependencies and the
+      # generator is one file — see CLAUDE.md, non-negotiable 1.
+
+      # Fails on invalid content, and rebuilds at BASE_PATH=/__probe__/ to catch
+      # any hardcoded root path. A bad edit stops here instead of being committed.
+      - name: Validate and probe
+        run: node build.mjs --check
+
+      - name: Build
+        run: node build.mjs
+
+      - name: Verify the generator
+        run: node --test test/build.test.mjs
+
+      - name: Commit regenerated HTML
+        run: |
+          if git diff --quiet; then
+            echo "No change to the generated output."
+            exit 0
+          fi
+          git config user.name  'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Rebuild site from content [skip ci]'
+          git push

@@ -9,11 +9,31 @@ GitHub Pages, custom domain, and the pre-flight.
 
 ## The model
 
-Generated HTML is **committed** and Pages serves it straight from the branch. No CI, no build step
-on the server, no Actions workflow. `git push` is the deploy.
+Generated HTML is **committed** and Pages serves it straight from the branch. `git push` is the
+deploy — there is no build step on the Pages server.
 
 That means: **always run `node build.mjs` before you commit.** A content edit without a rebuild
 ships nothing.
+
+### The browser-edit safety net
+
+That rule is easy to break from github.com, where you can edit `content/films.json` and commit
+without ever running the generator — changing the content and leaving the site untouched.
+
+`.github/workflows/build.yml` catches it. On any push to `main` that touches `content/`, `assets/`
+or `build.mjs`, it runs `node build.mjs --check`, rebuilds, runs the test suite, and commits the
+regenerated HTML back to `main`. So a content edit made in a browser reaches the live site on its
+own, a minute or two later.
+
+It cannot loop: its own commit touches only generated HTML, which is not in the workflow's `paths`
+filter, and the job additionally skips pushes made by `github-actions[bot]`.
+
+It cannot ship a bad edit either. `--check` fails on invalid content and on any hardcoded root
+path, and the tests run before the commit step, so a broken edit stops in CI with the site
+unchanged.
+
+This changes nothing about the Pages configuration — source stays **Deploy from a branch**.
+Building locally is still the faster loop and still the recommended one.
 
 ---
 

@@ -68,7 +68,11 @@ node build.mjs                 # regenerate all HTML from content/
 python3 -m http.server 8000    # preview at localhost:8000
 ```
 
-No install step, no test suite, no linter. If a change would need one, ask first.
+No install step, no linter. `node --test test/build.test.mjs` runs the generator's own tests.
+If a change would need a dependency, ask first.
+
+Pushing to `main` triggers `.github/workflows/build.yml`, which rebuilds and commits the HTML —
+so a content edit made in the GitHub web UI still reaches the live site. See `docs/07-DEPLOY.md`.
 
 Slash commands live in `.claude/commands/`: `/build-site`, `/add-film`, `/new-page`, `/check`, `/deploy`.
 
