@@ -168,6 +168,14 @@ Facade: poster + play control, iframe injected only on activation. The box is re
 `--embed-ratio` is the **only** place content data reaches a `style` attribute. It is regex-gated in
 the validator and re-asserted by the audit.
 
+**Portrait films (9:16 — Shorts).** When the parsed ratio is taller than wide, `embed()` adds
+`embed--portrait` and the entry gets `film-entry--portrait`. Uncapped, a 9:16 frame in a 46rem
+column stands over 1200px tall. Instead the frame caps at `max-width: 21rem` (centred on mobile),
+the play icon steps down a size, and at ≥60rem the entry grid inverts to
+`minmax(0, 21rem) minmax(0, 1fr)` with the copy vertically centred — narrow column for the film,
+wide one for the words. The first-child "statement" layout is overridden for portrait entries so a
+vertical film opening the page does not run full width.
+
 ---
 
 ## Focus

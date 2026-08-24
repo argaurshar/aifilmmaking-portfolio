@@ -218,10 +218,18 @@ function checkStrings(node, pathStr, rep) {
   }
 }
 
-function validateVideo(v, p, rep) {
+function validateVideo(v, p, rep, { allowPending = false } = {}) {
   if (!v || typeof v !== 'object') { rep.error(p, 'required object { platform, id }'); return; }
   if (!['youtube', 'vimeo'].includes(v.platform)) {
     rep.error(`${p}.platform`, `must be "youtube" or "vimeo", got ${JSON.stringify(v.platform)}`);
+  }
+  // A draft may be staged with everything but the id — title, runtime, logline
+  // all captured while the id itself is still being copied off the platform.
+  // Such a film is held out of every build, --drafts included, so a half-known
+  // entry can live in content without ever rendering a broken embed.
+  if (v.id === null && allowPending) {
+    rep.warn(`${p}.id`, 'awaiting the real id — this film is held out of every build');
+    return;
   }
   if (typeof v.id !== 'string' || !v.id) { rep.error(`${p}.id`, 'required string'); return; }
 
@@ -311,7 +319,7 @@ function validate(site, filmsDoc, processDoc, rep) {
     else if (f.logline.length > 200) rep.error(`${p}.logline`, `max 200 chars, got ${f.logline.length}`);
     if (!Array.isArray(f.roles) || !f.roles.length) rep.error(`${p}.roles`, 'required, at least one');
 
-    validateVideo(f.video, `${p}.video`, rep);
+    validateVideo(f.video, `${p}.video`, rep, { allowPending: (f.status ?? 'published') === 'draft' });
     validatePoster(f.poster, `${p}.poster`, rep);
 
     if (f.type === 'brand-film' && !f.client) rep.error(`${p}.client`, 'required when type is "brand-film"');
@@ -591,10 +599,19 @@ function embedOrigin(platform) {
  * The lite-embed facade. The control stays a real <a href> to the watch page,
  * so it genuinely works with JS off; JS upgrades it in place. Never role=button.
  */
+/**
+ * "9:16" → { css: "9 / 16", portrait: true }. One parse drives three things:
+ * the frame's aspect-ratio, the layout modifier, and the srcset sizes hint.
+ */
+function parseRatio(ratio) {
+  const [w, h] = String(ratio ?? '16:9').split(':').map(Number);
+  return { css: `${w} / ${h}`, portrait: h > w };
+}
+
 function embed({ video, poster, title, ratio, runtimeSeconds, eager = false, caption = null, noteGaps = false }) {
-  const ratioCss = (ratio ?? '16:9').replace(':', ' / ');
+  const { css: ratioCss, portrait } = parseRatio(ratio);
   const spoken = spokenRuntime(runtimeSeconds);
-  return html`<figure class="embed" data-embed
+  return html`<figure class="embed${portrait ? ' embed--portrait' : ''}" data-embed
     data-embed-src="${embedSrc(video)}"
     data-embed-origin="${embedOrigin(video.platform)}"
     data-embed-title="${title}"
@@ -603,7 +620,7 @@ function embed({ video, poster, title, ratio, runtimeSeconds, eager = false, cap
     <div class="embed__frame">
       ${poster
         ? html`<img class="embed__poster" src="${poster.src}"
-            ${poster.srcset ? attrs({ srcset: poster.srcset, sizes: '(min-width: 60rem) 60rem, 100vw' }) : ''}
+            ${poster.srcset ? attrs({ srcset: poster.srcset, sizes: portrait ? '(min-width: 40rem) 21rem, 92vw' : '(min-width: 60rem) 60rem, 100vw' }) : ''}
             width="${poster.width}" height="${poster.height}" alt=""
             ${attrs({ loading: eager ? 'eager' : 'lazy', fetchpriority: eager ? 'high' : false, decoding: 'async' })}>`
         : html`<span class="embed__noposter" aria-hidden="true"></span>`}
@@ -660,7 +677,8 @@ function filmEntry(film, ctx, { eager = false, headingLevel = 'h2' } = {}) {
     </dl>`);
   }
 
-  return html`<article class="film-entry" id="film-${film.id}">
+  const portrait = parseRatio(film.aspectRatio).portrait;
+  return html`<article class="film-entry${portrait ? ' film-entry--portrait' : ''}" id="film-${film.id}">
     ${embed({
       video: film.video, poster: film.resolvedPoster, title: film.title,
       ratio: film.aspectRatio, runtimeSeconds: film.runtimeSeconds, eager,
@@ -1397,7 +1415,11 @@ async function buildOnce({ base, includeDrafts, strict, quiet }) {
   const origin = process.env.SITE_ORIGIN || site.site.origin;
   const u = makeUrls({ base, origin });
 
-  let films = (filmsDoc.films ?? []).filter((f) => includeDrafts || (f.status ?? 'published') === 'published');
+  // A film with no video id has nothing to embed, so it never renders — not
+  // even under --drafts. See validateVideo's allowPending.
+  let films = (filmsDoc.films ?? [])
+    .filter((f) => f.video?.id)
+    .filter((f) => includeDrafts || (f.status ?? 'published') === 'published');
   films = films.slice().sort(sortFilms);
   let clips = (processDoc.clips ?? []).filter((c) => includeDrafts || (c.status ?? 'published') === 'published');
   clips = clips.slice().sort((a, b) => a.order - b.order);
@@ -1573,9 +1595,16 @@ async function main() {
     for (const g of gaps) console.log(`  TODO  ${g}`);
   }
 
-  const draftCount = (await loadJson('content/films.json')).films.filter((f) => (f.status ?? 'published') === 'draft').length;
+  const allFilms = (await loadJson('content/films.json')).films;
+  const pending = allFilms.filter((f) => !f.video?.id);
+  const draftCount = allFilms.filter((f) => (f.status ?? 'published') === 'draft' && f.video?.id).length;
   if (draftCount && !includeDrafts) {
     console.log(`\n  ${draftCount} draft film${draftCount === 1 ? '' : 's'} excluded. Preview with: node build.mjs --drafts`);
+  }
+  if (pending.length) {
+    console.log(`\n  ${pending.length} film${pending.length === 1 ? '' : 's'} awaiting a video id, held out of every build:`);
+    for (const f of pending) console.log(`    ${f.id}`);
+    console.log('    Set video.id in content/films.json to the 11 characters after /shorts/ or ?v=');
   }
 
   console.log(`\n  note: robots.txt is only honoured at an origin root. At ${ctx.u.BASE} it is advisory`);

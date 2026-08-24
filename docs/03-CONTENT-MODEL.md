@@ -112,6 +112,14 @@ silently — breaking exactly the videos most worth gating.
 
 The validator detects a pasted URL and tells you the exact ID to use instead.
 
+### Staging a film before its ID is known
+
+A **draft** may set `"video": { "platform": "youtube", "id": null }`. Everything else — title,
+logline, runtime, order — is captured while the ID is still being copied off the platform. A film
+with a null ID is held out of **every** build, `--drafts` included: there is nothing to embed, so
+it never renders as a broken player. The build summary lists what is waiting. Fill in `video.id`
+and flip `status` to `"published"` to release it. A published film with a null ID is an error.
+
 ### No authored image dimensions
 
 `poster.width` / `height` do not exist. The generator reads intrinsic dimensions off disk, so they
@@ -124,7 +132,7 @@ cannot be mistyped or drift.
 | `runtimeSeconds` | Runtime chip omitted; JSON-LD `duration` omitted. Never estimated. |
 | `synopsis` | The whole `<details>` block is dropped — no empty heading. |
 | `poster` | Auto-detected from `assets/stills/<id>-1920.jpg` (also `.jpeg`/`.png`, also the bare `<id>.<ext>`). If nothing is found: a quiet striped block, plus a build warning naming the exact file it wanted. The loud dashed `placeholder` shows for **drafts only** — nine of them on a client-facing page read as broken. Never a stock image, never a YouTube-hosted thumbnail. |
-| `aspectRatio` | Defaults to `16:9` **with a warning**, so a vertical film is never silently letterboxed. |
+| `aspectRatio` | Defaults to `16:9` **with a warning**, so a vertical film is never silently letterboxed. A ratio taller than wide (`9:16` — Shorts) switches the entry to the portrait layout: the frame caps at 21rem and the copy takes the wide column. |
 | `laurels` | Laurel row omitted. |
 | `published` | JSON-LD `uploadDate` omitted, plus a named warning that the film loses video rich-result eligibility. |
 | `order` | 1000. |

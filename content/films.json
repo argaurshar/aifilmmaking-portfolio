@@ -3,11 +3,17 @@
     "Titles and loglines are Nitish's own words, taken from the YouTube titles and",
     "descriptions he wrote, with the AI framing removed for the site per docs/04-VOICE.md rule 6.",
     "",
-    "ID mapping is CONFIRMED for all twelve films. The first nine were confirmed by matching",
-    "runtimes on the Studio list to the order the links were sent; foam-festival-yamuna was",
-    "confirmed directly against its video-details page (lLeEsLxh3LA, 0:57).",
+    "ID mapping is CONFIRMED for the twelve published films. The first nine were confirmed by",
+    "matching runtimes on the Studio list to the order the links were sent; foam-festival-yamuna",
+    "was confirmed directly against its video-details page (lLeEsLxh3LA, 0:57).",
     "",
-    "Outstanding: ramayana and what-if-hampi-could-live-again have no synopsis, and all three",
+    "The four architecture explainers at order 130-160 are STAGED, not published. Everything is",
+    "captured except the video id: the Studio screenshots truncate it, and an id is not something",
+    "to guess. Each entry records the visible prefix under _pendingIdPrefix. Open the video, copy",
+    "the 11 characters after /shorts/, put them in video.id and set status to \"published\".",
+    "A film with video.id null is held out of every build, --drafts included.",
+    "",
+    "Outstanding: ramayana and what-if-hampi-could-live-again have no synopsis.",
     "",
     "Preview drafts locally with:  node build.mjs --drafts",
     "Field reference: docs/03-CONTENT-MODEL.md"
@@ -367,6 +373,128 @@
       "order": 30,
       "status": "published",
       "published": "2026-08-24"
+    },
+    {
+      "id": "inside-antilia",
+      "title": "Inside Antilia: What Actually Holds It Up",
+      "year": 2026,
+      "type": "documentary",
+      "logline": "A private tower in the middle of Mumbai. Not the facade everyone photographs, but the structure underneath it.",
+      "roles": [
+        "Director",
+        "Writer",
+        "Editor"
+      ],
+      "video": {
+        "platform": "youtube",
+        "id": null,
+        "hash": null,
+        "startAt": null
+      },
+      "poster": null,
+      "runtimeSeconds": 57,
+      "synopsis": null,
+      "client": null,
+      "collaborators": [],
+      "laurels": [],
+      "aspectRatio": "9:16",
+      "featured": false,
+      "order": 130,
+      "status": "draft",
+      "published": "2026-08-24",
+      "_pendingIdPrefix": "YCaNOr"
+    },
+    {
+      "id": "new-parliament-triangle",
+      "title": "Why India's New Parliament Is a Triangle",
+      "year": 2026,
+      "type": "documentary",
+      "logline": "The building is a triangle, and that was a decision. This is the reasoning behind the shape.",
+      "roles": [
+        "Director",
+        "Writer",
+        "Animator"
+      ],
+      "video": {
+        "platform": "youtube",
+        "id": null,
+        "hash": null,
+        "startAt": null
+      },
+      "poster": null,
+      "runtimeSeconds": 67,
+      "synopsis": [
+        "Every frame in this film is modelled, lit and rendered in 3D."
+      ],
+      "client": null,
+      "collaborators": [],
+      "laurels": [],
+      "aspectRatio": "9:16",
+      "featured": false,
+      "order": 140,
+      "status": "draft",
+      "published": "2026-08-24",
+      "_pendingIdPrefix": "IRKanN"
+    },
+    {
+      "id": "qutub-minar",
+      "title": "Why the Qutub Minar Hasn't Fallen",
+      "year": 2026,
+      "type": "documentary",
+      "logline": "Earthquakes, lightning, centuries of weather. It is still standing, and there are reasons for that.",
+      "roles": [
+        "Director",
+        "Writer",
+        "Editor"
+      ],
+      "video": {
+        "platform": "youtube",
+        "id": null,
+        "hash": null,
+        "startAt": null
+      },
+      "poster": null,
+      "runtimeSeconds": 56,
+      "synopsis": null,
+      "client": null,
+      "collaborators": [],
+      "laurels": [],
+      "aspectRatio": "9:16",
+      "featured": false,
+      "order": 150,
+      "status": "draft",
+      "published": "2026-08-24",
+      "_pendingIdPrefix": "UNeK5"
+    },
+    {
+      "id": "coastal-tower-320m",
+      "title": "How Do You Build a 320m Tower on the Coast?",
+      "year": 2026,
+      "type": "documentary",
+      "logline": "Soft ground, salt air, and wind coming off the sea. What has to be solved before a 320-metre tower goes up at all.",
+      "roles": [
+        "Director",
+        "Writer",
+        "Animator"
+      ],
+      "video": {
+        "platform": "youtube",
+        "id": null,
+        "hash": null,
+        "startAt": null
+      },
+      "poster": null,
+      "runtimeSeconds": 101,
+      "synopsis": null,
+      "client": null,
+      "collaborators": [],
+      "laurels": [],
+      "aspectRatio": "9:16",
+      "featured": false,
+      "order": 160,
+      "status": "draft",
+      "published": "2026-08-24",
+      "_pendingIdPrefix": "dXGC1q"
     }
   ]
 }
