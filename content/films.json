@@ -1,14 +1,17 @@
 {
   "_comment": [
     "Titles and loglines are Nitish’s own words, taken from the YouTube titles and",
-    "descriptions he wrote, with the AI framing removed for the site per docs/04-VOICE.md",
-    "rule 6. The YouTube copy keeps its AI keywords for discovery; the site does not.",
+    "descriptions he wrote, with the AI framing removed for the site per docs/04-VOICE.md rule 6.",
     "",
-    "ID mapping is CONFIRMED: runtimes on the YouTube Studio list match this order exactly.",
+    "The nine published films have a CONFIRMED id mapping: runtimes on the YouTube Studio",
+    "list matched the order the links were sent, film for film.",
     "",
-    "Still missing: posters (poster: null on every film) and synopsis. Cut posters with",
-    "scripts/make-posters.sh, or paste the full YouTube descriptions for synopsis text.",
+    "The three new-film-* entries hold real video IDs but placeholder everything else, so they",
+    "are \"status\": \"draft\" and the build EXCLUDES them. Their ids are temporary: the real id is",
+    "a slug of the title, and the poster filename derives from the id, so both get set together",
+    "once the titles arrive.",
     "",
+    "Preview drafts locally with:  node build.mjs --drafts",
     "Field reference: docs/03-CONTENT-MODEL.md"
   ],
   "films": [
@@ -272,6 +275,87 @@
       "order": 90,
       "status": "published",
       "published": "2026-07-25"
+    },
+    {
+      "id": "new-film-01",
+      "title": "TODO: title for youtu.be/US1ts3jG0Ak",
+      "year": 2026,
+      "type": "animation",
+      "logline": "TODO: one sentence. What happens, concretely. No adjectives.",
+      "roles": [
+        "Director"
+      ],
+      "video": {
+        "platform": "youtube",
+        "id": "US1ts3jG0Ak",
+        "hash": null,
+        "startAt": null
+      },
+      "poster": null,
+      "runtimeSeconds": null,
+      "synopsis": null,
+      "client": null,
+      "collaborators": [],
+      "laurels": [],
+      "aspectRatio": "16:9",
+      "featured": false,
+      "order": 100,
+      "status": "draft",
+      "published": null
+    },
+    {
+      "id": "new-film-02",
+      "title": "TODO: title for youtu.be/ECdd56qfn94",
+      "year": 2026,
+      "type": "animation",
+      "logline": "TODO: one sentence. What happens, concretely. No adjectives.",
+      "roles": [
+        "Director"
+      ],
+      "video": {
+        "platform": "youtube",
+        "id": "ECdd56qfn94",
+        "hash": null,
+        "startAt": null
+      },
+      "poster": null,
+      "runtimeSeconds": null,
+      "synopsis": null,
+      "client": null,
+      "collaborators": [],
+      "laurels": [],
+      "aspectRatio": "16:9",
+      "featured": false,
+      "order": 110,
+      "status": "draft",
+      "published": null
+    },
+    {
+      "id": "new-film-03",
+      "title": "TODO: title for youtu.be/lLeEsLxh3LA",
+      "year": 2026,
+      "type": "animation",
+      "logline": "TODO: one sentence. What happens, concretely. No adjectives.",
+      "roles": [
+        "Director"
+      ],
+      "video": {
+        "platform": "youtube",
+        "id": "lLeEsLxh3LA",
+        "hash": null,
+        "startAt": null
+      },
+      "poster": null,
+      "runtimeSeconds": null,
+      "synopsis": null,
+      "client": null,
+      "collaborators": [],
+      "laurels": [],
+      "aspectRatio": "16:9",
+      "featured": false,
+      "order": 120,
+      "status": "draft",
+      "published": null
     }
   ]
 }
