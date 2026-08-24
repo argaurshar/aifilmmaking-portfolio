@@ -1,30 +1,34 @@
 {
   "site": {
     "origin": "https://argaurshar.github.io",
-    "title": "Nitish Jain — Filmmaker",
-    "description": "Narrative shorts, brand films and animation by Nitish Jain.",
+    "title": "Xelion Labs — Film Studio",
+    "description": "Narrative shorts, brand films and animation by Xelion Labs.",
     "locale": "en",
     "updated": "2026-08-24",
-    "ogImage": "assets/og/nitish-jain-card-v2.jpg"
+    "ogImage": "assets/og/xelion-labs-card.jpg"
   },
   "identity": {
-    "name": "Nitish Jain",
-    "role": "Filmmaker",
-    "tagline": "I make short films. Some of them are for [[brands]].",
+    "name": "Xelion Labs",
+    "role": "Film Studio",
+    "tagline": "We make short films. Some of them are for [[brands]].",
     "location": null,
     "shortBio": [
-      "I make short films — animation and documentary, most of them one to two minutes, and most of them about India."
+      "We make short films — animation and documentary, most of them one to two minutes, and most of them about India."
     ],
     "longBio": [
-      "I make short films. Most run between one and two minutes. A tiffin that comes back untouched. A thread tied every year that always fades. A boy playing a World Cup final in a backyard with a rag ball and the number 7 chalked onto it.",
-      "They tend to find the same thing from different directions: someone holding on to something small that matters more than it should. A beaver who thinks he is nothing without a crown. A man who has spent his life outrunning one fear. I am interested in the moment a person works out what they have been carrying.",
+      "We make short films. Most run between one and two minutes. A tiffin that comes back untouched. A thread tied every year that always fades. A boy playing a World Cup final in a backyard with a rag ball and the number 7 chalked onto it.",
+      "They tend to find the same thing from different directions: someone holding on to something small that matters more than it should. A beaver who thinks he is nothing without a crown. A man who has spent his life outrunning one fear. We are interested in the moment a person works out what they have been carrying.",
       "Two of the films are documentary. One is about Sonam Wangchuk, who built his own school in Ladakh after the system decided he was slow. One is a tribute to a master of humane Indian modernism, an architect who held that a house is not shelter but a precious thing. Both are about people who were underestimated for a long time.",
-      "I work with generative tools. They let one person build a scene that would otherwise need a crew, a location and a budget. That is all they are to me — how the work gets made. What I care about is whether a shot holds and whether a cut lands."
+      "We work with generative tools. They let one person build a scene that would otherwise need a crew, a location and a budget. That is all they are to us — how the work gets made. What matters is whether a shot holds and whether a cut lands."
     ],
     "portrait": {
       "src": "assets/stills/portrait.jpg",
-      "alt": "A digital billboard in Times Square, New York, showing Nitish Jain",
+      "alt": "A digital billboard in Times Square, New York, showing Nitish Jain of Xelion Labs",
       "caption": null
+    },
+    "person": {
+      "name": "Nitish Jain",
+      "role": "Director"
     }
   },
   "contact": {
@@ -56,14 +60,14 @@
       "heroKicker": "Narrative · Brand · Animation",
       "heroHeadline": "Films made frame by frame, on a small budget and a short clock.",
       "heroSub": [],
-      "metaDescription": "Narrative shorts, brand films and animation by Nitish Jain."
+      "metaDescription": "Narrative shorts, brand films and animation by Xelion Labs."
     },
     "work": {
       "heading": "Work",
       "intro": [
         "Everything below is finished and watchable. Shorts first, then commissioned work."
       ],
-      "metaDescription": "Films by Nitish Jain — narrative shorts, brand films and animation.",
+      "metaDescription": "Films by Xelion Labs — narrative shorts, brand films and animation.",
       "emptyState": "No films are published yet. They will appear here as they go up."
     },
     "process": {
@@ -71,18 +75,18 @@
       "intro": [
         "Four short breakdowns of how a scene actually gets built — the problem, the approach, and what it cost."
       ],
-      "metaDescription": "How the work gets made — four craft breakdowns by Nitish Jain."
+      "metaDescription": "How the work gets made — four craft breakdowns by Xelion Labs."
     },
     "hire": {
-      "heading": "Hire me",
+      "heading": "Work with us",
       "intro": [
-        "I take on a small number of commissions at a time. Tell me what you need and roughly when."
+        "We take on a small number of commissions at a time. Tell us what you need and roughly when."
       ],
-      "metaDescription": "Commission a narrative short, brand film or animated piece from Nitish Jain."
+      "metaDescription": "Commission a narrative short, brand film or animated piece from Xelion Labs."
     },
     "about": {
       "heading": "About",
-      "metaDescription": "Nitish Jain is a filmmaker working in narrative shorts, brand films and animation."
+      "metaDescription": "Xelion Labs is a film studio working in narrative shorts, brand films and animation."
     },
     "notFound": {
       "heading": "Nothing here",

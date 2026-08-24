@@ -811,16 +811,25 @@ ${footer(ctx)}
    9. SEO builders
    ═══════════════════════════════════════════════════════════════════════════ */
 
-function personNode(ctx) {
+/**
+ * The site's own identity. An Organization when identity.person is set (the
+ * site belongs to a studio), a Person when it is not (a solo filmmaker).
+ * schema.org treats these very differently, so this is not a name swap.
+ */
+function identityNode(ctx) {
   const { site, u } = ctx;
+  const isOrg = Boolean(site.identity.person);
   const node = {
-    '@type': 'Person',
-    '@id': u.absUrl('about.html') + '#person',
+    '@type': isOrg ? 'Organization' : 'Person',
+    '@id': u.absUrl('about.html') + '#identity',
     name: site.identity.name,
     url: u.absUrl(''),
-    jobTitle: site.identity.role,
-    knowsAbout: ['Directing', 'Editing', 'Narrative short film', 'Brand film', 'Animation'],
   };
+  if (isOrg) node.founder = personRef(ctx);
+  else {
+    node.jobTitle = site.identity.role;
+    node.knowsAbout = ['Directing', 'Editing', 'Narrative short film', 'Brand film', 'Animation'];
+  }
   const bio = (site.identity.shortBio ?? []).join(' ').trim();
   if (bio && !/TODO/.test(bio)) node.description = bio;
   if (site.identity.portrait) node.image = ctx.ORIGIN + u.url(site.identity.portrait.src);
@@ -828,7 +837,28 @@ function personNode(ctx) {
   return node;
 }
 
-const personRef = (ctx) => ({ '@id': ctx.u.absUrl('about.html') + '#person' });
+const identityRef = (ctx) => ({ '@id': ctx.u.absUrl('about.html') + '#identity' });
+
+/**
+ * The named human who directs the films. VideoObject.director expects a Person,
+ * so an Organization cannot fill that slot — and festivals credit a director,
+ * not a studio. Falls back to the identity when the site is one person.
+ */
+function personNode(ctx) {
+  const { site, u } = ctx;
+  if (!site.identity.person) return identityNode(ctx);
+  return {
+    '@type': 'Person',
+    '@id': u.absUrl('about.html') + '#person',
+    name: site.identity.person.name,
+    jobTitle: site.identity.person.role ?? 'Director',
+    worksFor: identityRef(ctx),
+    knowsAbout: ['Directing', 'Editing', 'Narrative short film', 'Brand film', 'Animation'],
+  };
+}
+
+const personRef = (ctx) =>
+  ({ '@id': ctx.u.absUrl('about.html') + (ctx.site.identity.person ? '#person' : '#identity') });
 
 function videoObject(film, ctx) {
   const { u } = ctx;
@@ -841,8 +871,8 @@ function videoObject(film, ctx) {
     url: u.absUrl('work.html') + `#film-${film.id}`,
     genre: TYPE_LABEL[film.type],
     inLanguage: ctx.site.site.locale ?? 'en',
-    creator: personRef(ctx),
-    director: personRef(ctx),
+    creator: identityRef(ctx),   // the studio produced it
+    director: personRef(ctx),   // a person directed it
   };
   if (film.resolvedPoster) node.thumbnailUrl = [ctx.ORIGIN + film.resolvedPoster.src];
   if (film.published) node.uploadDate = film.published;         // omitted, never invented
@@ -874,7 +904,8 @@ function pageIndex(ctx) {
   const p = site.pages.index;
 
   const jsonLd = [
-    { '@type': 'WebSite', '@id': u.absUrl('') + '#website', url: u.absUrl(''), name: site.site.title, publisher: personRef(ctx) },
+    { '@type': 'WebSite', '@id': u.absUrl('') + '#website', url: u.absUrl(''), name: site.site.title, publisher: identityRef(ctx) },
+    identityNode(ctx),
     personNode(ctx),
     ...(hero ? [videoObject(hero, ctx)] : []),
   ];
@@ -976,7 +1007,7 @@ function pageWork(ctx) {
     description: p.metaDescription,
     ogImagePath: films[0]?.poster?.src ?? null,
     jsonLd: [
-      personNode(ctx),
+      identityNode(ctx), personNode(ctx),
       {
         '@type': 'ItemList',
         itemListElement: films.map((f, i) => ({
@@ -998,7 +1029,7 @@ function pageWorkFiltered(ctx, type) {
     title: `${TYPE_LABEL[type]} — ${site.identity.name}`,
     description: `${TYPE_LABEL[type]} work by ${site.identity.name}.`,
     ogImagePath: list[0]?.poster?.src ?? null,
-    jsonLd: [personNode(ctx), ...list.map((f) => videoObject(f, ctx))],
+    jsonLd: [identityNode(ctx), personNode(ctx), ...list.map((f) => videoObject(f, ctx))],
     body: workBody(ctx, list, type),
   };
 }
@@ -1011,7 +1042,7 @@ function pageProcess(ctx) {
     title: `Process — ${site.identity.name}`,
     description: p.metaDescription,
     ogImagePath: clips[0]?.poster?.src ?? null,
-    jsonLd: [personNode(ctx), breadcrumb({ path: 'process.html', title: 'Process' }, ctx)],
+    jsonLd: [identityNode(ctx), personNode(ctx), breadcrumb({ path: 'process.html', title: 'Process' }, ctx)],
     body: html`
 <header class="page-head l-container l-stack">
   <h1 class="page-head__title">${inline(p.heading)}</h1>
@@ -1067,15 +1098,15 @@ function pageHire(ctx) {
     }
     return offer;                                      // no priceSpecification when there is no rate
   });
-  const person = personNode(ctx);
-  person.makesOffer = offers;
+  const seller = identityNode(ctx);
+  seller.makesOffer = offers;
 
   return {
     id: 'hire', path: 'hire.html', navMatch: 'hire.html',
     title: `Hire — ${site.identity.name}`,
     description: p.metaDescription,
     ogImagePath: null,
-    jsonLd: [person, breadcrumb({ path: 'hire.html', title: 'Hire' }, ctx)],
+    jsonLd: [seller, personNode(ctx), breadcrumb({ path: 'hire.html', title: 'Hire' }, ctx)],
     body: html`
 <header class="page-head l-container l-stack">
   <h1 class="page-head__title">${inline(p.heading)}</h1>
@@ -1120,7 +1151,7 @@ function pageAbout(ctx) {
     title: `About — ${site.identity.name}`,
     description: p.metaDescription,
     ogImagePath: site.identity.portrait?.src ?? null,
-    jsonLd: [personNode(ctx), breadcrumb({ path: 'about.html', title: 'About' }, ctx)],
+    jsonLd: [identityNode(ctx), personNode(ctx), breadcrumb({ path: 'about.html', title: 'About' }, ctx)],
     body: html`
 <header class="page-head l-container l-stack">
   <h1 class="page-head__title">${inline(p.heading)}</h1>
@@ -1136,7 +1167,7 @@ ${site.identity.portrait && site.identity.portraitWide
   </figure>`
       : ''}
 
-<section class="section l-container about">
+<section class="section l-container about${site.identity.portrait && !site.identity.portraitWide ? ' about--split' : ''}">
   ${site.identity.portrait && !site.identity.portraitWide
       ? html`<img class="about__portrait" src="${ctx.u.url(site.identity.portrait.src)}"
           alt="${site.identity.portrait.alt}" width="${site.identity.portraitSize.width}"

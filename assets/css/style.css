@@ -469,8 +469,11 @@ main > :last-child { margin-block-end: var(--space-section); }
 /* ── About ──────────────────────────────────────────────────────────────── */
 
 .about { display: grid; gap: var(--space-l); }
+/* Two columns ONLY when a side portrait sits in the section. A wide portrait
+   renders as a banner outside it, and without this the bio was left stranded
+   in the 18rem column with the rest of the row empty. */
 @media (min-width: 50rem) {
-  .about { grid-template-columns: minmax(0, 18rem) minmax(0, 1fr); align-items: start; }
+  .about--split { grid-template-columns: minmax(0, 18rem) minmax(0, 1fr); align-items: start; }
 }
 .about__portrait { border-radius: var(--radius-md); width: 100%; object-fit: cover; }
 
