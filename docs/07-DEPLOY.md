@@ -73,6 +73,41 @@ any hardcoded root path that a normal build would not catch.
 
 ## Vercel
 
+### When Vercel stops deploying
+
+Symptom: you push, GitHub has the commit, and Vercel keeps serving an old one. No failed build,
+no error — just nothing. That is a dead **webhook**, not a failed build. Vercel's Deployments list
+is the tell:
+
+| Deployments list shows | Meaning | Fix |
+|---|---|---|
+| Nothing newer than the stale commit | The Git webhook is not firing | Deploy hook, below — or reconnect under Settings → Git |
+| Entries marked **Error** | Builds run and fail | Open the newest and read the log |
+| Entries marked **Ready** | Builds succeed, production never promoted | Promote it, or fix Settings → Git → Production Branch |
+
+**Redeploy does not help.** Its dialog says it builds "the same source code as your current one" —
+it rebuilds the stale commit. This trips people up: they click Redeploy, see the old site again,
+and conclude the fix failed.
+
+### The deploy hook
+
+`.github/workflows/build.yml` POSTs to a Vercel deploy hook after each build, which triggers a
+deployment without going near the webhook. Two steps to arm it:
+
+1. Vercel → project → **Settings → Git → Deploy Hooks** — create one for `main`, copy the URL.
+2. GitHub → repo **Settings → Secrets and variables → Actions → New repository secret**, named
+   `VERCEL_DEPLOY_HOOK`, pasted as the value.
+
+With the secret unset the step is skipped and nothing fails. With it set, a 4xx fails the job
+loudly rather than silently doing nothing — which is the failure mode this exists to prevent.
+
+A deploy hook still needs Vercel's read access to the repository. If it 404s, the repo connection
+itself is gone, not just the webhook: reconnect under Settings → Git. Note the repo lives under
+`argaurshar` while the Vercel account is a different login, so Vercel's GitHub authorisation has to
+include this repository.
+
+### How Vercel builds
+
 Vercel serves from a domain **root**, not a subpath, so the HTML committed for GitHub Pages (which
 hardcodes `/aifilmmaking-portfolio/`) would 404 on every asset. `vercel.json` solves this by having
 Vercel run the generator itself at deploy time:

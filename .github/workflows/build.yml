@@ -68,3 +68,30 @@ jobs:
           git add -A
           git commit -m 'Rebuild site from content [skip ci]'
           git push
+
+      # Vercel's own Git integration stopped firing after f3bc2b1 — pushes
+      # produce no deployment and no error, which is what a dead webhook looks
+      # like. A deploy hook is a plain URL that tells Vercel to build; POSTing
+      # it here bypasses the webhook entirely.
+      #
+      # To arm it: Vercel -> project -> Settings -> Git -> Deploy Hooks, create
+      # one for `main`, then GitHub -> Settings -> Secrets and variables ->
+      # Actions -> New repository secret, named VERCEL_DEPLOY_HOOK.
+      #
+      # Unset, this step is skipped and nothing fails. curl only — no npm.
+      - name: Trigger the Vercel deploy
+        env:
+          HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "VERCEL_DEPLOY_HOOK is not set — skipping. GitHub Pages is unaffected."
+            exit 0
+          fi
+          code=$(curl -sS -o /dev/null -w '%{http_code}' -X POST "$HOOK")
+          echo "Vercel deploy hook returned $code"
+          # A 4xx means the hook is wrong or revoked; that is worth failing on,
+          # because a silent no-op is the exact problem this step exists to fix.
+          case "$code" in
+            2*) echo "Deployment queued." ;;
+            *)  echo "::error::Deploy hook rejected the request ($code). Recreate it in Vercel -> Settings -> Git -> Deploy Hooks."; exit 1 ;;
+          esac
