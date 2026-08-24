@@ -1,15 +1,15 @@
 {
   "_comment": [
-    "Titles and loglines are Nitish’s own words, taken from the YouTube titles and",
+    "Titles and loglines are Nitish's own words, taken from the YouTube titles and",
     "descriptions he wrote, with the AI framing removed for the site per docs/04-VOICE.md rule 6.",
     "",
-    "The nine published films have a CONFIRMED id mapping: runtimes on the YouTube Studio",
-    "list matched the order the links were sent, film for film.",
+    "ID mapping is CONFIRMED for all twelve films. The first nine were confirmed by matching",
+    "runtimes on the Studio list to the order the links were sent; foam-festival-yamuna was",
+    "confirmed directly against its video-details page (lLeEsLxh3LA, 0:57).",
     "",
-    "The three new-film-* entries hold real video IDs but placeholder everything else, so they",
-    "are \"status\": \"draft\" and the build EXCLUDES them. Their ids are temporary: the real id is",
-    "a slug of the title, and the poster filename derives from the id, so both get set together",
-    "once the titles arrive.",
+    "Outstanding: ramayana and what-if-hampi-could-live-again have no synopsis, and all three",
+    "of the newest films have no \"published\" date, so the build warns they are not eligible",
+    "for video rich results.",
     "",
     "Preview drafts locally with:  node build.mjs --drafts",
     "Field reference: docs/03-CONTENT-MODEL.md"
@@ -339,7 +339,7 @@
       "title": "Foam Festival — Yamuna, 2026",
       "year": 2026,
       "type": "documentary",
-      "logline": "No dialogue, one minute, on the Yamuna during Chhath Puja.",
+      "logline": "Every year during Chhath Puja, thousands wade into the Yamuna at sunrise. Every year, the river is covered in a thick white foam that looks like fresh snow.",
       "roles": [
         "Director",
         "Writer",
@@ -353,7 +353,14 @@
       },
       "poster": null,
       "runtimeSeconds": 57,
-      "synopsis": null,
+      "synopsis": [
+        "Every year during Chhath Puja, thousands of devotees wade into the Yamuna in Delhi to offer arghya at sunrise. Every year, the river is covered in a thick white foam that looks like fresh snow.",
+        "The photographs are real, and they are taken every November. The film photographs that morning with total reverence, and then tells you what the white is made of.",
+        "The froth forms when untreated sewage and detergent runoff load the river with phosphates and surfactants, which whip into foam wherever the water is churned, usually at barrages and weirs. High ammonia is part of the same picture.",
+        "In November 2025 the Delhi Pollution Control Committee recorded zero dissolved oxygen at multiple points on the Delhi stretch of the Yamuna. Zero dissolved oxygen means nothing can live there.",
+        "The 22 kilometres between Wazirabad and Okhla make up less than two percent of the river's length and carry roughly eighty percent of its pollution load. That stretch is where people stand.",
+        "The people in the water did not put any of this in the river."
+      ],
       "client": null,
       "collaborators": [],
       "laurels": [],
