@@ -69,10 +69,11 @@ jobs:
           git commit -m 'Rebuild site from content [skip ci]'
           git push
 
-      # Vercel's own Git integration stopped firing after f3bc2b1 — pushes
-      # produce no deployment and no error, which is what a dead webhook looks
-      # like. A deploy hook is a plain URL that tells Vercel to build; POSTing
-      # it here bypasses the webhook entirely.
+      # Backstop only. Vercel's stale-site episode turned out to be a
+      # wrong-repository link, not a dead webhook — see the two-repository trap
+      # in docs/07-DEPLOY.md. A deploy hook cannot rescue that case, since it
+      # builds whatever repo the project points at. It does cover a webhook that
+      # genuinely stops firing, which is why it stays.
       #
       # To arm it: Vercel -> project -> Settings -> Git -> Deploy Hooks, create
       # one for `main`, then GitHub -> Settings -> Secrets and variables ->
