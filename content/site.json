@@ -1,10 +1,10 @@
 {
   "site": {
     "origin": "https://argaurshar.github.io",
-    "title": "Xelion Labs — Film Studio",
+    "title": "Xelion Labs \u2014 Film Studio",
     "description": "Narrative shorts, brand films and animation by Xelion Labs.",
     "locale": "en",
-    "updated": "2026-08-24",
+    "updated": "2026-08-25",
     "ogImage": "assets/og/xelion-labs-card.jpg"
   },
   "identity": {
@@ -13,13 +13,13 @@
     "tagline": "We make short films. Some of them are for [[brands]].",
     "location": null,
     "shortBio": [
-      "We make short films — animation and documentary, most of them one to two minutes, and most of them about India."
+      "We make short films \u2014 animation and documentary, most of them one to two minutes, and most of them about India."
     ],
     "longBio": [
       "We make short films. Most run between one and two minutes. A tiffin that comes back untouched. A thread tied every year that always fades. A boy playing a World Cup final in a backyard with a rag ball and the number 7 chalked onto it.",
       "They tend to find the same thing from different directions: someone holding on to something small that matters more than it should. A beaver who thinks he is nothing without a crown. A man who has spent his life outrunning one fear. We are interested in the moment a person works out what they have been carrying.",
-      "Two of the films are documentary. One is about Sonam Wangchuk, who built his own school in Ladakh after the system decided he was slow. One is a tribute to a master of humane Indian modernism, an architect who held that a house is not shelter but a precious thing. Both are about people who were underestimated for a long time.",
-      "We work with generative tools. They let one person build a scene that would otherwise need a crew, a location and a budget. That is all they are to us — how the work gets made. What matters is whether a shot holds and whether a cut lands."
+      "Some of them are documentary. One is about Sonam Wangchuk, who built his own school in Ladakh after the system decided he was slow. One is a tribute to a master of humane Indian modernism, an architect who held that a house is not shelter but a precious thing. Both are about people who were underestimated for a long time.",
+      "We work with generative tools. They let one person build a scene that would otherwise need a crew, a location and a budget. That is all they are to us \u2014 how the work gets made. What matters is whether a shot holds and whether a cut lands."
     ],
     "portrait": {
       "src": "assets/stills/portrait.jpg",
@@ -66,7 +66,7 @@
   ],
   "pages": {
     "index": {
-      "heroKicker": "Narrative · Brand · Animation",
+      "heroKicker": "Narrative \u00b7 Brand \u00b7 Animation",
       "heroHeadline": "Films made [[frame by frame]], on a small budget and a short clock.",
       "heroSub": [],
       "metaDescription": "Narrative shorts, brand films and animation by Xelion Labs."
@@ -74,17 +74,17 @@
     "work": {
       "heading": "Work",
       "intro": [
-        "Every film here is finished and watchable. Newest first."
+        "Every film here is finished and watchable."
       ],
-      "metaDescription": "Films by Xelion Labs — narrative shorts, brand films and animation.",
+      "metaDescription": "Films by Xelion Labs \u2014 narrative shorts, brand films and animation.",
       "emptyState": "No films are published yet. They will appear here as they go up."
     },
     "process": {
       "heading": "Process",
       "intro": [
-        "Four short breakdowns of how a scene actually gets built — the problem, the approach, and what it cost."
+        "How a film gets made here, in the order it actually happens."
       ],
-      "metaDescription": "How the work gets made — four craft breakdowns by Xelion Labs."
+      "metaDescription": "How the work gets made at Xelion Labs \u2014 the four stages of a film, start to finish."
     },
     "hire": {
       "heading": "Work with us",
@@ -132,7 +132,7 @@
     {
       "id": "animation",
       "title": "Animation",
-      "summary": "Moving image work that is not shot — sequences, titles, transitions, whole pieces.",
+      "summary": "Moving image work that is not shot \u2014 sequences, titles, transitions, whole pieces.",
       "deliverables": [
         "Finished sequence, graded",
         "Master file plus a web-ready export"
@@ -154,7 +154,7 @@
       "n": 2,
       "title": "Find the look",
       "body": [
-        "Reference first, then a small set of rules — palette, lens, how light behaves in this world. Fixing that early is what stops a sequence drifting apart in the middle."
+        "Reference first, then a small set of rules \u2014 palette, lens, how light behaves in this world. Fixing that early is what stops a sequence drifting apart in the middle."
       ]
     },
     {
@@ -168,7 +168,7 @@
       "n": 4,
       "title": "Cut, grade, finish",
       "body": [
-        "The edit decides the rhythm — where it breathes and where it moves. Then sound, then grade, then delivery in the format the film is actually going to be watched in."
+        "The edit decides the rhythm \u2014 where it breathes and where it moves. Then sound, then grade, then delivery in the format the film is actually going to be watched in."
       ]
     }
   ],

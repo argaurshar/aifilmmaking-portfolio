@@ -354,6 +354,7 @@ function validate(site, filmsDoc, processDoc, rep) {
     if (!c.title) rep.error(`${p}.title`, 'required');
     if (!CRAFTS.includes(c.craft)) rep.error(`${p}.craft`, `must be one of ${CRAFTS.join(', ')}`);
     if (!Array.isArray(c.summary) || !c.summary.length) rep.error(`${p}.summary`, 'required array of paragraphs');
+    if (c.aspectRatio != null && !RATIO.test(c.aspectRatio)) rep.error(`${p}.aspectRatio`, 'must look like "16:9"');
     validateVideo(c.video, `${p}.video`, rep);
     validatePoster(c.poster, `${p}.poster`, rep);
     if (c.filmId != null && !filmIds.has(c.filmId)) rep.error(`${p}.filmId`, `unknown film id "${c.filmId}"`);
@@ -478,9 +479,15 @@ async function copyDir(from, to) {
  * assets/stills/<id>-1920.jpg (or .jpeg/.png, or the bare <id>.<ext>).
  * Drop a correctly-named file in and the build picks it up with no JSON edit.
  */
+const POSTER_WIDTHS = [640, 810, 960, 1080, 1440, 1920];
+
 async function autoPoster(id, dir) {
+  // Widest first: the largest variant present becomes the default src.
+  // 1080 and below matter for portrait films — a 9:16 still is 1080 wide at
+  // full height, so demanding -1920 would reject the natural export.
+  const names = [...POSTER_WIDTHS].reverse().map((w) => `${id}-${w}.`);
   for (const ext of ['jpg', 'jpeg', 'png']) {
-    for (const name of [`${id}-1920.${ext}`, `${id}.${ext}`]) {
+    for (const name of [...names.map((n) => n + ext), `${id}.${ext}`]) {
       const rel = `${dir}/${name}`;
       if (await assetExists(rel)) return { src: rel, alt: '' };
     }
@@ -510,7 +517,7 @@ async function resolvePoster(poster, ctx, whereForErrors) {
   const m = /^(.*)-(\d+)\.(jpg|jpeg|png)$/i.exec(poster.src);
   const sources = [];
   if (m) {
-    for (const w of [960, 1440, 1920]) {
+    for (const w of POSTER_WIDTHS) {
       const cand = `${m[1]}-${w}.${m[3]}`;
       if (await assetExists(cand)) sources.push({ rel: cand, w });
     }
@@ -606,6 +613,17 @@ function embedOrigin(platform) {
 function parseRatio(ratio) {
   const [w, h] = String(ratio ?? '16:9').split(':').map(Number);
   return { css: `${w} / ${h}`, portrait: h > w };
+}
+
+/**
+ * og:video:width/height were hardcoded 1280x720. With 9:16 films on the site
+ * that told every scraper a portrait film was landscape. Derive from the ratio,
+ * normalised to a 720px long edge.
+ */
+function ogVideoSize(ratio) {
+  const [w, h] = String(ratio ?? '16:9').split(':').map(Number);
+  const scale = 720 / Math.max(w, h);
+  return { width: Math.round(w * scale), height: Math.round(h * scale) };
 }
 
 function embed({ video, poster, title, ratio, runtimeSeconds, eager = false, caption = null, noteGaps = false }) {
@@ -757,8 +775,8 @@ ${page.ogVideo
     ? html`<meta property="og:video:url" content="${page.ogVideo.url}">
 <meta property="og:video:secure_url" content="${page.ogVideo.url}">
 <meta property="og:video:type" content="text/html">
-<meta property="og:video:width" content="1280">
-<meta property="og:video:height" content="720">`
+<meta property="og:video:width" content="${String(page.ogVideo.width)}">
+<meta property="og:video:height" content="${String(page.ogVideo.height)}">`
     : ''}
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preload" as="font" type="font/woff2" href="${u.url('assets/fonts/space-grotesk-var.woff2')}" crossorigin>
@@ -939,7 +957,7 @@ function breadcrumb(page, ctx) {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 function pageIndex(ctx) {
-  const { site, films, u } = ctx;
+  const { site, films, clips, u } = ctx;
   const featured = films.filter((f) => f.featured);
   const hero = featured[0] ?? films[0] ?? null;
   const rest = films.filter((f) => f !== hero).slice(0, 3);
@@ -957,7 +975,7 @@ function pageIndex(ctx) {
     title: site.site.title,
     description: p.metaDescription,
     ogType: hero ? 'video.other' : 'website',
-    ogVideo: hero ? { url: embedSrc(hero.video) } : null,
+    ogVideo: hero ? { url: embedSrc(hero.video), ...ogVideoSize(hero.aspectRatio) } : null,
     ogImagePath: hero?.poster?.src ?? null,
     jsonLd,
     body: html`
@@ -995,7 +1013,7 @@ ${rest.length
 <section class="section section--split l-container" aria-labelledby="process-teaser">
   <h2 class="section__heading" id="process-teaser">How it gets made</h2>
   ${prose(site.pages.process.intro, 'prose prose--lede')}
-  <p><a class="btn btn--ghost" href="${u.url('process.html')}">Read the breakdowns</a></p>
+  <p><a class="btn btn--ghost" href="${u.url('process.html')}">${clips.length ? 'Read the breakdowns' : 'How we work'}</a></p>
 </section>
 
 <section class="section section--split l-container" aria-labelledby="services-teaser">
@@ -1424,6 +1442,13 @@ async function buildOnce({ base, includeDrafts, strict, quiet }) {
   let clips = (processDoc.clips ?? []).filter((c) => includeDrafts || (c.status ?? 'published') === 'published');
   clips = clips.slice().sort((a, b) => a.order - b.order);
 
+  // process.html renders the four processSteps whether or not any clip ships,
+  // so a fully-drafted process.json produces a page that looks finished while
+  // promising craft breakdowns it does not contain. Nothing caught that.
+  if ((processDoc.clips ?? []).length && !clips.length) {
+    rep.warn('process.clips', `all ${(processDoc.clips ?? []).length} clips are drafts — process.html ships with none. Check site.pages.process.intro does not promise them`);
+  }
+
   if (films.length && !films.some((f) => f.featured)) {
     rep.error('films', 'no film has "featured": true — the home page has no hero without one');
     throw new ReportError(rep);
@@ -1434,7 +1459,15 @@ async function buildOnce({ base, includeDrafts, strict, quiet }) {
   // Assets
   for (const f of films) {
     const poster = f.poster ?? await autoPoster(f.id, 'assets/stills');
-    if (!poster) rep.warn(`films[${f.id}].poster`, `no poster — add assets/stills/${f.id}-1920.jpg`);
+    if (!poster) {
+      // Named separately from the generic gap report because a missing poster
+      // also strips thumbnailUrl from the film's VideoObject, and Google
+      // requires it for video rich results. A poster-less film is invisible
+      // to video search, not merely plain-looking.
+      const want = (f.aspectRatio ?? '16:9').startsWith('9:') ? '1080' : '1920';
+      rep.warn(`films[${f.id}].poster`,
+        `no poster — add assets/stills/${f.id}-${want}.jpg. Without one this film ships no thumbnailUrl and cannot earn a video rich result`);
+    }
     // Write the auto-detected poster back, so page templates reading `poster.src`
     // for ogImagePath see it too. Without this, every film relying on filename
     // detection has poster === null and every page falls back to site.ogImage.
@@ -1586,10 +1619,14 @@ async function main() {
     for (const w of rep.warnings) console.log(`  WARN  ${w.path.padEnd(pad)} — ${w.msg}`);
   }
 
+  // Collected from the UNFILTERED documents. Reporting only what shipped hid
+  // every TODO sitting in a draft, which is precisely where unfinished content
+  // lives — the report was quietest exactly when it had most to say.
   const gaps = [];
+  const strip = (o) => ({ ...o, resolvedPoster: undefined });
   collectGaps(site, 'site', gaps);
-  collectGaps({ films: films.map((f) => ({ ...f, resolvedPoster: undefined })) }, 'films', gaps);
-  collectGaps({ clips: clips.map((c) => ({ ...c, resolvedPoster: undefined })) }, 'process', gaps);
+  collectGaps({ films: (filmsDoc.films ?? []).map(strip) }, 'films', gaps);
+  collectGaps({ clips: (processDoc.clips ?? []).map(strip) }, 'process', gaps);
   if (gaps.length) {
     console.log(`\n${gaps.length} content gap${gaps.length === 1 ? '' : 's'} still to fill:`);
     for (const g of gaps) console.log(`  TODO  ${g}`);

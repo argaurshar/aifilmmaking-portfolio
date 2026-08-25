@@ -40,14 +40,25 @@ function warmConnection(root) {
   }
 }
 
-function restoreEmbed(root) {
+function restoreEmbed(root, { refocus = false } = {}) {
   if (root.dataset.embedState !== 'playing') return;
   const frame = root.querySelector('.embed__frame');
   // Removing the iframe is how playback stops — you cannot pause a
   // cross-origin player without the vendor's JS API, which is a dependency.
-  if (frame && root._posterMarkup != null) frame.innerHTML = root._posterMarkup;
+  //
+  // Restore the ORIGINAL nodes, never a serialised copy. innerHTML would
+  // re-parse the markup into a fresh <a>, silently discarding the listeners
+  // bound in init('embeds') — after which the play control is a plain link
+  // that navigates the visitor to youtube.com. That fires on the ordinary
+  // path too: activateEmbed() restores the previous embed whenever a second
+  // film is played, so playing B used to break A.
+  if (frame && root._posterNodes) frame.replaceChildren(...root._posterNodes);
   delete root.dataset.embedState;
   if (activeEmbed === root) activeEmbed = null;
+
+  // The iframe we just removed may have held focus. Left alone it falls to
+  // <body> and a keyboard user restarts from the top of the document.
+  if (refocus) root.querySelector('.embed__play')?.focus();
 }
 
 function activateEmbed(root) {
@@ -58,7 +69,7 @@ function activateEmbed(root) {
 
   if (activeEmbed && activeEmbed !== root) restoreEmbed(activeEmbed);
 
-  root._posterMarkup = frame.innerHTML;
+  root._posterNodes = [...frame.childNodes];
 
   const iframe = document.createElement('iframe');
   iframe.className = 'embed__iframe';
@@ -96,7 +107,7 @@ init('embeds', () => {
   }
 
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && activeEmbed) restoreEmbed(activeEmbed);
+    if (e.key === 'Escape' && activeEmbed) restoreEmbed(activeEmbed, { refocus: true });
   });
 });
 

@@ -1,7 +1,7 @@
 {
   "_comment": [
     "Titles and loglines are Nitish's own words, taken from the YouTube titles and",
-    "descriptions he wrote, with the AI framing removed for the site per docs/04-VOICE.md rule 6.",
+    "descriptions he wrote, with the AI framing removed for the site per the AI-framing rule in docs/04-VOICE.md.",
     "",
     "ID mapping is CONFIRMED for fifteen of the sixteen films. The first nine were confirmed by",
     "matching runtimes on the Studio list to the order the links were sent; foam-festival-yamuna",
@@ -14,7 +14,7 @@
     "this is the remaining one. Open the film on the site and check the video matches the title.",
     "",
     "Outstanding: ramayana and what-if-hampi-could-live-again have no synopsis. The four explainers",
-    "have no posters — drop vertical stills into assets/stills/<id>-1080.jpg and rebuild.",
+    "have no posters \u2014 drop vertical stills into assets/stills/<id>-1080.jpg and rebuild.",
     "",
     "A draft may carry video.id: null; it is then held out of every build. See docs/03-CONTENT-MODEL.md.",
     "Preview drafts locally with:  node build.mjs --drafts",
@@ -26,7 +26,7 @@
       "title": "The Architect Who Built for the Soul",
       "year": 2026,
       "type": "documentary",
-      "logline": "A tribute to a master of humane Indian modernism — the architect who believed a house is not shelter but a precious thing.",
+      "logline": "A tribute to a master of humane Indian modernism \u2014 the architect who believed a house is not shelter but a precious thing.",
       "roles": [
         "Director",
         "Writer",
@@ -342,7 +342,7 @@
     },
     {
       "id": "foam-festival-yamuna",
-      "title": "Foam Festival — Yamuna, 2026",
+      "title": "Foam Festival \u2014 Yamuna, 2026",
       "year": 2026,
       "type": "documentary",
       "logline": "Every year during Chhath Puja, thousands wade into the Yamuna at sunrise. Every year, the river is covered in a thick white foam that looks like fresh snow.",

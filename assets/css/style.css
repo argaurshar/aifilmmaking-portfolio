@@ -342,6 +342,11 @@ main > :last-child { margin-block-end: var(--space-section); }
     transparent 24%);
   transition: background var(--dur) var(--ease-out);
 }
+/* The frame sets overflow:hidden and this link's border box IS the frame's
+   padding box, so the site-wide focus ring — outline-offset: 3px — is painted
+   entirely in the clipped region and never appears. Pull it inside. Without
+   this, tabbing through sixteen films moves focus with nothing visible. */
+.embed__play:focus-visible { outline-offset: -5px; }
 .embed__play:hover, .embed__play:focus-visible {
   color: var(--c-text);
   background: linear-gradient(to top,
@@ -358,7 +363,8 @@ main > :last-child { margin-block-end: var(--space-section); }
   transition: transform var(--dur) var(--ease-out), background var(--dur) var(--ease-out);
 }
 .embed__icon svg { translate: 2px 0; }
-.embed__play:hover .embed__icon {
+.embed__play:hover .embed__icon,
+.embed__play:focus-visible .embed__icon {
   transform: scale(1.08);
   background: var(--c-accent); color: var(--c-accent-ink);
   box-shadow: 0 0 0 8px color-mix(in oklch, var(--c-accent) 18%, transparent),
@@ -399,7 +405,13 @@ main > :last-child { margin-block-end: var(--space-section); }
 /* Vertical films (9:16 — Shorts). Left to itself a 9:16 frame in a 46rem
    column stands over 1200px tall and swallows the page. Cap the frame
    instead, and let the copy take the width the film gives back. */
+/* Centred only while the entry is a single stacked column. Once the copy sits
+   beside it (>=60rem, below) the frame goes flush left to share its baseline;
+   centring it there left the film adrift from its own title. */
 .embed--portrait .embed__frame { max-width: 21rem; margin-inline: auto; }
+@media (min-width: 46rem) and (max-width: 59.999rem) {
+  .film-entry--portrait .embed--portrait .embed__frame { margin-inline: 0; }
+}
 .embed--portrait .embed__icon { width: 3.5rem; height: 3.5rem; }
 
 @media (min-width: 60rem) {
@@ -573,7 +585,10 @@ main > :last-child { margin-block-end: var(--space-section); }
    button it stops being a signature. Primary stays solid, disciplined amber. */
 .btn--primary { background: var(--c-accent); color: var(--c-accent-ink); }
 .btn--primary:hover { background: color-mix(in oklch, var(--c-accent) 84%, white); color: var(--c-accent-ink); }
-.btn--ghost { border-color: var(--c-line-strong); color: var(--c-text); }
+/* --c-line-strong is a divider colour; as the only boundary of an interactive
+   control it fell under the 3:1 non-text floor. Buttons get a stronger edge
+   than rules do. */
+.btn--ghost { border-color: color-mix(in oklch, var(--c-text) 55%, transparent); color: var(--c-text); }
 .btn--ghost:hover { border-color: var(--c-text); color: var(--c-text); background: var(--c-bg-elev-1); }
 
 /* ── About ──────────────────────────────────────────────────────────────── */
