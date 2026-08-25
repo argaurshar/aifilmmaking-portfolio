@@ -479,26 +479,40 @@ async function copyDir(from, to) {
  * assets/stills/<id>-1920.jpg (or .jpeg/.png, or the bare <id>.<ext>).
  * Drop a correctly-named file in and the build picks it up with no JSON edit.
  */
-const POSTER_WIDTHS = [640, 810, 960, 1080, 1440, 1920];
+/**
+ * Every `<id>-<width>.<ext>` sibling in `dir`, widest first.
+ *
+ * Deliberately NOT a fixed ladder of expected widths. A hardcoded list forces
+ * whoever makes the files to hit those exact numbers, and a source narrower
+ * than the smallest rung then has to be either upscaled or mislabelled — and a
+ * 335px file named -1080.jpg makes the srcset lie, so browsers pick a tiny
+ * image believing it is large. Read what is actually on disk instead.
+ */
+async function posterVariants(id, dir) {
+  const re = new RegExp(`^${id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}-(\\d+)\\.(jpg|jpeg|png)$`, 'i');
+  let entries;
+  try { entries = await readdir(path.join(ROOT, dir)); } catch { return []; }
+  return entries
+    .map((name) => { const m = re.exec(name); return m ? { rel: `${dir}/${name}`, w: Number(m[1]) } : null; })
+    .filter(Boolean)
+    .sort((a, b) => b.w - a.w);
+}
 
 async function autoPoster(id, dir) {
-  // Widest first: the largest variant present becomes the default src.
-  // 1080 and below matter for portrait films — a 9:16 still is 1080 wide at
-  // full height, so demanding -1920 would reject the natural export.
-  const names = [...POSTER_WIDTHS].reverse().map((w) => `${id}-${w}.`);
+  // The widest variant present becomes the default src.
+  const variants = await posterVariants(id, dir);
+  if (variants.length) return { src: variants[0].rel, alt: '' };
   for (const ext of ['jpg', 'jpeg', 'png']) {
-    for (const name of [...names.map((n) => n + ext), `${id}.${ext}`]) {
-      const rel = `${dir}/${name}`;
-      if (await assetExists(rel)) return { src: rel, alt: '' };
-    }
+    const rel = `${dir}/${id}.${ext}`;
+    if (await assetExists(rel)) return { src: rel, alt: '' };
   }
   return null;
 }
 
 /**
- * Resolve a poster into { src, srcset, width, height, alt } by probing which
- * of the -960 / -1440 / -1920 variants exist. A complete responsive-images
- * story with no build tooling.
+ * Resolve a poster into { src, srcset, width, height, alt }. The srcset is
+ * built from whatever `<id>-<width>` siblings exist on disk, so every width
+ * descriptor is one a file actually has. Responsive images, no build tooling.
  */
 async function resolvePoster(poster, ctx, whereForErrors) {
   if (!poster) return null;
@@ -514,14 +528,10 @@ async function resolvePoster(poster, ctx, whereForErrors) {
   }
   const { width, height } = await imageSize(poster.src);
 
-  const m = /^(.*)-(\d+)\.(jpg|jpeg|png)$/i.exec(poster.src);
-  const sources = [];
-  if (m) {
-    for (const w of POSTER_WIDTHS) {
-      const cand = `${m[1]}-${w}.${m[3]}`;
-      if (await assetExists(cand)) sources.push({ rel: cand, w });
-    }
-  }
+  const m = /^(.*\/)?([^/]+)-(\d+)\.(jpg|jpeg|png)$/i.exec(poster.src);
+  const sources = m
+    ? (await posterVariants(m[2], (m[1] ?? '').replace(/\/$/, ''))).slice().sort((a, b) => a.w - b.w)
+    : [];
   const srcset = sources.length > 1
     ? sources.map((s) => `${ctx.u.url(s.rel)} ${s.w}w`).join(', ')
     : null;

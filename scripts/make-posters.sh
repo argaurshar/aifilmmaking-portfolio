@@ -61,6 +61,24 @@ elif [ -n "${SRC_H:-}" ]; then
   esac
 fi
 
+# Drop rungs wider than the source and add the native width, so no file is
+# ever upscaled and no filename claims a width the image does not have.
+# build.mjs reads the actual widths off disk, so any set works.
+if [ -n "${SRC_W:-}" ]; then
+  KEPT=""; MAX=0
+  for W in $WIDTHS; do
+    if [ "$W" -lt "$SRC_W" ]; then KEPT="$KEPT $W"; MAX="$W"; fi
+  done
+  if [ -z "$KEPT" ]; then
+    WIDTHS="$SRC_W"                                  # narrower than every rung
+  elif [ "$SRC_W" -gt "$(( MAX * 115 / 100 ))" ]; then
+    WIDTHS="$KEPT $SRC_W"                            # meaningfully bigger: keep it
+  else
+    WIDTHS="$KEPT"                                   # within 15% of a rung: redundant
+  fi
+  echo "  source is ${SRC_W}px wide — emitting:$WIDTHS"
+fi
+
 OVER=0
 for W in $WIDTHS; do
   # Never upscale: a 1080-wide screenshot asked for at 1440 would be softened
