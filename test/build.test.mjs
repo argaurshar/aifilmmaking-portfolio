@@ -10,6 +10,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile, readdir } from 'node:fs/promises';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -150,4 +152,27 @@ test('unsafeHtml is never used in page templates', async () => {
   const src = await read('build.mjs');
   const pagesSection = src.slice(src.indexOf('10. Pages'), src.indexOf('11. Machine-readable'));
   assert.ok(!pagesSection.includes('unsafeHtml('), 'unsafeHtml() must not appear in page templates');
+});
+
+/**
+ * Everything above reads the ALREADY-generated HTML, so a generator that writes
+ * every page correctly and then throws on its way out looks entirely healthy
+ * here. That happened: a reporting change referenced buildOnce()'s locals from
+ * main(), so `node build.mjs` wrote all nine pages and then died with
+ * "filmsDoc is not defined" — exit 1, output perfect, suite green.
+ *
+ * This runs the real binary and insists it exits clean.
+ */
+test('node build.mjs exits 0 and reports no failure', async () => {
+  const { stdout, stderr } = await promisify(execFile)(
+    process.execPath, ['build.mjs'], { cwd: ROOT, encoding: 'utf8' });
+  const out = stdout + stderr;
+  assert.doesNotMatch(out, /Build failed/, `build.mjs reported a failure:\n${out}`);
+  assert.match(stdout, /^✓ \d+ pages/m, `build.mjs printed no success line:\n${out}`);
+});
+
+test('node build.mjs --check exits 0', async () => {
+  const { stdout } = await promisify(execFile)(
+    process.execPath, ['build.mjs', '--check'], { cwd: ROOT, encoding: 'utf8' });
+  assert.match(stdout, /probe build at .* passed/, 'probe build did not report passing');
 });

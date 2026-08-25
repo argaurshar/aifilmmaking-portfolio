@@ -1622,17 +1622,21 @@ async function main() {
   // Collected from the UNFILTERED documents. Reporting only what shipped hid
   // every TODO sitting in a draft, which is precisely where unfinished content
   // lives — the report was quietest exactly when it had most to say.
+  // filmsDoc/processDoc are local to buildOnce(); re-read them here rather than
+  // widening that scope, which is also what the draft report below already does.
+  const allFilms = (await loadJson('content/films.json')).films ?? [];
+  const allClips = (await loadJson('content/process.json')).clips ?? [];
+
   const gaps = [];
   const strip = (o) => ({ ...o, resolvedPoster: undefined });
   collectGaps(site, 'site', gaps);
-  collectGaps({ films: (filmsDoc.films ?? []).map(strip) }, 'films', gaps);
-  collectGaps({ clips: (processDoc.clips ?? []).map(strip) }, 'process', gaps);
+  collectGaps({ films: allFilms.map(strip) }, 'films', gaps);
+  collectGaps({ clips: allClips.map(strip) }, 'process', gaps);
   if (gaps.length) {
     console.log(`\n${gaps.length} content gap${gaps.length === 1 ? '' : 's'} still to fill:`);
     for (const g of gaps) console.log(`  TODO  ${g}`);
   }
 
-  const allFilms = (await loadJson('content/films.json')).films;
   const pending = allFilms.filter((f) => !f.video?.id);
   const draftCount = allFilms.filter((f) => (f.status ?? 'published') === 'draft' && f.video?.id).length;
   if (draftCount && !includeDrafts) {
