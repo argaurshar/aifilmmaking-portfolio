@@ -71,9 +71,8 @@ Fluid scale via `clamp()`; **every step keeps a `rem` term** so browser zoom wor
 Two steps were added above the old top for title cards:
 
 ```css
---step-5: clamp(2.75rem, 1.60rem + 5.20vw, 6rem);   /* page titles, the statement */
---step-6: clamp(2.9rem,  1.20rem + 7.20vw, 7rem);   /* reserved: between a page title and a stage */
---step-7: clamp(3.2rem,  1.05rem + 9.20vw, 9rem);   /* the title card on a stage, a film's h1 */
+--step-5: clamp(2.1rem,  0.90rem + 4.90vw, 6rem);   /* page titles, the statement */
+--step-6: clamp(2.25rem, 0.60rem + 6.80vw, 6.75rem); /* the title card on a stage, a film's h1 */
 ```
 
 Measure: `--measure: 40rem` for prose, `--measure-wide: 90rem` for page width.
@@ -126,8 +125,10 @@ A film edge to edge. `.stage` wraps an `embed` and paints two pseudo-elements ov
 no image request) and `::after` is a left-weighted vignette that carries the title card. Both sit at
 `z-index: 1`, under the play control at `2` and the title card at `3`.
 
-- `.stage--hero` (home): 16:9 on a desk, **4:5 in the hand** — a film still is not a banner. Capped
-  at `92svh`. The centred play icon is hidden; the title card's pill is the visible affordance and
+- `.stage--hero` (home): 16:9 from 60rem up, **4:5 below** — a film still is not a banner, and
+  under 60rem a 16:9 frame is too short to carry the title card. Capped at `92svh`, cropping the
+  picture rather than narrowing the frame (`width: 100%` keeps the cap from transferring through
+  the ratio). The centred play icon is hidden; the title card's pill is the visible affordance and
   the whole frame is the control.
 - `.stage--plain` (a landscape film page): grain, no vignette, no card.
 - `.stage--portrait` (a vertical film page): the 9:16 frame centred on a dark stage with its own
@@ -137,7 +138,7 @@ no image request) and `::after` is a left-weighted vignette that carries the tit
 ### The title card
 
 `.title-card` is absolutely positioned inside the stage's frame, `pointer-events: none` except for
-its links. Eyebrow (`Now showing · 04 / 16`), the title at `--step-7`, a mono credits line, a Play
+its links. Eyebrow (`Now showing · 04 / 16`), the title at `--step-6`, a mono credits line, a Play
 pill and a Film page pill, and Next at the right. The Play pill is a `<span>`: the frame itself is
 the play link, and the pill lights up through `.embed__play:hover ~ .title-card .btn--play`.
 
@@ -152,7 +153,7 @@ the reel, the Recent side column and the Related list all use it. Two things mak
 
 - **`.frame` is a container** (`container-type: inline-size`), so `.frame__title` is sized in
   `cqw` and scales with whatever frame it lands in. It is a caption, not a headline: a reel frame
-  gets ~19px, a Work tile ~15px, a portrait frame ~14px. The hero's own title card is `--step-7`.
+  gets ~19px, a Work tile ~15px, a portrait frame ~14px. The hero's own title card is `--step-6`.
   One rule, no per-context overrides.
 - **The scrim is the caption**, a gradient on `.frame__cap` itself, so it is only ever as tall as
   the text needs. A text-shadow covers the case of a bright poster. Under `forced-colors` the
@@ -186,7 +187,7 @@ focus — and is always visible on `(hover: none)`, because a touch screen has n
 
 ### Film page
 
-`.film-head` is a two-column title card: eyebrow, title at `--step-7`, the logline as a lede, Play
+`.film-head` is a two-column title card: eyebrow, title at `--step-6`, the logline as a lede, Play
 and Watch-on-YouTube pills; beside it `.credits`, a mono `<dl>` with hairline rules. Synopsis runs
 in `.prose--columns` (two columns from 60rem). `.related__list` is three frames. `.pager` is
 previous / next by site order, wrapping.

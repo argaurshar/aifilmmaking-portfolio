@@ -1084,8 +1084,9 @@ function pageIndex(ctx) {
     ...(hero ? [videoObject(hero, ctx)] : []),
   ];
 
-  const heroMeta = [TYPE_LABEL[hero?.type], hero?.year, formatRuntime(hero?.runtimeSeconds),
-    director ? `Directed by ${director.name}` : null].filter(Boolean).join(' · ');
+  const heroBits = [TYPE_LABEL[hero?.type], hero?.year, formatRuntime(hero?.runtimeSeconds)].filter(Boolean).join(' · ');
+  // The credit is one span so a phone wraps before it, never inside it.
+  const heroMeta = html`${heroBits}${director ? html`${heroBits ? ' · ' : ''}<span>Directed by ${director.name}</span>` : ''}`;
 
   const titleCard = hero ? html`<div class="title-card">
       <div class="title-card__main">

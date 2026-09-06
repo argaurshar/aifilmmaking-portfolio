@@ -31,9 +31,8 @@
   --step-2:  clamp(1.5rem,    1.30rem + 1.00vw, 2.1rem);
   --step-3:  clamp(1.9rem,    1.52rem + 1.90vw, 3rem);
   --step-4:  clamp(2.4rem,    1.70rem + 3.40vw, 4.4rem);
-  --step-5:  clamp(2.75rem,   1.60rem + 5.20vw, 6rem);
-  --step-6:  clamp(2.9rem,    1.20rem + 7.20vw, 7rem);
-  --step-7:  clamp(3.2rem,    1.05rem + 9.20vw, 9rem);
+  --step-5:  clamp(2.1rem,    0.90rem + 4.90vw, 6rem);
+  --step-6:  clamp(2.25rem,   0.60rem + 6.80vw, 6.75rem);
 
   --space-3xs: .25rem;  --space-2xs: .5rem;   --space-xs: .75rem;
   --space-s:   1rem;    --space-m:  1.5rem;   --space-l:  2.5rem;
@@ -387,12 +386,17 @@ main > :last-child { margin-block-end: var(--space-section); }
 }
 .stage--plain .embed__frame::after { display: none; }
 
-/* The hero: 16:9 on a desk, 4:5 in the hand — a film still is not a banner. */
+/* The hero: 16:9 on a desk, 4:5 in the hand — a film still is not a banner.
+   The switch is 60rem, not 46rem: below that a 16:9 frame is under 540px tall
+   and the title card would cover more than half of it. */
 .stage--hero .embed__frame {
+  /* width is explicit so max-height crops the picture rather than being
+     transferred through the ratio into a narrower frame with a band beside it */
+  width: 100%;
   aspect-ratio: 4 / 5;
   max-height: 92svh;
 }
-@media (min-width: 46rem) {
+@media (min-width: 60rem) {
   .stage--hero .embed__frame { aspect-ratio: 16 / 9; }
 }
 .stage--hero .embed__icon { display: none; }
@@ -438,8 +442,13 @@ main > :last-child { margin-block-end: var(--space-section); }
   display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-l);
 }
 .title-card__main { display: flex; flex-direction: column; gap: var(--space-s); max-width: 68rem; }
-.title-card__title { font-size: var(--step-7); font-stretch: 78%; color: var(--c-text); text-wrap: balance; }
+@media (max-width: 46rem) {
+  .title-card__main { gap: var(--space-xs); }
+  .title-card__meta { font-size: 0.625rem; letter-spacing: 0.12em; }
+}
+.title-card__title { font-size: var(--step-6); font-stretch: 80%; color: var(--c-text); text-wrap: balance; }
 .title-card__meta { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--c-text-muted); }
+.title-card__meta span { white-space: nowrap; }
 .title-card__actions { display: flex; flex-wrap: wrap; gap: var(--space-xs); margin-block-start: var(--space-2xs); }
 .title-card__actions > * { pointer-events: auto; }
 .title-card__next { pointer-events: auto; text-align: right; line-height: 1.8; text-decoration: none; }
@@ -738,7 +747,7 @@ main > :last-child { margin-block-end: var(--space-section); }
 
 .film-head { display: grid; gap: var(--space-l); align-items: start; }
 .film-head__main { display: flex; flex-direction: column; gap: var(--space-m); }
-.film-head__title { font-size: var(--step-7); font-stretch: 78%; text-wrap: balance; }
+.film-head__title { font-size: var(--step-6); font-stretch: 80%; text-wrap: balance; }
 .film-head__lede { font-size: var(--step-2); font-stretch: 100%; font-weight: 400; line-height: 1.35; color: var(--c-text-muted); max-width: 30ch; letter-spacing: -0.01em; }
 .film-head__actions { display: flex; flex-wrap: wrap; gap: var(--space-xs); }
 @media (min-width: 60rem) {
