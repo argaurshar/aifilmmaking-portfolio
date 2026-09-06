@@ -493,21 +493,22 @@ main > :last-child { margin-block-end: var(--space-section); }
    rather than a separate layer, so it is only ever as tall as the text needs. */
 .frame__cap {
   position: absolute; z-index: 2; inset-inline: 0; bottom: 0; pointer-events: none;
-  padding: clamp(1.75rem, 14cqw, 5rem) clamp(0.75rem, 4cqw, 1.75rem) clamp(0.7rem, 3.5cqw, 1.5rem);
-  display: flex; flex-direction: column; gap: 0.3em;
+  padding: clamp(1.5rem, 9cqw, 3rem) clamp(0.75rem, 3cqw, 1.25rem) clamp(0.65rem, 2.5cqw, 1rem);
+  display: flex; flex-direction: column; gap: 0.25em;
   background: linear-gradient(to top,
     color-mix(in oklch, var(--c-bg) 90%, transparent),
     color-mix(in oklch, var(--c-bg) 55%, transparent) 45%,
     transparent);
 }
 .frame__title {
-  font-size: clamp(1.15rem, 8.5cqw, 3.4rem);
-  font-stretch: 80%; color: var(--c-text); text-wrap: balance;
+  font-size: clamp(0.9375rem, 3.6cqw, 1.375rem);
+  font-weight: 700; font-stretch: 92%; letter-spacing: -0.01em; line-height: 1.15;
+  color: var(--c-text); text-wrap: balance;
   text-shadow: 0 0.02em 0.5em color-mix(in oklch, var(--c-bg) 70%, transparent);
 }
-.frame--portrait .frame__title { font-size: clamp(1rem, 12cqw, 2.5rem); }
+.frame--portrait .frame__title { font-size: clamp(0.875rem, 6cqw, 1.125rem); }
 .frame__meta {
-  font-family: var(--font-mono); font-size: clamp(0.625rem, 2cqw, 0.75rem);
+  font-family: var(--font-mono); font-size: clamp(0.5625rem, 1.5cqw, 0.6875rem);
   letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-accent);
 }
 .frame--titled:hover .frame__title, .frame--titled:focus-visible .frame__title { color: var(--c-accent); }
@@ -575,7 +576,7 @@ main > :last-child { margin-block-end: var(--space-section); }
   position: absolute; z-index: 2; left: var(--space-m); bottom: var(--space-m); right: var(--space-m);
   pointer-events: none; display: flex; flex-direction: column; gap: var(--space-2xs);
 }
-.recent__lead-card .display { font-size: var(--step-5); font-stretch: 80%; text-wrap: balance; }
+.recent__lead-card .display { font-size: var(--step-4); text-wrap: balance; }
 .recent__lead .frame::after {
   content: ''; position: absolute; inset: 0; pointer-events: none;
   background: linear-gradient(to top, color-mix(in oklch, var(--c-bg) 88%, transparent), transparent 55%);
@@ -705,7 +706,7 @@ main > :last-child { margin-block-end: var(--space-section); }
 .tile__poster { position: absolute; inset: 0; }
 .tile__cap {
   position: absolute; z-index: 2; inset-inline: 0; bottom: 0;
-  padding: clamp(1.75rem, 14cqw, 4.5rem) clamp(0.75rem, 4cqw, 1.5rem) clamp(0.7rem, 3.5cqw, 1.25rem);
+  padding: clamp(1.5rem, 9cqw, 3rem) clamp(0.75rem, 3cqw, 1.25rem) clamp(0.65rem, 2.5cqw, 1rem);
   display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-s);
   background: linear-gradient(to top,
     color-mix(in oklch, var(--c-bg) 90%, transparent),
@@ -713,11 +714,12 @@ main > :last-child { margin-block-end: var(--space-section); }
     transparent);
 }
 .tile__title {
-  font-size: clamp(1.05rem, 8cqw, 2.6rem); font-stretch: 80%;
+  display: block; font-size: clamp(0.9375rem, 3.6cqw, 1.25rem);
+  font-weight: 700; font-stretch: 92%; letter-spacing: -0.01em; line-height: 1.15;
   color: var(--c-text); text-wrap: balance;
   text-shadow: 0 0.02em 0.5em color-mix(in oklch, var(--c-bg) 70%, transparent);
 }
-.tile__meta { display: block; font-family: var(--font-mono); font-size: clamp(0.625rem, 2cqw, 0.6875rem); letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-accent); margin-block-start: 0.4em; }
+.tile__meta { display: block; font-family: var(--font-mono); font-size: clamp(0.5625rem, 1.5cqw, 0.6875rem); letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-accent); margin-block-start: 0.4em; }
 .tile__go {
   flex: none; width: 2.25rem; height: 2.25rem; border-radius: var(--radius-full);
   background: var(--c-accent); color: var(--c-accent-ink); display: grid; place-items: center;

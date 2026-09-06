@@ -151,8 +151,9 @@ With `label: true` the film's title is set **over** the poster in `.frame__cap`,
 the reel, the Recent side column and the Related list all use it. Two things make that work:
 
 - **`.frame` is a container** (`container-type: inline-size`), so `.frame__title` is sized in
-  `cqw` and fills whatever frame it lands in. A reel frame gets ~45px, a Work tile ~29px, and the
-  hero's own title card is `--step-7`. One rule, no per-context overrides.
+  `cqw` and scales with whatever frame it lands in. It is a caption, not a headline: a reel frame
+  gets ~19px, a Work tile ~15px, a portrait frame ~14px. The hero's own title card is `--step-7`.
+  One rule, no per-context overrides.
 - **The scrim is the caption**, a gradient on `.frame__cap` itself, so it is only ever as tall as
   the text needs. A text-shadow covers the case of a bright poster. Under `forced-colors` the
   gradient is not painted, so the scrim becomes solid `Canvas` and the shadow is dropped.
