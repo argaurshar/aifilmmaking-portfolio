@@ -72,7 +72,8 @@ Two steps were added above the old top for title cards:
 
 ```css
 --step-5: clamp(2.75rem, 1.60rem + 5.20vw, 6rem);   /* page titles, the statement */
---step-6: clamp(2.9rem,  1.20rem + 7.20vw, 7rem);   /* the title card on a stage */
+--step-6: clamp(2.9rem,  1.20rem + 7.20vw, 7rem);   /* reserved: between a page title and a stage */
+--step-7: clamp(3.2rem,  1.05rem + 9.20vw, 9rem);   /* the title card on a stage, a film's h1 */
 ```
 
 Measure: `--measure: 40rem` for prose, `--measure-wide: 90rem` for page width.
@@ -136,7 +137,7 @@ no image request) and `::after` is a left-weighted vignette that carries the tit
 ### The title card
 
 `.title-card` is absolutely positioned inside the stage's frame, `pointer-events: none` except for
-its links. Eyebrow (`Now showing · 04 / 16`), the title at `--step-6`, a mono credits line, a Play
+its links. Eyebrow (`Now showing · 04 / 16`), the title at `--step-7`, a mono credits line, a Play
 pill and a Film page pill, and Next at the right. The Play pill is a `<span>`: the frame itself is
 the play link, and the pill lights up through `.embed__play:hover ~ .title-card .btn--play`.
 
@@ -144,12 +145,29 @@ the play link, and the pill lights up through `.embed__play:hover ~ .title-card 
 
 `.frame` is a poster that behaves like a film: an `<a>` to the film's page carrying
 `data-cursor="play"`, a `view-transition-name`, and — when a strip exists — `data-strip` and
-`data-frames`. The accessible name is a visually-hidden span inside the link; the `.cap` beside it
-is plain text, so a screen reader hears one link per film. Hover scales the poster 1.05.
+`data-frames`. Hover scales the poster 1.05.
+
+With `label: true` the film's title is set **over** the poster in `.frame__cap`, not under it —
+the reel, the Recent side column and the Related list all use it. Two things make that work:
+
+- **`.frame` is a container** (`container-type: inline-size`), so `.frame__title` is sized in
+  `cqw` and fills whatever frame it lands in. A reel frame gets ~45px, a Work tile ~29px, and the
+  hero's own title card is `--step-7`. One rule, no per-context overrides.
+- **The scrim is the caption**, a gradient on `.frame__cap` itself, so it is only ever as tall as
+  the text needs. A text-shadow covers the case of a bright poster. Under `forced-colors` the
+  gradient is not painted, so the scrim becomes solid `Canvas` and the shadow is dropped.
+
+`.tile__cap` on the Work sheet is the same treatment: it used to appear on hover, which a phone
+never does, so the title is always visible and only the round go button waits for intent.
+
+The caption is `aria-hidden`; the accessible name stays a visually-hidden span inside the link,
+so a screen reader still hears one link per film, title then type and runtime.
 
 ### The reel
 
 `.reel__track` is a horizontal scroller: `overflow-x: auto`, `scroll-snap-type: x proximity`,
+`scroll-padding-inline: var(--gutter)` so the first frame snaps to the page margin rather than the
+window edge,
 `tabindex="0"` with `role="region"`. Items are sized from `--reel-h` (12.5rem on a phone, 18.75rem
 on a desk); a portrait item is `--reel-h × 9/16` wide. Prev/next buttons are shown by JS only.
 
@@ -167,7 +185,7 @@ focus — and is always visible on `(hover: none)`, because a touch screen has n
 
 ### Film page
 
-`.film-head` is a two-column title card: eyebrow, title at `--step-6`, the logline as a lede, Play
+`.film-head` is a two-column title card: eyebrow, title at `--step-7`, the logline as a lede, Play
 and Watch-on-YouTube pills; beside it `.credits`, a mono `<dl>` with hairline rules. Synopsis runs
 in `.prose--columns` (two columns from 60rem). `.related__list` is three frames. `.pager` is
 previous / next by site order, wrapping.

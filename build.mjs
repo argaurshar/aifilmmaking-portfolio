@@ -774,11 +774,12 @@ const playGlyph = () => html`<svg viewBox="0 0 10 12" aria-hidden="true" focusab
  * The accessible name lives inside the link; the caption beside it is plain
  * text, so a screen reader hears one link per film, not two.
  */
-function frame(film, ctx, { sizes = '(min-width: 60rem) 34rem, 90vw', eager = false, vt = true } = {}) {
+function frame(film, ctx, { sizes = '(min-width: 60rem) 34rem, 90vw', eager = false, vt = true, label = false } = {}) {
   const { u } = ctx;
   const portrait = parseRatio(film.aspectRatio).portrait;
   const p = film.resolvedPoster;
-  return html`<a class="frame${portrait ? ' frame--portrait' : ''}" href="${u.url(filmPath(film))}" data-cursor="play"
+  const bits = filmBits(film);
+  return html`<a class="frame${portrait ? ' frame--portrait' : ''}${label ? ' frame--titled' : ''}" href="${u.url(filmPath(film))}" data-cursor="play"
       ${film.strip ? attrs({ 'data-strip': film.strip.src, 'data-frames': String(film.strip.frames) }) : ''}
       ${vt ? new Html(` style="view-transition-name: film-${film.id}"`) : ''}>
     ${p
@@ -786,17 +787,21 @@ function frame(film, ctx, { sizes = '(min-width: 60rem) 34rem, 90vw', eager = fa
           width="${p.width}" height="${p.height}" alt=""
           ${attrs({ loading: eager ? 'eager' : 'lazy', fetchpriority: eager ? 'high' : false, decoding: 'async' })}>`
       : html`<span class="frame__noposter" aria-hidden="true"></span>`}
-    <span class="u-visually-hidden">${film.title}</span>
+    ${label
+      ? html`<span class="frame__cap" aria-hidden="true">
+          <span class="frame__title display">${film.title}</span>
+          ${bits ? html`<span class="frame__meta">${bits}</span>` : ''}
+        </span>`
+      : ''}
+    <span class="u-visually-hidden">${film.title}${label && bits ? `, ${bits}` : ''}</span>
   </a>`;
 }
 
-function caption(film) {
+/** Type, runtime, and orientation when it is the point — one spoken line. */
+function filmBits(film) {
   const bits = [TYPE_LABEL[film.type], formatRuntime(film.runtimeSeconds)];
   if (parseRatio(film.aspectRatio).portrait) bits.push('Vertical');
-  return html`<div class="cap">
-    <div class="cap__title">${film.title}</div>
-    <div class="cap__meta">${bits.filter(Boolean).join(' · ')}</div>
-  </div>`;
+  return bits.filter(Boolean).join(' · ');
 }
 
 /** A tile on the Work sheet: the poster, with the title revealed on intent. */
@@ -804,7 +809,7 @@ function filmTile(film, ctx) {
   const { u } = ctx;
   const portrait = parseRatio(film.aspectRatio).portrait;
   const p = film.resolvedPoster;
-  const bits = [TYPE_LABEL[film.type], formatRuntime(film.runtimeSeconds)].filter(Boolean).join(' · ');
+  const bits = filmBits(film);
   return html`<div class="sheet__item${portrait ? ' sheet__item--portrait' : ''}" data-type="${film.type}"
       data-orientation="${portrait ? 'portrait' : 'landscape'}" id="film-${film.id}">
     <a class="tile" href="${u.url(filmPath(film))}" data-cursor="play"
@@ -815,7 +820,7 @@ function filmTile(film, ctx) {
             width="${p.width}" height="${p.height}" alt="" loading="lazy" decoding="async">`
         : html`<span class="frame__noposter" aria-hidden="true"></span>`}
       <span class="tile__cap" aria-hidden="true">
-        <span><span class="tile__title">${film.title}</span><span class="tile__meta">${bits}</span></span>
+        <span><span class="tile__title display">${film.title}</span><span class="tile__meta">${bits}</span></span>
         <span class="tile__go">${playGlyph()}</span>
       </span>
       <span class="u-visually-hidden">${film.title}${bits ? `, ${bits}` : ''}</span>
@@ -1137,8 +1142,7 @@ ${films.length
   </div>
   <div class="reel__track" tabindex="0" role="region" aria-label="All films, scrolls sideways" data-reel>
     ${films.map((f) => html`<div class="reel__item${parseRatio(f.aspectRatio).portrait ? ' reel__item--portrait' : ''}">
-      ${frame(f, ctx, { sizes: '(min-width: 46rem) 34rem, 22rem' })}
-      ${caption(f)}
+      ${frame(f, ctx, { sizes: '(min-width: 46rem) 34rem, 22rem', label: true })}
     </div>`)}
   </div>
 </section>`
@@ -1159,7 +1163,7 @@ ${recent.length
       </div>
     </div>
     <div class="recent__side">
-      ${recent.slice(1).map((f) => html`<div>${frame(f, ctx, { sizes: '(min-width: 60rem) 30rem, 45vw', vt: false })}${caption(f)}</div>`)}
+      ${recent.slice(1).map((f) => html`<div>${frame(f, ctx, { sizes: '(min-width: 60rem) 30rem, 45vw', vt: false, label: true })}</div>`)}
     </div>
   </div>
 </section>`
@@ -1366,8 +1370,7 @@ ${related.length
   </div>
   <div class="related__list">
     ${related.map((f) => html`<div class="related__item${isPortrait(f) ? ' related__item--portrait' : ''}">
-      ${frame(f, ctx, { sizes: '(min-width: 46rem) 28rem, 90vw' })}
-      ${caption(f)}
+      ${frame(f, ctx, { sizes: '(min-width: 46rem) 28rem, 90vw', label: true })}
     </div>`)}
   </div>
 </section>`

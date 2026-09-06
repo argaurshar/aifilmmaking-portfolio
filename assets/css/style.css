@@ -33,6 +33,7 @@
   --step-4:  clamp(2.4rem,    1.70rem + 3.40vw, 4.4rem);
   --step-5:  clamp(2.75rem,   1.60rem + 5.20vw, 6rem);
   --step-6:  clamp(2.9rem,    1.20rem + 7.20vw, 7rem);
+  --step-7:  clamp(3.2rem,    1.05rem + 9.20vw, 9rem);
 
   --space-3xs: .25rem;  --space-2xs: .5rem;   --space-xs: .75rem;
   --space-s:   1rem;    --space-m:  1.5rem;   --space-l:  2.5rem;
@@ -437,7 +438,7 @@ main > :last-child { margin-block-end: var(--space-section); }
   display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-l);
 }
 .title-card__main { display: flex; flex-direction: column; gap: var(--space-s); max-width: 68rem; }
-.title-card__title { font-size: var(--step-6); font-stretch: 80%; color: var(--c-text); }
+.title-card__title { font-size: var(--step-7); font-stretch: 78%; color: var(--c-text); text-wrap: balance; }
 .title-card__meta { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--c-text-muted); }
 .title-card__actions { display: flex; flex-wrap: wrap; gap: var(--space-xs); margin-block-start: var(--space-2xs); }
 .title-card__actions > * { pointer-events: auto; }
@@ -458,6 +459,9 @@ main > :last-child { margin-block-end: var(--space-section); }
   background: var(--c-bg-elev-2);
   aspect-ratio: var(--frame-ratio, 16 / 9);
   text-decoration: none; color: inherit;
+  /* The title over a frame is sized against the frame, not the page, so a
+     thumbnail and a hero carry the same weight of type at their own scale. */
+  container-type: inline-size;
 }
 .frame img { width: 100%; height: 100%; object-fit: cover; transition: transform var(--dur-slow) var(--ease-out); }
 .frame__poster { position: absolute; inset: 0; }
@@ -465,7 +469,7 @@ main > :last-child { margin-block-end: var(--space-section); }
 /* A frame strip, when one exists: N stills side by side, one shown at a time.
    JS slides it under the pointer. Without JS or a strip, the poster stands. */
 .frame__strip {
-  position: absolute; inset: 0; height: 100%; width: auto; max-width: none;
+  position: absolute; z-index: 1; inset: 0; height: 100%; width: auto; max-width: none;
   object-fit: cover; opacity: 0; transition: none; transform: none;
 }
 .frame.is-scrubbing .frame__strip { opacity: 1; }
@@ -485,11 +489,30 @@ main > :last-child { margin-block-end: var(--space-section); }
 }
 .frame__noposter { position: absolute; inset: 0; background: repeating-linear-gradient(45deg, var(--c-bg-elev-1) 0 10px, var(--c-bg-elev-2) 10px 20px); }
 
-.cap { display: flex; flex-direction: column; gap: 0.25rem; margin-block-start: var(--space-xs); }
-.cap__title { font-family: var(--font-display); font-weight: 700; font-stretch: 95%; font-size: 0.9375rem; letter-spacing: -0.01em; line-height: 1.2; }
-.cap__meta { font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--c-text-dim); }
-a.cap-link { text-decoration: none; display: block; }
-a.cap-link:hover .cap__title { color: var(--c-accent); }
+/* The title, over the frame it belongs to. The scrim is part of the caption
+   rather than a separate layer, so it is only ever as tall as the text needs. */
+.frame__cap {
+  position: absolute; z-index: 2; inset-inline: 0; bottom: 0; pointer-events: none;
+  padding: clamp(1.75rem, 14cqw, 5rem) clamp(0.75rem, 4cqw, 1.75rem) clamp(0.7rem, 3.5cqw, 1.5rem);
+  display: flex; flex-direction: column; gap: 0.3em;
+  background: linear-gradient(to top,
+    color-mix(in oklch, var(--c-bg) 90%, transparent),
+    color-mix(in oklch, var(--c-bg) 55%, transparent) 45%,
+    transparent);
+}
+.frame__title {
+  font-size: clamp(1.15rem, 8.5cqw, 3.4rem);
+  font-stretch: 80%; color: var(--c-text); text-wrap: balance;
+  text-shadow: 0 0.02em 0.5em color-mix(in oklch, var(--c-bg) 70%, transparent);
+}
+.frame--portrait .frame__title { font-size: clamp(1rem, 12cqw, 2.5rem); }
+.frame__meta {
+  font-family: var(--font-mono); font-size: clamp(0.625rem, 2cqw, 0.75rem);
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-accent);
+}
+.frame--titled:hover .frame__title, .frame--titled:focus-visible .frame__title { color: var(--c-accent); }
+/* While a frame is scrubbing, the film is playing — the title gets out of its way. */
+.frame.is-scrubbing .frame__cap { opacity: 0.25; transition: opacity var(--dur) var(--ease-out); }
 
 /* ── The reel: a horizontal strip of every film ─────────────────────────── */
 
@@ -516,6 +539,10 @@ a.cap-link:hover .cap__title { color: var(--c-accent); }
      arrow key makes, so keyboard users could never move the track at all. */
   scroll-snap-type: x proximity;
   padding-inline: var(--gutter);
+  /* Snap to the page's margin, not the window edge. Without this the browser
+     aligns the first frame with the scrollport and the reel starts 39px left
+     of every other thing on the page. */
+  scroll-padding-inline: var(--gutter);
   padding-block-end: var(--space-s);
   scrollbar-width: thin;
   scrollbar-color: var(--c-line-strong) transparent;
@@ -525,7 +552,6 @@ a.cap-link:hover .cap__title { color: var(--c-accent); }
 .reel__item { flex: none; scroll-snap-align: start; width: calc(var(--reel-h) * 16 / 9); }
 .reel__item--portrait { width: calc(var(--reel-h) * 9 / 16); }
 .reel__item .frame { height: var(--reel-h); aspect-ratio: auto; }
-.reel__item .cap__title { max-width: 100%; }
 
 /* ── Home: statement, recent, strip, commissions ───────────────────────── */
 
@@ -549,12 +575,13 @@ a.cap-link:hover .cap__title { color: var(--c-accent); }
   position: absolute; z-index: 2; left: var(--space-m); bottom: var(--space-m); right: var(--space-m);
   pointer-events: none; display: flex; flex-direction: column; gap: var(--space-2xs);
 }
-.recent__lead-card .display { font-size: var(--step-4); }
+.recent__lead-card .display { font-size: var(--step-5); font-stretch: 80%; text-wrap: balance; }
 .recent__lead .frame::after {
   content: ''; position: absolute; inset: 0; pointer-events: none;
   background: linear-gradient(to top, color-mix(in oklch, var(--c-bg) 88%, transparent), transparent 55%);
 }
-.recent__side { display: grid; gap: var(--space-s); grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.recent__side { display: grid; gap: var(--space-s); }
+@media (min-width: 30rem) { .recent__side { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (min-width: 60rem) {
   .recent { grid-template-columns: minmax(0, 1.85fr) minmax(0, 1fr); align-items: end; }
   .recent__side { grid-template-columns: 1fr; }
@@ -673,25 +700,33 @@ a.cap-link:hover .cap__title { color: var(--c-accent); }
 .sheet__item { display: block; }
 .sheet__item--portrait { grid-row: span 3; }
 .sheet__item[hidden] { display: none; }
-.tile { position: relative; display: block; width: 100%; height: 100%; overflow: hidden; background: var(--c-bg-elev-2); text-decoration: none; color: inherit; }
+.tile { position: relative; display: block; width: 100%; height: 100%; overflow: hidden; background: var(--c-bg-elev-2); text-decoration: none; color: inherit; container-type: inline-size; }
 .tile img { width: 100%; height: 100%; object-fit: cover; transition: transform var(--dur-slow) var(--ease-out); }
 .tile__poster { position: absolute; inset: 0; }
 .tile__cap {
   position: absolute; z-index: 2; inset-inline: 0; bottom: 0;
-  padding: var(--space-l) var(--space-s) var(--space-s);
+  padding: clamp(1.75rem, 14cqw, 4.5rem) clamp(0.75rem, 4cqw, 1.5rem) clamp(0.7rem, 3.5cqw, 1.25rem);
   display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-s);
-  background: linear-gradient(to top, color-mix(in oklch, var(--c-bg) 92%, transparent), transparent);
-  opacity: 0; transition: opacity var(--dur) var(--ease-out);
+  background: linear-gradient(to top,
+    color-mix(in oklch, var(--c-bg) 90%, transparent),
+    color-mix(in oklch, var(--c-bg) 55%, transparent) 45%,
+    transparent);
 }
-.tile__title { font-family: var(--font-display); font-weight: 700; font-stretch: 95%; font-size: var(--step-0); letter-spacing: -0.01em; line-height: 1.1; }
-.tile__meta { font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-accent); margin-block-start: 0.3em; }
+.tile__title {
+  font-size: clamp(1.05rem, 8cqw, 2.6rem); font-stretch: 80%;
+  color: var(--c-text); text-wrap: balance;
+  text-shadow: 0 0.02em 0.5em color-mix(in oklch, var(--c-bg) 70%, transparent);
+}
+.tile__meta { display: block; font-family: var(--font-mono); font-size: clamp(0.625rem, 2cqw, 0.6875rem); letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-accent); margin-block-start: 0.4em; }
 .tile__go {
   flex: none; width: 2.25rem; height: 2.25rem; border-radius: var(--radius-full);
   background: var(--c-accent); color: var(--c-accent-ink); display: grid; place-items: center;
 }
 .tile__go svg { width: 0.6rem; height: 0.7rem; translate: 1px 0; }
 .tile:hover img, .tile:focus-visible img { transform: scale(1.05); }
-.tile:hover .tile__cap, .tile:focus-visible .tile__cap { opacity: 1; }
+.tile__go { opacity: 0; transition: opacity var(--dur) var(--ease-out); }
+.tile:hover .tile__go, .tile:focus-visible .tile__go { opacity: 1; }
+.tile:hover .tile__title, .tile:focus-visible .tile__title { color: var(--c-accent); }
 .tile:focus-visible { outline-offset: -4px; }
 /* No hover on a touch screen: the caption is always there. */
 @media (hover: none) { .tile__cap { opacity: 1; } }
@@ -701,7 +736,7 @@ a.cap-link:hover .cap__title { color: var(--c-accent); }
 
 .film-head { display: grid; gap: var(--space-l); align-items: start; }
 .film-head__main { display: flex; flex-direction: column; gap: var(--space-m); }
-.film-head__title { font-size: var(--step-6); font-stretch: 80%; }
+.film-head__title { font-size: var(--step-7); font-stretch: 78%; text-wrap: balance; }
 .film-head__lede { font-size: var(--step-2); font-stretch: 100%; font-weight: 400; line-height: 1.35; color: var(--c-text-muted); max-width: 30ch; letter-spacing: -0.01em; }
 .film-head__actions { display: flex; flex-wrap: wrap; gap: var(--space-xs); }
 @media (min-width: 60rem) {
@@ -929,6 +964,8 @@ a.cap-link:hover .cap__title { color: var(--c-accent); }
 @media (forced-colors: active) {
   .btn, .embed__frame, .chip, .frame, .tile, .filter-bar a, .reel__btn { border: 1px solid ButtonBorder; }
   .embed__icon, .tile__go { forced-color-adjust: none; }
+  .frame__cap, .tile__cap { background: Canvas; }
+  .frame__title, .tile__title { text-shadow: none; }
   :focus-visible { outline: 2px solid Highlight; }
   .site-nav__panel a[aria-current="page"] { text-decoration: underline; }
   .stage .embed__frame::before, .stage .embed__frame::after, .stage--portrait::after { display: none; }
