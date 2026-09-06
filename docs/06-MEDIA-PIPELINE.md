@@ -76,9 +76,10 @@ assets/stills/<film-id>-1440.jpg
 assets/stills/<film-id>-1920.jpg
 ```
 
-`build.mjs` **probes which of the three exist** and builds `srcset`/`sizes` from whatever it finds —
-a complete responsive-images story with zero build tooling. One file is enough to start; add the
-others later and the build picks them up with no content edit.
+`build.mjs` **reads the directory** and builds `srcset` from every `<film-id>-<width>` sibling it
+finds, whatever the widths — so a portrait still at 640/810/1080 works exactly like a landscape one
+at 960/1440/1920, and a 335px source can honestly ship as `-335.jpg` rather than lie about its size.
+One file is enough to start; add others later and the build picks them up with no content edit.
 
 **No JSON edit is needed.** Leave `poster` as `null` and the generator finds
 `assets/stills/<film-id>-1920.jpg` by filename. Set `poster.src` explicitly only to point somewhere
@@ -93,15 +94,39 @@ can; `scripts/make-posters.sh` does it in one command.
 
 ---
 
+## Frame strips — the hover-scrub
+
+```
+assets/strips/<film-id>.jpg
+```
+
+N stills of the film laid side by side in one JPEG. On a pointer device, moving across the film's
+poster slides the strip so the frame under the cursor shows — the poster plays, and not a byte of
+video is hosted. The build finds the file by name and reads the frame count off the image's own
+proportions (a 16:9 strip of 24 frames is 24 × 16/9 as wide as it is tall), so no JSON edit is
+needed. Each frame is 320px on its long edge; a 24-frame strip is around 150–300 KB and is fetched
+on first hover, never on load. Without a strip the poster simply stands.
+
+```bash
+./scripts/make-posters.sh --strip media/ramayana.mov ramayana        # 24 frames
+./scripts/make-posters.sh --strip media/ramayana.mov ramayana 36     # or any count
+```
+
+---
+
 ## `scripts/make-posters.sh`
 
 ```bash
-./scripts/make-posters.sh media/the-long-quiet.mov the-long-quiet 00:01:23
+./scripts/make-posters.sh media/the-long-quiet.mov the-long-quiet 00:01:23   # from a master
+./scripts/make-posters.sh ~/Desktop/frame.png qutub-minar                     # from a still
+./scripts/make-posters.sh --strip media/ramayana.mov ramayana                 # a frame strip
 ```
 
-Cuts the frame at the given timestamp to all three widths with `ffmpeg`, writes into
-`assets/stills/`, and prints the resulting file sizes. Requires `ffmpeg` on your machine — it is
-**not** a build dependency, and `node build.mjs` never invokes it.
+Detects orientation and emits the right ladder (960/1440/1920 landscape, 640/810/1080 portrait),
+never upscaling and never naming a file for a width it does not have. Takes a still as readily as
+a master — a screenshot of a paused Short is the realistic source for a vertical film. Writes into
+`assets/stills/` and prints sizes. Requires `ffmpeg` on your machine — it is **not** a build
+dependency, and `node build.mjs` never invokes it.
 
 The relevant recipe, if you would rather run it by hand:
 

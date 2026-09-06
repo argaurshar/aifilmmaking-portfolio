@@ -81,17 +81,18 @@ the single place it is most likely to be forgotten, because nobody reads it.
 
 ### `VideoObject` — one per film
 
-Emitted on Work (all published films) and Index (featured only).
+Emitted on the film's own page (`films/<id>.html`), where it is the main entity, and on Index
+for the featured film. Work carries an `ItemList` of film-page URLs instead of every node.
 
 ```json
 { "@type": "VideoObject",
-  "@id": "{origin}{base}work.html#film-{id}",
+  "@id": "{origin}{base}films/{id}.html",
   "name": "…", "description": "{logline}",
   "thumbnailUrl": ["…absolute…"],
   "uploadDate": "2026-03-01",        // OMITTED when `published` is absent
   "duration": "PT6M52S",             // OMITTED when `runtimeSeconds` is absent
   "embedUrl": "https://www.youtube-nocookie.com/embed/{id}",
-  "url": "{origin}{base}work.html#film-{id}",
+  "url": "{origin}{base}films/{id}.html",
   "genre": "Narrative short", "inLanguage": "en",
   "creator": { "@id": "…#person" }, "director": { "@id": "…#person" } }
 ```
@@ -105,8 +106,10 @@ rich results: no `published` date" — rather than fabricating a date.
 
 ### Also
 
-- `ItemList` on Work, enumerating films in display order.
-- `BreadcrumbList` on inner pages.
+- `ItemList` on Work and the filter pages, enumerating film-page URLs in display order.
+- `BreadcrumbList` on inner pages; three steps on a film page (Home › Work › the film).
+- `og:type` `video.other` with `og:video:*` on Index and every film page; the dimensions follow
+  the film's aspect ratio, so a vertical film is not announced as landscape.
 - `Person.makesOffer[]` → `Offer` → `Service` on Hire. `priceSpecification` is **omitted entirely**
   when `startingAt` is null — never `"price": "0"`, which reads as free.
 

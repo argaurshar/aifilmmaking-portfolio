@@ -1,97 +1,81 @@
 # 02 — Design System
 
 > **Reconstructed.** The original of this file was not supplied. It was written from `CLAUDE.md`
-> plus the build plan. If you have the original, replace this file and rebuild.
+> plus the build plan, and rewritten for the Screening Room redesign. If you have the original,
+> replace this file and rebuild.
 
-**Direction: cinema black.** Near-black, full-bleed video, minimal chrome, small precise type. The
-work does the talking. Nothing decorative competes with a film still.
+**Direction: the Screening Room.** The site behaves like a screening, not a brochure. A film is on
+screen first, edge to edge, with a title card. The work is browsed as a filmstrip that plays under
+the pointer. Every film has its own page. Type is condensed and enormous for titles, monospaced for
+credits. The ground is warm near-black with film grain. Nothing decorative competes with a still.
+
+The audit that led here, and the three directions considered, are on the design canvas linked from
+the project history. What follows is what shipped.
 
 ---
 
 ## Colour
 
-Warm-neutral dark, in `oklch` — sRGB hex ramps band badly at these luminances, and oklch gives a
-perceptually even ramp. Film stills are the only saturated thing on the page.
+Warm-neutral dark in `oklch` — sRGB hex ramps band badly at these luminances. Hue 70–85 (a faint
+warmth, like a cinema with the house lights down) rather than the previous cool 285. Film stills are
+the only saturated thing on the page; amber is the one accent and it is spent carefully.
 
 ```css
---c-bg:          oklch(0.155 0.006 285);   /* page */
---c-bg-elev-1:   oklch(0.200 0.008 285);   /* cards */
---c-bg-elev-2:   oklch(0.255 0.010 285);   /* wells, video letterbox */
---c-line:        oklch(0.320 0.010 285);
---c-line-strong: oklch(0.440 0.012 285);
---c-text:        oklch(0.960 0.005 285);
---c-text-muted:  oklch(0.760 0.008 285);   /* body-safe */
---c-text-dim:    oklch(0.620 0.008 285);   /* METADATA ONLY — never body copy */
---c-accent:      oklch(0.800 0.145 78);    /* warm amber, film-lab */
---c-accent-ink:  oklch(0.180 0.030 78);    /* text on accent */
---c-focus:       oklch(0.860 0.170 210);   /* cyan — never the accent, so focus never reads as brand */
+--c-bg:          oklch(0.135 0.004 70);   /* page */
+--c-bg-elev-1:   oklch(0.165 0.006 70);   /* the process strip */
+--c-bg-elev-2:   oklch(0.205 0.007 70);   /* empty frames, letterbox */
+--c-text:        oklch(0.950 0.008 85);
+--c-text-muted:  oklch(0.760 0.012 80);   /* body-safe */
+--c-text-dim:    oklch(0.620 0.012 80);   /* METADATA ONLY — never body copy */
+--c-line:        color-mix(in oklch, var(--c-text) 10%, transparent);
+--c-line-strong: color-mix(in oklch, var(--c-text) 22%, transparent);
+--c-accent:      oklch(0.800 0.145 78);   /* amber */
+--c-accent-ink:  oklch(0.180 0.030 78);   /* text on amber */
+--c-focus:       oklch(0.860 0.170 210);  /* cyan — never the accent, so focus never reads as brand */
 ```
 
-`--c-text-dim` on `--c-bg` is ~7:1 and fine for the metadata it is scoped to; it must never carry
-body copy. `--c-text-muted` is ~12:1.
+`--c-text-dim` on `--c-bg` is ~7:1 and fine for the metadata it is scoped to. Rules are
+`color-mix` of the text colour so they sit on any ground, including over a still.
 
-**Dark only.** No light mode and no toggle. A light frame around dark video creates
-simultaneous-contrast problems that flatten stills, and a second theme doubles the regression
-surface on a project whose premise is fewer moving parts. Declare `color-scheme: dark` so scrollbars
-and form controls match. Because no component hardcodes a colour, adding light mode later is one
-`@media (prefers-color-scheme: light)` token override with zero component edits.
-
-Ship instead:
-- `@media (forced-colors: active)` — restore borders where backgrounds vanish.
-- `@media print` — a festival programmer will print the Hire page. Invert to black-on-white, hide
-  chrome, and expand link URLs.
+**Dark only.** No light mode and no toggle. Declare `color-scheme: dark`. Ship
+`@media (forced-colors: active)` (restore borders where backgrounds vanish; drop grain and
+vignette) and `@media print` (black on white, chrome hidden, link URLs expanded, the reel unrolled).
 
 ---
 
 ## Type
 
-Fluid scale via `clamp()`. **Every step keeps a `rem` term** so browser zoom still works (WCAG 1.4.4).
+Two faces, three registers. Both OFL, both self-hosted in `assets/fonts/` with the licence beside
+them. Never Google Fonts at runtime: a render-blocking third-party request, a privacy leak, and a
+live dependency that contradicts "still builds in five years".
+
+| Face | File | Role |
+|---|---|---|
+| **Archivo** (variable: weight 100–900 **and width 62–125%**) | `archivo-var.woff2`, 87 KB | Everything that is not credits. Titles run **condensed** (`font-stretch` 80–88%, weight 800, tight tracking, line-height 0.94); body runs at 100%. The width axis is why this face was chosen — one file gives a cinematic title and a readable paragraph. |
+| **IBM Plex Mono** (400, 500) | `plex-mono-400/500.woff2`, 9 KB each | Credits, labels, metadata, buttons, nav: the small print of a title card. |
+
+Only Archivo is preloaded (`<link rel="preload" as="font" crossorigin>` — `crossorigin` is
+required even same-origin, or the font is fetched twice).
+
+The three registers, as classes:
 
 ```css
---step--1: clamp(0.875rem, 0.845rem + 0.15vw, 0.95rem);   /* metadata, chips */
---step-0:  clamp(1rem,     0.960rem + 0.20vw, 1.125rem);  /* body */
---step-1:  clamp(1.25rem,  1.150rem + 0.50vw, 1.5rem);    /* lead */
---step-2:  clamp(1.5rem,   1.300rem + 1.00vw, 2.1rem);    /* h3 */
---step-3:  clamp(1.9rem,   1.520rem + 1.90vw, 3rem);      /* h2 */
---step-4:  clamp(2.4rem,   1.700rem + 3.40vw, 4.4rem);    /* h1 */
---step-5:  clamp(3rem,     1.800rem + 6.00vw, 6.5rem);    /* hero only */
+.display { font-weight: 800; font-stretch: 82%; letter-spacing: -0.02em; line-height: 0.94; }
+.eyebrow { font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.2em; text-transform: uppercase; }
+.meta    { /* eyebrow, tracked a little tighter */ }
 ```
 
-Measure: `--measure: 38rem` for prose, `--measure-wide: 76rem` for page width.
+Headings inherit the display treatment. Do not invent a fourth register.
 
-### Fonts
-
-**In use: Space Grotesk (variable, 300–700), self-hosted at `assets/fonts/space-grotesk-var.woff2`,
-OFL-licensed (licence committed alongside).** It is the display voice only — headlines, brand,
-kickers, nav, buttons. Body copy stays on the system stack for speed and reading comfort. The
-single latin file is 22KB and is preloaded from the document head.
-
-**Self-hosted variable woff2 in `assets/fonts/`.** Not a system stack — the type *is* the design on
-a site judged on craft, and a portfolio that renders in Segoe UI on one machine and SF on another
-has no typographic identity. Not Google Fonts — a render-blocking third-party request, a privacy
-leak on a site whose video embeds were deliberately made privacy-friendly, and a live external
-dependency that contradicts "still builds in five years with nothing but Node and a browser".
-
-Subsetting is a **one-time authoring step performed outside the build**, exactly like exporting a
-JPEG. The committed `.woff2` is an asset; `build.mjs` never needs a font tool. Faces must be
-OFL-licensed to live in a public repo.
-
-Kill the swap shift with a metric-adjusted fallback — pure CSS, no dependency:
+Fluid scale via `clamp()`; **every step keeps a `rem` term** so browser zoom works (WCAG 1.4.4).
+Two steps were added above the old top for title cards:
 
 ```css
-@font-face {
-  font-family: 'Text Fallback';
-  src: local('Arial'), local('Helvetica'), local('Liberation Sans');
-  size-adjust: 107%; ascent-override: 90%; descent-override: 22.5%; line-gap-override: 0%;
-}
+--step-5: clamp(2.75rem, 1.60rem + 5.20vw, 6rem);   /* page titles, the statement */
+--step-6: clamp(2.9rem,  1.20rem + 7.20vw, 7rem);   /* the title card on a stage */
 ```
 
-Those four numbers **must be measured against the real face**, not guessed. Until the real face
-ships, the stack falls back to `system-ui` and the overrides are commented out — a wrong override is
-worse than none.
-
-Preload only the text face: `<link rel="preload" as="font" type="font/woff2" crossorigin>`.
-`crossorigin` is required even same-origin, or the font is fetched twice.
+Measure: `--measure: 40rem` for prose, `--measure-wide: 90rem` for page width.
 
 ---
 
@@ -100,17 +84,16 @@ Preload only the text face: `<link rel="preload" as="font" type="font/woff2" cro
 ```css
 --space-3xs:.25rem  --space-2xs:.5rem  --space-xs:.75rem  --space-s:1rem
 --space-m:1.5rem    --space-l:2.5rem   --space-xl:4rem    --space-2xl:6rem
---space-section: clamp(3.5rem, 2rem + 6vw, 8rem);
---gutter:        clamp(1rem, 0.6rem + 2vw, 2.5rem);
+--space-section: clamp(3.5rem, 2rem + 6vw, 7.5rem);
+--gutter:        clamp(1.25rem, 0.8rem + 1.8vw, 2.5rem);
 
---radius-sm:4px --radius-md:10px --radius-lg:18px --radius-full:999px
+--radius-sm:3px  --radius-md:6px  --radius-full:999px      /* frames have no radius at all */
 
---dur-fast:120ms --dur:220ms --dur-slow:420ms
---ease-out: cubic-bezier(.2,.8,.2,1);  --ease-in-out: cubic-bezier(.4,0,.2,1);
+--dur-fast:120ms --dur:220ms --dur-slow:480ms
+--ease-out: cubic-bezier(.2,.8,.2,1);
 ```
 
-All three durations collapse to `.01ms` under `prefers-reduced-motion: reduce`, together with a
-global `*` override for animation, transition and `scroll-behavior`.
+Frames of film are square-cornered, always. Rounded corners belong to pills and placeholders.
 
 ---
 
@@ -120,72 +103,129 @@ global `*` override for animation, transition and `scroll-behavior`.
 .l-container { width: min(100% - var(--gutter)*2, var(--measure-wide)); margin-inline: auto; }
 .l-stack > * + * { margin-block-start: var(--stack-space, var(--space-m)); }
 .l-grid { display:grid; gap: var(--gap, var(--space-l));
-          grid-template-columns: repeat(auto-fit, minmax(min(var(--col-min, 22rem), 100%), 1fr)); }
+          grid-template-columns: repeat(auto-fit, minmax(min(var(--col-min, 20rem), 100%), 1fr)); }
 .l-cluster { display:flex; flex-wrap:wrap; gap: var(--gap, var(--space-2xs)); align-items:center; }
 ```
 
-`minmax(min(var(--col-min), 100%), 1fr)` is the detail that stops `auto-fit` grids overflowing on
-narrow viewports. Do not simplify it to `minmax(22rem, 1fr)`.
+`minmax(min(var(--col-min), 100%), 1fr)` is what stops `auto-fit` grids overflowing on narrow
+viewports. Do not simplify it.
 
-Full-bleed inside a contained page uses a named-line grid (`full` / `content`) rather than negative
-margins or `100vw`, which causes horizontal overflow when a scrollbar is present.
+Full-bleed sections (`.stage`, `.reel`, `.strip`, `.sheet`) are direct children of `<main>` at
+`width: 100%`; the container lives inside them. On pages that open on a stage (`.page--index`,
+`.page--film`) the header is absolute over the picture and the first section has no top margin.
 
 ---
 
 ## Components
 
-`skip-link`, `site-header` + `site-nav`, `hero`, `embed`, `film-entry`, `film-card` + `film-grid`,
-`meta-list` (`<dl>` for credits), `chip`, `laurel-row` + `laurel`, `process-step` (`<ol>`),
-`service-card`, `callout`, `btn` (`--primary`, `--ghost`), `prose`, `site-footer`, `placeholder`.
+### The stage
 
-### `placeholder` is first-class, not an afterthought
+A film edge to edge. `.stage` wraps an `embed` and paints two pseudo-elements over the poster:
+`::before` is film grain (an inline SVG `feTurbulence`, `mix-blend-mode: overlay`, opacity 0.26 —
+no image request) and `::after` is a left-weighted vignette that carries the title card. Both sit at
+`z-index: 1`, under the play control at `2` and the title card at `3`.
 
-```css
-.placeholder {
-  display:grid; place-items:center; min-height:8rem;
-  border:2px dashed var(--c-line-strong); border-radius: var(--radius-md);
-  color: var(--c-text-muted); font-family: ui-monospace, monospace;
-  font-size: var(--step--1); text-align:center; padding: var(--space-m);
-}
-```
+- `.stage--hero` (home): 16:9 on a desk, **4:5 in the hand** — a film still is not a banner. Capped
+  at `92svh`. The centred play icon is hidden; the title card's pill is the visible affordance and
+  the whole frame is the control.
+- `.stage--plain` (a landscape film page): grain, no vignette, no card.
+- `.stage--portrait` (a vertical film page): the 9:16 frame centred on a dark stage with its own
+  poster blurred behind it (`.stage__bg`, `blur(28px) brightness(0.42)`), a soft shadow, and two
+  mono notes at the corners. The awkward format becomes a feature.
 
-It renders `MISSING: poster for the-long-quiet`. Making the gap visually loud is what stops
-"never invent facts" from quietly decaying into invented copy.
+### The title card
+
+`.title-card` is absolutely positioned inside the stage's frame, `pointer-events: none` except for
+its links. Eyebrow (`Now showing · 04 / 16`), the title at `--step-6`, a mono credits line, a Play
+pill and a Film page pill, and Next at the right. The Play pill is a `<span>`: the frame itself is
+the play link, and the pill lights up through `.embed__play:hover ~ .title-card .btn--play`.
+
+### Frames
+
+`.frame` is a poster that behaves like a film: an `<a>` to the film's page carrying
+`data-cursor="play"`, a `view-transition-name`, and — when a strip exists — `data-strip` and
+`data-frames`. The accessible name is a visually-hidden span inside the link; the `.cap` beside it
+is plain text, so a screen reader hears one link per film. Hover scales the poster 1.05.
+
+### The reel
+
+`.reel__track` is a horizontal scroller: `overflow-x: auto`, `scroll-snap-type: x proximity`,
+`tabindex="0"` with `role="region"`. Items are sized from `--reel-h` (12.5rem on a phone, 18.75rem
+on a desk); a portrait item is `--reel-h × 9/16` wide. Prev/next buttons are shown by JS only.
+
+Snap is `proximity`, **not** `mandatory`: a mandatory snap undoes the small scroll an arrow key
+makes, so keyboard users could never move the track. `main.js` also maps ArrowLeft/Right to one
+frame and Home/End to the ends.
+
+### The sheet (Work)
+
+`.sheet` is an edge-to-edge grid with 4px gutters: 2 columns on a phone, 3 from 46rem, 4 from
+72rem. Every cell is 16:9 (`grid-auto-rows` computed from the viewport); a vertical film spans
+**three** rows, which lands within a few percent of 9:16 so nothing important is cropped.
+`grid-auto-flow: dense` backfills. A `.tile` is the poster with a caption that appears on hover or
+focus — and is always visible on `(hover: none)`, because a touch screen has no hover.
+
+### Film page
+
+`.film-head` is a two-column title card: eyebrow, title at `--step-6`, the logline as a lede, Play
+and Watch-on-YouTube pills; beside it `.credits`, a mono `<dl>` with hairline rules. Synopsis runs
+in `.prose--columns` (two columns from 60rem). `.related__list` is three frames. `.pager` is
+previous / next by site order, wrapping.
+
+### Pills
+
+`.btn` is the only button: mono, uppercase, 44px tall, fully rounded. `--primary` is amber,
+`--ghost` a 45%-text border (above the 3:1 non-text floor). Nothing else is a button.
 
 ### Video embed
 
 Facade: poster + play control, iframe injected only on activation. The box is reserved with
-`aspect-ratio` before the poster loads, so CLS is zero on a page with a dozen films.
+`aspect-ratio` so CLS is zero. `--embed-ratio` and `view-transition-name: film-<slug>` are the
+**only** declarations permitted in a `style` attribute; the audit and a test enforce it.
 
-```css
-.embed__frame { position:relative; aspect-ratio: var(--embed-ratio, 16/9); overflow:hidden;
-                border-radius: var(--radius-md); background: var(--c-bg-elev-2); }
-.embed__poster, .embed__iframe { position:absolute; inset:0; width:100%; height:100%; }
-.embed__poster { object-fit:cover; }
-.embed__iframe { border:0; }
-```
+`.embed__play:focus-visible { outline-offset: -5px }` pulls the focus ring inside the clipping
+frame, where it is actually visible.
 
-`--embed-ratio` is the **only** place content data reaches a `style` attribute. It is regex-gated in
-the validator and re-asserted by the audit.
+### `placeholder` is first-class
 
-**Portrait films (9:16 — Shorts).** When the parsed ratio is taller than wide, `embed()` adds
-`embed--portrait` and the entry gets `film-entry--portrait`. Uncapped, a 9:16 frame in a 46rem
-column stands over 1200px tall. Instead the frame caps at `max-width: 21rem` (centred on mobile),
-the play icon steps down a size, and at ≥60rem the entry grid inverts to
-`minmax(0, 21rem) minmax(0, 1fr)` with the copy vertically centred — narrow column for the film,
-wide one for the words. The first-child "statement" layout is overridden for portrait entries so a
-vertical film opening the page does not run full width.
+A dashed, monospaced `MISSING: …` block. Making a gap loud is what stops "never invent facts" from
+decaying into invented copy.
 
 ---
 
 ## Focus
 
 ```css
-:focus-visible { outline:2px solid var(--c-focus); outline-offset:3px; border-radius:inherit; }
-:target { scroll-margin-block-start: calc(var(--header-h) + var(--space-l)); }
+:focus-visible { outline: 2px solid var(--c-focus); outline-offset: 3px; border-radius: inherit; }
 ```
 
-`outline: none` without a replacement is **banned** and grep-tested in `test/`.
+`outline: none` without a replacement is **banned** and grep-tested. Anything with
+`overflow: hidden` that contains a focusable control pulls the ring inside with a negative offset:
+`.embed__play`, `.frame`, `.tile`, `.reel__track`. A focused frame also draws a Play pill with CSS
+(`.frame:focus-visible::after`) — the keyboard gets what the pointer gets.
+
+---
+
+## The five signatures
+
+In order of impact. Every one is progressive enhancement, and every one is off under
+`prefers-reduced-motion: reduce`.
+
+1. **Hover-scrub.** Each film may ship a strip of N stills side by side at
+   `assets/strips/<id>.jpg` (`scripts/make-posters.sh --strip`). The build reads the frame count off
+   the image's proportions and stamps `data-strip` / `data-frames` on the film's frames and tiles.
+   On a pointer device, `main.js` appends the strip on first hover (never on load) and slides it so
+   the frame under the pointer shows. Motion from stills: not a byte of video is hosted.
+2. **The title-card hero.** Above.
+3. **The play cursor.** On fine-pointer devices `main.js` appends one `.cursor` pill that eases
+   toward the pointer over any `[data-cursor="play"]`; the native cursor is hidden there via
+   `.has-cursor`. Purely decorative, `aria-hidden`, and never a substitute for the focus ring.
+4. **Page transitions.** `@view-transition { navigation: auto }` — cross-document, native, no
+   library. Every frame and tile carries `view-transition-name: film-<slug>`, and the film page's
+   stage carries the same name, so the frame you click grows into the stage. The header is named
+   too, so it holds still. Browsers without the feature simply navigate. A name must be unique on a
+   page: on the home page the reel owns it and the Recent block does not.
+5. **The stage for vertical films.** Above.
 
 ---
 
@@ -197,22 +237,17 @@ the user just clicked."
 | Behaviour | Under `reduce` |
 |---|---|
 | User clicks play → `autoplay=1` in the iframe | **Unchanged.** User-initiated. |
-| Hover video preview | **Never shipped** — would need self-hosted video, which the rules forbid. |
-| Autoplaying hero reel | **Never shipped**, same reason. Hero is a still + play facade. |
-| Scroll reveal, parallax | Suppressed by the global block; the JS never runs. |
-| Hover scale, focus transitions | Collapsed to `.01ms`. |
+| Hover-scrub | JS never runs; the poster stands. |
+| Play cursor | Still shown (it is a pointer, not motion), but it stops easing and simply follows. |
+| Page transitions | `@view-transition { navigation: none }`. |
+| Scroll reveal | Suppressed; the JS bails before touching the DOM. |
+| Hover scale, pill transitions | Collapsed to `.01ms`; poster transforms disabled. |
+| Autoplaying showreel | **Never shipped** — it would need a YouTube embed on load, which trades away the privacy posture. The hero is a still with a title card. |
 
-### The motion system that shipped
+### Scroll reveal
 
-- **Scroll reveal** — film entries, cards, founders, steps and section headings fade-rise 18px with
-  a 70ms sibling stagger. The `.reveal` class is added by `main.js` only: with JS off or under
-  `prefers-reduced-motion` nothing is ever hidden. Elements already in the viewport at load are
-  skipped — reveals are for content that scrolls in, never a curtain over first paint.
-- **Gradient ink** — one word of the hero headline (`[[…]]` in content) carries a slow 14s
-  drifting warm gradient. Solid amber fallback without `background-clip: text` support; solid
-  `CanvasText` under forced colors; frozen under reduced motion.
-- **Hover** — cards lift 4px with an amber-tinted shadow, posters scale 1.045 and brighten,
-  the play button gains a glow ring, primary buttons run a single sheen sweep, nav links grow a
-  1px amber underline. All transform/opacity/background-size — nothing that triggers layout.
-- **Ambient** — a static two-point radial glow behind the home hero. No animation, no texture
-  loops; depth comes from light, not movement.
+Reel items, sheet tiles, strip items, founders, offers, timeline steps, related films, the recent
+block, section headings, the statement and the film head fade-rise 18px with a 70ms sibling
+stagger. `.reveal` is added by `main.js` only, so with JS off or under reduced motion nothing is
+ever hidden. Elements already in the viewport at load are skipped, and a scroll sweep catches
+anything a teleport scrolled past.

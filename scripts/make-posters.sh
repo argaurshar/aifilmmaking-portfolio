@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Cut poster stills from a local master, or resize a still you already have.
+# Or, with --strip, cut a frame strip for the hover-scrub (see below).
 #
 #   ./scripts/make-posters.sh media/the-long-quiet.mov the-long-quiet 00:01:23
 #   ./scripts/make-posters.sh ~/Desktop/shot.png qutub-minar
@@ -10,6 +11,45 @@
 # Requires ffmpeg on YOUR machine. It is NOT a build dependency — build.mjs
 # never invokes it. See docs/06-MEDIA-PIPELINE.md.
 set -euo pipefail
+
+# ── Strip mode ───────────────────────────────────────────────────────────────
+#   ./scripts/make-posters.sh --strip media/ramayana.mov ramayana [frames]
+#
+# Cuts N evenly spaced frames (default 24) from a master and tiles them into
+# ONE image at assets/strips/<id>.jpg. On the site, moving the pointer across
+# the poster slides this strip so the film plays under the cursor — motion
+# from stills, with no video hosted anywhere. build.mjs finds it by filename
+# and reads the frame count off the image's own proportions.
+if [ "${1:-}" = "--strip" ]; then
+  shift
+  SRC="${1:?usage: make-posters.sh --strip <master-file> <film-id> [frames]}"
+  ID="${2:?missing film id}"
+  N="${3:-24}"
+  [ -f "$SRC" ] || { echo "No such file: $SRC" >&2; exit 1; }
+  command -v ffmpeg >/dev/null || { echo "ffmpeg not found. Install it, then retry." >&2; exit 1; }
+  case "$ID" in *[!a-z0-9-]*|-*|*-) echo "Film id must be a lowercase slug: $ID" >&2; exit 1 ;; esac
+  case "$N" in ''|*[!0-9]*) echo "frames must be a whole number: $N" >&2; exit 1 ;; esac
+
+  # Duration from ffmpeg's own banner — ffprobe is not on every build.
+  # ffmpeg exits 1 when asked for no output, so it is guarded, otherwise
+  # errexit + pipefail would abort the script here without a word.
+  DUR=$( { ffmpeg -hide_banner -i "$SRC" 2>&1 || true; } \
+         | sed -nE 's/.*Duration: ([0-9:.]+).*/\1/p' | head -1 )
+  [ -n "$DUR" ] || { echo "Could not read the duration of $SRC" >&2; exit 1; }
+  SECS=$(echo "$DUR" | awk -F: '{ print ($1 * 3600) + ($2 * 60) + $3 }')
+  case "$SECS" in 0|0.*) echo "$SRC is too short to cut a strip from ($DUR)" >&2; exit 1 ;; esac
+
+  mkdir -p assets/strips
+  OUT="assets/strips/${ID}.jpg"
+  # One frame every SECS/N seconds, each scaled so its long edge is 320px
+  # (landscape 320 wide, portrait 320 tall), tiled into a single row.
+  ffmpeg -loglevel error -y -i "$SRC" \
+    -vf "fps=${N}/${SECS},scale='if(gt(iw,ih),320,-2)':'if(gt(iw,ih),-2,320)':flags=lanczos,tile=${N}x1" \
+    -frames:v 1 -q:v 5 "$OUT"
+  printf '  %-38s %s  (%s frames)\n' "$OUT" "$(du -h "$OUT" | cut -f1)" "$N"
+  echo "Done. Rebuild and the poster for '${ID}' scrubs on hover. Under 300 KB is the aim."
+  exit 0
+fi
 
 SRC="${1:?usage: make-posters.sh <master-file-or-image> <film-id> [timestamp]}"
 ID="${2:?missing film id}"

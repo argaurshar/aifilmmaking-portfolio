@@ -109,6 +109,19 @@ init('embeds', () => {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && activeEmbed) restoreEmbed(activeEmbed, { refocus: true });
   });
+
+  // The film page's title card carries its own Play pill. With JS off it is a
+  // link to the watch page; here it drives the stage's embed instead.
+  for (const btn of document.querySelectorAll('[data-play-embed]')) {
+    btn.addEventListener('click', (e) => {
+      const root = document.querySelector('[data-embed]');
+      if (!root) return;
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+      e.preventDefault();
+      activateEmbed(root);
+      root.scrollIntoView({ block: 'center', behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+    });
+  }
 });
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -167,13 +180,16 @@ init('filter', () => {
   const status = document.querySelector('[data-filter-status]');
   if (!bar || !list) return;
 
-  const items = [...list.querySelectorAll('.film-list__item')];
+  const items = [...list.querySelectorAll('.sheet__item')];
   const total = items.length;
 
   const apply = (type, { push }) => {
     let shown = 0;
     for (const item of items) {
-      const match = type === 'all' || item.dataset.type === type;
+      // "vertical" is an orientation, not a type: it cuts across the others.
+      const match = type === 'all'
+        || item.dataset.type === type
+        || (type === 'vertical' && item.dataset.orientation === 'portrait');
       item.hidden = !match;
       if (match) shown++;
     }
@@ -270,8 +286,9 @@ init('reveal', () => {
   if (!('IntersectionObserver' in window)) return;
 
   const targets = document.querySelectorAll(
-    '.film-list__item, .film-card, .service-card, .founder, .process-step, ' +
-    '.process-clip, .callout, .section__heading, .hero-reel .embed'
+    '.reel__item, .sheet__item, .strip__item, .founder, .offer, .timeline__step, ' +
+    '.related__item, .recent__lead, .recent__side > *, .process-clip, .callout, ' +
+    '.section__heading, .statement, .film-head'
   );
   if (!targets.length) return;
 
@@ -290,7 +307,7 @@ init('reveal', () => {
     // that has yet to scroll in, not a curtain over the first paint.
     if (el.getBoundingClientRect().top < innerHeight * 0.92) continue;
     const siblings = el.parentElement ? [...el.parentElement.children] : [el];
-    const among = siblings.filter((n) => n.matches?.('.film-card, .service-card, .founder'));
+    const among = siblings.filter((n) => n.matches?.('.reel__item, .sheet__item, .strip__item, .founder, .offer, .related__item'));
     const idx = Math.max(0, among.indexOf(el));
     el.style.setProperty('--reveal-delay', `${Math.min(idx, 5) * 70}ms`);
     el.classList.add('reveal');
@@ -316,4 +333,116 @@ init('reveal', () => {
   };
   const onScroll = () => { if (!raf) raf = requestAnimationFrame(sweep); };
   addEventListener('scroll', onScroll, { passive: true });
+});
+
+/* ══════════════════════════════════════════════════════════════════════════
+   The reel — prev/next buttons for the horizontal track.
+
+   The track is a real scrolling region (tabindex="0"), so keyboard users
+   already have arrow keys and touch users already have swipe. The buttons
+   are for the mouse. With JS off they are hidden by CSS.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+init('reel', () => {
+  const track = document.querySelector('[data-reel]');
+  if (!track) return;
+  const step = () => {
+    const item = track.querySelector('.reel__item');
+    return item ? item.getBoundingClientRect().width + 16 : track.clientWidth * 0.8;
+  };
+  const go = (dir, n = 2) => track.scrollBy({ left: dir * step() * n, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+  document.querySelector('[data-reel-prev]')?.addEventListener('click', () => go(-1));
+  document.querySelector('[data-reel-next]')?.addEventListener('click', () => go(1));
+
+  // Arrow keys move one whole frame. The browser's own key scrolling nudges
+  // by a few dozen pixels, which the snap then pulls back — net movement zero.
+  track.addEventListener('keydown', (e) => {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    if (e.key === 'ArrowRight') { e.preventDefault(); go(1, 1); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1, 1); }
+    else if (e.key === 'Home') { e.preventDefault(); track.scrollTo({ left: 0, behavior: reduceMotion.matches ? 'auto' : 'smooth' }); }
+    else if (e.key === 'End') { e.preventDefault(); track.scrollTo({ left: track.scrollWidth, behavior: reduceMotion.matches ? 'auto' : 'smooth' }); }
+  });
+});
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Hover-scrub — a poster that plays under the pointer.
+
+   Any element with data-strip names an image of N frames laid side by side
+   (assets/strips/<id>.jpg, cut by scripts/make-posters.sh --strip). Moving
+   across the element slides the strip so the frame under the cursor shows.
+   Motion from stills: not a byte of video is hosted. The strip is fetched
+   on first hover, never on load. Pointer devices only; off under reduced
+   motion, where the poster simply stands.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+init('scrub', () => {
+  if (reduceMotion.matches) return;
+  if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+  for (const el of document.querySelectorAll('[data-strip]')) {
+    const frames = Number(el.dataset.frames) || 0;
+    if (frames < 2) continue;
+    let strip = null;
+
+    const ensure = () => {
+      if (strip) return strip;
+      strip = new Image();
+      strip.className = 'frame__strip';
+      strip.alt = '';
+      strip.decoding = 'async';
+      strip.style.width = `${frames * 100}%`;
+      strip.src = el.dataset.strip;
+      el.append(strip);
+      return strip;
+    };
+    const show = (e) => {
+      if (!strip) return;
+      const r = el.getBoundingClientRect();
+      const i = Math.min(frames - 1, Math.max(0, Math.floor((e.clientX - r.left) / r.width * frames)));
+      strip.style.transform = `translateX(${(-i * 100) / frames}%)`;
+    };
+
+    el.addEventListener('pointerenter', (e) => { ensure(); el.classList.add('is-scrubbing'); show(e); });
+    el.addEventListener('pointermove', show);
+    el.addEventListener('pointerleave', () => el.classList.remove('is-scrubbing'));
+  }
+});
+
+/* ══════════════════════════════════════════════════════════════════════════
+   The play cursor — a small white pill that follows the pointer over a film.
+
+   Decorative only: aria-hidden, pointer devices only, and never a substitute
+   for the focus ring, which is untouched. Keyboard users get the same pill
+   drawn by CSS on :focus-visible.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+init('cursor', () => {
+  if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  const targets = document.querySelectorAll('[data-cursor="play"]');
+  if (!targets.length) return;
+
+  const pill = document.createElement('div');
+  pill.className = 'cursor';
+  pill.setAttribute('aria-hidden', 'true');
+  pill.innerHTML = '<svg viewBox="0 0 10 12" aria-hidden="true"><path d="M0 0l10 6-10 6z" fill="currentColor"/></svg>Play';
+  document.body.append(pill);
+  document.documentElement.classList.add('has-cursor');
+
+  // Eases toward the pointer so it feels attached rather than glued.
+  // Under reduced motion it simply follows.
+  const ease = reduceMotion.matches ? 1 : 0.32;
+  let x = 0, y = 0, tx = 0, ty = 0, raf = 0, over = false;
+  const tick = () => {
+    x += (tx - x) * ease; y += (ty - y) * ease;
+    pill.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
+    raf = (over || Math.abs(tx - x) + Math.abs(ty - y) > 0.5) ? requestAnimationFrame(tick) : 0;
+  };
+  const move = (e) => { tx = e.clientX; ty = e.clientY; if (!raf) raf = requestAnimationFrame(tick); };
+
+  for (const t of targets) {
+    t.addEventListener('pointerenter', (e) => { over = true; x = tx = e.clientX; y = ty = e.clientY; pill.classList.add('is-on'); move(e); });
+    t.addEventListener('pointermove', move);
+    t.addEventListener('pointerleave', () => { over = false; pill.classList.remove('is-on'); });
+  }
 });

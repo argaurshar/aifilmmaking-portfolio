@@ -1,8 +1,9 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    Xelion Labs — Film Studio
-   Cinema black. See docs/02-DESIGN-SYSTEM.md.
+   The Screening Room. See docs/02-DESIGN-SYSTEM.md.
 
-   Order matters: tokens → reset → base → layout → components → utilities → media.
+   Order matters: tokens → fonts → reset → base → layout → header → stage →
+   components → pages → utilities → motion → media.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* ── Tokens ─────────────────────────────────────────────────────────────── */
@@ -10,14 +11,15 @@
 :root {
   color-scheme: dark;
 
-  --c-bg:          oklch(0.155 0.006 285);
-  --c-bg-elev-1:   oklch(0.200 0.008 285);
-  --c-bg-elev-2:   oklch(0.255 0.010 285);
-  --c-line:        oklch(0.320 0.010 285);
-  --c-line-strong: oklch(0.440 0.012 285);
-  --c-text:        oklch(0.960 0.005 285);
-  --c-text-muted:  oklch(0.760 0.008 285);
-  --c-text-dim:    oklch(0.620 0.008 285);   /* metadata only — never body copy */
+  /* Warm near-black: a cinema, not a terminal. The amber is the one accent. */
+  --c-bg:          oklch(0.135 0.004 70);
+  --c-bg-elev-1:   oklch(0.165 0.006 70);
+  --c-bg-elev-2:   oklch(0.205 0.007 70);
+  --c-text:        oklch(0.950 0.008 85);
+  --c-text-muted:  oklch(0.760 0.012 80);
+  --c-text-dim:    oklch(0.620 0.012 80);   /* metadata only — never body copy */
+  --c-line:        color-mix(in oklch, var(--c-text) 10%, transparent);
+  --c-line-strong: color-mix(in oklch, var(--c-text) 22%, transparent);
   --c-accent:      oklch(0.800 0.145 78);
   --c-accent-ink:  oklch(0.180 0.030 78);
   --c-focus:       oklch(0.860 0.170 210);
@@ -29,43 +31,54 @@
   --step-2:  clamp(1.5rem,    1.30rem + 1.00vw, 2.1rem);
   --step-3:  clamp(1.9rem,    1.52rem + 1.90vw, 3rem);
   --step-4:  clamp(2.4rem,    1.70rem + 3.40vw, 4.4rem);
-  --step-5:  clamp(2.75rem,   1.80rem + 4.75vw, 5.5rem);
+  --step-5:  clamp(2.75rem,   1.60rem + 5.20vw, 6rem);
+  --step-6:  clamp(2.9rem,    1.20rem + 7.20vw, 7rem);
 
   --space-3xs: .25rem;  --space-2xs: .5rem;   --space-xs: .75rem;
   --space-s:   1rem;    --space-m:  1.5rem;   --space-l:  2.5rem;
   --space-xl:  4rem;    --space-2xl: 6rem;
-  --space-section: clamp(3.5rem, 2rem + 6vw, 8rem);
-  --gutter:        clamp(1rem, 0.6rem + 2vw, 2.5rem);
+  --space-section: clamp(3.5rem, 2rem + 6vw, 7.5rem);
+  --gutter:        clamp(1.25rem, 0.8rem + 1.8vw, 2.5rem);
 
-  --measure: 38rem;
-  --measure-wide: 76rem;
+  --measure: 40rem;
+  --measure-wide: 90rem;
 
-  --radius-sm: 4px; --radius-md: 10px; --radius-lg: 18px; --radius-full: 999px;
+  --radius-sm: 3px; --radius-md: 6px; --radius-full: 999px;
 
-  --dur-fast: 120ms; --dur: 220ms; --dur-slow: 420ms;
+  --dur-fast: 120ms; --dur: 220ms; --dur-slow: 480ms;
   --ease-out: cubic-bezier(.2, .8, .2, 1);
 
   --header-h: 4.5rem;
 
-  --font-text: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
-  --font-display: 'Space Grotesk', var(--font-text);
+  --font-text: 'Archivo', system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --font-display: 'Archivo', system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
 
-  /* the generative signature: a slow-breathing warm gradient, used sparingly */
-  --ink-a: oklch(0.82 0.15 78);
-  --ink-b: oklch(0.78 0.16 45);
-  --ink-c: oklch(0.80 0.14 110);
+  /* Film grain, drawn by the browser. One SVG, no image request. */
+  --grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.6 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
 }
 
-/* Space Grotesk (variable, 300–700) — self-hosted, OFL. One 22KB file.
-   Display voice only: headlines, brand, labels. Body stays on the system
-   stack for speed and reading comfort. */
+/* Archivo, variable on weight AND width — the width axis is the whole point.
+   Titles run condensed (font-stretch 80–88%), body runs at 100%. One 87KB file
+   for every register on the site. IBM Plex Mono carries credits, labels and
+   metadata: the type of a title card's small print. All three OFL, self-hosted. */
 @font-face {
-  font-family: 'Space Grotesk';
-  src: url('../fonts/space-grotesk-var.woff2') format('woff2-variations');
-  font-weight: 300 700;
+  font-family: 'Archivo';
+  src: url('../fonts/archivo-var.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
   font-style: normal;
   font-display: swap;
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  src: url('../fonts/plex-mono-400.woff2') format('woff2');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  src: url('../fonts/plex-mono-500.woff2') format('woff2');
+  font-weight: 500; font-style: normal; font-display: swap;
 }
 
 /* ── Reset ──────────────────────────────────────────────────────────────── */
@@ -81,7 +94,7 @@ body {
   color: var(--c-text);
   font-family: var(--font-text);
   font-size: var(--step-0);
-  line-height: 1.6;
+  line-height: 1.55;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
@@ -95,8 +108,11 @@ ul, ol { list-style: none; padding: 0; }
 
 h1, h2, h3, h4 {
   font-family: var(--font-display);
-  line-height: 1.06; font-weight: 600; text-wrap: balance; letter-spacing: -0.015em;
-  font-optical-sizing: auto;
+  font-weight: 800;
+  font-stretch: 85%;
+  line-height: 0.96;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
 }
 p, li { text-wrap: pretty; }
 
@@ -128,7 +144,6 @@ a:hover { color: var(--c-accent); }
   /* min() is what stops auto-fit overflowing narrow viewports. Do not simplify. */
   grid-template-columns: repeat(auto-fit, minmax(min(var(--col-min, 20rem), 100%), 1fr));
 }
-.l-grid--services { --col-min: 18rem; }
 .l-cluster {
   display: flex; flex-wrap: wrap;
   gap: var(--gap, var(--space-2xs));
@@ -138,6 +153,26 @@ a:hover { color: var(--c-accent); }
 main > * + * { margin-block-start: var(--space-section); }
 main > :first-child { margin-block-start: var(--space-xl); }
 main > :last-child { margin-block-end: var(--space-section); }
+/* A page that opens on a stage owns its own top edge. */
+.page--index main > :first-child, .page--film main > :first-child { margin-block-start: 0; }
+
+/* ── Type registers ─────────────────────────────────────────────────────── */
+
+/* The three voices of a title card: display (the title), mono (the credits),
+   and the eyebrow (the small print above). Use them; do not invent a fourth. */
+.display { font-family: var(--font-display); font-weight: 800; font-stretch: 82%; letter-spacing: -0.02em; line-height: 0.94; }
+.mono { font-family: var(--font-mono); font-weight: 400; }
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--c-text-dim);
+}
+.eyebrow--accent { color: var(--c-accent); }
+.meta {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--c-text-dim);
+}
 
 /* ── Skip link ──────────────────────────────────────────────────────────── */
 
@@ -156,48 +191,46 @@ main > :last-child { margin-block-end: var(--space-section); }
 
 .site-header {
   position: sticky; top: 0; z-index: 100;
-  background: color-mix(in oklch, var(--c-bg) 88%, transparent);
-  backdrop-filter: blur(12px);
-  border-block-end: 1px solid color-mix(in oklch, var(--c-line) 60%, transparent);
+  background: color-mix(in oklch, var(--c-bg) 86%, transparent);
+  backdrop-filter: blur(14px);
+  border-block-end: 1px solid var(--c-line);
+  view-transition-name: site-header;
+}
+/* Over a stage the header floats on the picture. It is the same element at
+   the same position, so the view transition holds it still while pages change. */
+.page--index .site-header, .page--film .site-header {
+  position: absolute; inset-inline: 0; top: 0;
+  background: linear-gradient(to bottom, color-mix(in oklch, var(--c-bg) 55%, transparent), transparent);
+  backdrop-filter: none;
+  border: 0;
 }
 .site-header__inner {
   display: flex; align-items: center; justify-content: space-between;
   gap: var(--space-m);
   min-height: var(--header-h);
 }
-.site-header__brand {
-  display: flex; flex-direction: column; line-height: 1.15;
-  text-decoration: none;
-}
+.site-header__brand { display: flex; flex-direction: column; text-decoration: none; }
 .site-header__name {
-  font-family: var(--font-display);
-  font-size: var(--step--1); font-weight: 600;
-  text-transform: uppercase; letter-spacing: 0.12em;
+  font-family: var(--font-display); font-weight: 800; font-stretch: 75%;
+  font-size: 1.125rem; letter-spacing: 0.04em; text-transform: uppercase; line-height: 1;
 }
 .site-header__role {
-  font-family: var(--font-display);
-  font-size: var(--step--1); color: var(--c-text-dim);
-  text-transform: uppercase; letter-spacing: 0.12em;
+  font-family: var(--font-mono); font-size: 0.625rem; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--c-text-dim); margin-block-start: 0.3em;
 }
 
 .site-nav__toggle { display: none; }
-.site-nav__panel { display: flex; gap: var(--space-m); }
+.site-nav__panel { display: flex; gap: var(--space-l); }
 .site-nav__panel a {
-  font-family: var(--font-display);
-  font-size: var(--step--1);
-  text-transform: uppercase; letter-spacing: 0.1em;
+  font-family: var(--font-mono);
+  font-size: 0.75rem; letter-spacing: 0.18em; text-transform: uppercase;
   text-decoration: none; color: var(--c-text-muted);
   padding-block: var(--space-2xs);
-}
-.site-nav__panel a {
   background: linear-gradient(var(--c-accent), var(--c-accent)) bottom left / 0% 1px no-repeat;
   transition: background-size var(--dur) var(--ease-out), color var(--dur-fast) var(--ease-out);
 }
 .site-nav__panel a:hover { color: var(--c-text); background-size: 100% 1px; }
-.site-nav__panel a[aria-current="page"] {
-  color: var(--c-text);
-  background-size: 100% 1px;
-}
+.site-nav__panel a[aria-current="page"] { color: var(--c-text); background-size: 100% 1px; }
 
 @media (max-width: 46rem) {
   .js .site-nav__toggle {
@@ -229,82 +262,27 @@ main > :last-child { margin-block-end: var(--space-section); }
   .site-nav__panel a { font-size: var(--step-0); padding-block: var(--space-xs); }
 }
 
-/* ── Hero ───────────────────────────────────────────────────────────────── */
+/* ── Pills (the only button) ────────────────────────────────────────────── */
 
-.hero { --stack-space: var(--space-m); max-width: var(--measure-wide); position: relative; }
-/* Static ambient glow — depth without motion. Sits behind the hero only. */
-.page--index main::before {
-  content: '';
-  position: absolute; inset: 0 0 auto 0; height: 90vh;
-  background:
-    radial-gradient(90% 55% at 70% -10%, color-mix(in oklch, var(--c-accent) 9%, transparent), transparent 70%),
-    radial-gradient(60% 40% at 10% 10%, color-mix(in oklch, var(--ink-c) 5%, transparent), transparent 70%);
-  pointer-events: none;
+.btn {
+  font-family: var(--font-mono);
+  display: inline-flex; align-items: center; gap: 0.6em;
+  min-height: 2.75rem; padding: 0 1.4em;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.14em;
+  text-decoration: none; white-space: nowrap;
+  border: 1px solid transparent;
+  transition: background var(--dur) var(--ease-out), color var(--dur) var(--ease-out),
+              border-color var(--dur) var(--ease-out), transform var(--dur) var(--ease-out);
 }
-.page--index main { position: relative; }
-.page--index main > * { position: relative; }
-.hero__kicker {
-  font-family: var(--font-display);
-  font-size: var(--step--1); color: var(--c-text-dim);
-  text-transform: uppercase; letter-spacing: 0.16em;
-}
-.hero__headline {
-  font-size: var(--step-5);
-  max-width: 18ch;
-  letter-spacing: -0.03em;
-  font-weight: 640;
-}
-.hero__sub { font-size: var(--step-1); color: var(--c-text-muted); max-width: var(--measure); }
-.hero__actions { --gap: var(--space-s); margin-block-start: var(--space-l); }
-
-.hero-reel__caption {
-  margin-block-start: var(--space-s);
-  color: var(--c-text-muted); font-size: var(--step--1);
-  max-width: var(--measure);
-}
-
-/* ── Page head / sections ───────────────────────────────────────────────── */
-
-.page-head { --stack-space: var(--space-s); }
-.page-head__title { font-size: var(--step-4); max-width: 16ch; }
-.page-head__intro { font-size: var(--step-1); color: var(--c-text-muted); max-width: var(--measure); }
-.page-head__note { color: var(--c-text-dim); font-size: var(--step--1); }
-
-.section { --stack-space: var(--space-l); }
-
-/* Label-left / content-right editorial grid for light sections. The rule
-   moves to the section's top edge; the heading loses its own. */
-.section--split { border-block-start: 1px solid var(--c-line); padding-block-start: var(--space-l); }
-.section--split > * + * { margin-block-start: var(--space-m); }
-.section--split > .section__heading { border: 0; padding: 0; }
-@media (min-width: 60rem) {
-  .section--split {
-    display: grid;
-    grid-template-columns: minmax(13rem, 1fr) 2.6fr;
-    column-gap: var(--space-xl); row-gap: var(--space-m);
-    align-items: start;
-  }
-  .section--split > * { margin-block-start: 0; }
-  .section--split > .section__heading { grid-column: 1; grid-row: 1; }
-  .section--split > :not(.section__heading) { grid-column: 2; }
-}
-
-/* A lede: the first paragraph of a marked prose block speaks at display size. */
-.prose--lede > p:first-child {
-  font-size: var(--step-1);
-  color: var(--c-text);
-  letter-spacing: -0.01em;
-}
-.section__heading {
-  font-family: var(--font-display);
-  font-size: var(--step--1); color: var(--c-text-dim);
-  text-transform: uppercase; letter-spacing: 0.16em; font-weight: 600;
-  padding-block-end: var(--space-xs);
-  border-block-end: 1px solid var(--c-line);
-}
-
-.prose { max-width: var(--measure); color: var(--c-text-muted); }
-.prose > * + * { margin-block-start: var(--space-s); }
+.btn svg { width: 0.7em; height: 0.85em; flex: none; }
+.btn--primary { background: var(--c-accent); color: var(--c-accent-ink); }
+.btn--primary:hover { background: color-mix(in oklch, var(--c-accent) 84%, white); color: var(--c-accent-ink); }
+/* The only boundary of an interactive control must clear the 3:1 non-text floor. */
+.btn--ghost { border-color: color-mix(in oklch, var(--c-text) 45%, transparent); color: var(--c-text); }
+.btn--ghost:hover { border-color: var(--c-text); color: var(--c-text); background: color-mix(in oklch, var(--c-text) 6%, transparent); }
+.btn--small { min-height: 2.25rem; padding: 0 1em; font-size: 0.6875rem; }
 
 /* ── Video embed facade ─────────────────────────────────────────────────── */
 
@@ -313,14 +291,13 @@ main > :last-child { margin-block-end: var(--space-section); }
   position: relative;
   aspect-ratio: var(--embed-ratio, 16 / 9);
   overflow: hidden;
-  border-radius: var(--radius-md);
   background: var(--c-bg-elev-2);
 }
 .embed__poster, .embed__iframe, .embed__noposter {
-  position: absolute; inset: 0; width: 100%; height: 100%;
+  position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0;
 }
 .embed__poster { object-fit: cover; }
-.embed__iframe { border: 0; }
+.embed__iframe { border: 0; z-index: 2; }
 /* No poster yet: a quiet stripe, never a dashed box competing with the play
    control. The loud "missing" note goes below the frame instead. */
 .embed__noposter {
@@ -331,7 +308,7 @@ main > :last-child { margin-block-end: var(--space-section); }
 .embed .placeholder { margin-block-start: var(--space-xs); min-height: 0; }
 
 .embed__play {
-  position: absolute; inset: 0;
+  position: absolute; inset: 0; z-index: 2;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: var(--space-xs);
   text-decoration: none; color: var(--c-text);
@@ -344,8 +321,7 @@ main > :last-child { margin-block-end: var(--space-section); }
 }
 /* The frame sets overflow:hidden and this link's border box IS the frame's
    padding box, so the site-wide focus ring — outline-offset: 3px — is painted
-   entirely in the clipped region and never appears. Pull it inside. Without
-   this, tabbing through sixteen films moves focus with nothing visible. */
+   entirely in the clipped region and never appears. Pull it inside. */
 .embed__play:focus-visible { outline-offset: -5px; }
 .embed__play:hover, .embed__play:focus-visible {
   color: var(--c-text);
@@ -370,9 +346,7 @@ main > :last-child { margin-block-end: var(--space-section); }
   box-shadow: 0 0 0 8px color-mix(in oklch, var(--c-accent) 18%, transparent),
               0 8px 40px -8px color-mix(in oklch, var(--c-accent) 55%, transparent);
 }
-/* The label duplicated the title sitting right beside every poster, twelve
-   times over on Work. It stays in the accessible name; visually, the play
-   icon is the affordance and the film is the image. */
+/* The label stays in the accessible name; visually, the icon is the affordance. */
 .embed__label {
   position: absolute; width: 1px; height: 1px;
   padding: 0; margin: -1px; overflow: hidden;
@@ -383,89 +357,387 @@ main > :last-child { margin-block-end: var(--space-section); }
 
 /* "opens on YouTube" is only true before JS upgrades the control. */
 .js .embed__nojs { display: none; }
-.embed[data-embed-state="playing"] .embed__play { display: none; }
+.embed[data-embed-state="playing"] .embed__play,
+.embed[data-embed-state="playing"] .title-card { display: none; }
+.embed[data-embed-state="playing"] .embed__frame::before,
+.embed[data-embed-state="playing"] .embed__frame::after { display: none; }
 
-/* ── Film entry / card ──────────────────────────────────────────────────── */
-
-.film-list { --stack-space: var(--space-2xl); }
-.film-entry { display: grid; gap: var(--space-m); }
-.film-entry__body { --stack-space: var(--space-xs); }
-.film-entry__title { font-size: var(--step-2); }
-.film-entry__logline { color: var(--c-text-muted); max-width: var(--measure); font-size: var(--step-1); }
-
-@media (min-width: 60rem) {
-  .film-entry { grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); align-items: start; gap: var(--space-l); }
-  /* The index opens on a statement, not a spreadsheet row: the first film
-     runs full width with its title a register up. */
-  .film-list__item:first-child .film-entry { grid-template-columns: 1fr; }
-  .film-list__item:first-child .film-entry__title { font-size: var(--step-3); }
-  .film-list__item:first-child .film-entry__logline { font-size: var(--step-1); }
-}
-
-/* Vertical films (9:16 — Shorts). Left to itself a 9:16 frame in a 46rem
-   column stands over 1200px tall and swallows the page. Cap the frame
-   instead, and let the copy take the width the film gives back. */
-/* Centred only while the entry is a single stacked column. Once the copy sits
-   beside it (>=60rem, below) the frame goes flush left to share its baseline;
-   centring it there left the film adrift from its own title. */
+/* Portrait films: cap the frame, never let a 9:16 swallow the column. */
 .embed--portrait .embed__frame { max-width: 21rem; margin-inline: auto; }
-@media (min-width: 46rem) and (max-width: 59.999rem) {
-  .film-entry--portrait .embed--portrait .embed__frame { margin-inline: 0; }
-}
 .embed--portrait .embed__icon { width: 3.5rem; height: 3.5rem; }
 
+/* ── The stage: a film edge to edge, with grain and a vignette ──────────── */
+
+.stage { position: relative; width: 100%; background: #000; }
+.stage .embed__frame { border-radius: 0; }
+/* Grain over the picture, under the controls. */
+.stage .embed__frame::before {
+  content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background-image: var(--grain);
+  opacity: 0.26; mix-blend-mode: overlay;
+}
+/* The vignette carries the title card. Left-weighted, because that is where the card sits. */
+.stage .embed__frame::after {
+  content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background:
+    linear-gradient(to top, color-mix(in oklch, var(--c-bg) 92%, transparent) 0%,
+                            color-mix(in oklch, var(--c-bg) 35%, transparent) 38%, transparent 70%),
+    linear-gradient(to right, color-mix(in oklch, var(--c-bg) 35%, transparent), transparent 45%);
+}
+.stage--plain .embed__frame::after { display: none; }
+
+/* The hero: 16:9 on a desk, 4:5 in the hand — a film still is not a banner. */
+.stage--hero .embed__frame {
+  aspect-ratio: 4 / 5;
+  max-height: 92svh;
+}
+@media (min-width: 46rem) {
+  .stage--hero .embed__frame { aspect-ratio: 16 / 9; }
+}
+.stage--hero .embed__icon { display: none; }
+.stage--hero .embed__play { background: none; }
+
+/* A vertical film gets a screening room of its own: the 9:16 frame centred,
+   its own picture blurred behind it. The awkward format becomes a feature. */
+.stage--portrait {
+  height: min(92svh, 52rem);
+  overflow: hidden;
+}
+.stage__bg {
+  position: absolute; inset: -8%; width: 116%; height: 116%; max-width: none;
+  object-fit: cover;
+  filter: blur(28px) brightness(0.42) saturate(0.85);
+}
+.stage--portrait::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background-image: var(--grain); opacity: 0.22; mix-blend-mode: overlay;
+}
+.stage--portrait .embed {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  z-index: 1; padding-block: var(--space-l);
+}
+.stage--portrait .embed__frame {
+  height: 100%; width: auto; max-width: none; margin: 0;
+  aspect-ratio: var(--embed-ratio, 9 / 16);
+  box-shadow: 0 40px 120px rgba(0, 0, 0, 0.7);
+}
+.stage--portrait .embed__frame::before, .stage--portrait .embed__frame::after { display: none; }
+.stage__note {
+  position: absolute; z-index: 2; bottom: var(--space-m);
+  font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--c-text-dim);
+}
+.stage__note--start { left: var(--gutter); }
+.stage__note--end { right: var(--gutter); }
+
+/* The title card: sits over the stage, reads like a screening's opening frame. */
+.title-card {
+  position: absolute; z-index: 3; pointer-events: none;
+  left: var(--gutter); right: var(--gutter); bottom: clamp(1.25rem, 3vw, 2.75rem);
+  display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-l);
+}
+.title-card__main { display: flex; flex-direction: column; gap: var(--space-s); max-width: 68rem; }
+.title-card__title { font-size: var(--step-6); font-stretch: 80%; color: var(--c-text); }
+.title-card__meta { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--c-text-muted); }
+.title-card__actions { display: flex; flex-wrap: wrap; gap: var(--space-xs); margin-block-start: var(--space-2xs); }
+.title-card__actions > * { pointer-events: auto; }
+.title-card__next { pointer-events: auto; text-align: right; line-height: 1.8; text-decoration: none; }
+.title-card__next span { display: block; color: var(--c-text); }
+@media (max-width: 46rem) { .title-card__next { display: none; } }
+/* The play pill is a stand-in: the whole frame is the control. It lights when the frame does. */
+.embed__play:hover ~ .title-card .btn--play,
+.embed__play:focus-visible ~ .title-card .btn--play {
+  background: color-mix(in oklch, var(--c-accent) 84%, white);
+  transform: translateY(-1px);
+}
+
+/* ── Frames: a poster that acts like a film ─────────────────────────────── */
+
+.frame {
+  position: relative; display: block; overflow: hidden;
+  background: var(--c-bg-elev-2);
+  aspect-ratio: var(--frame-ratio, 16 / 9);
+  text-decoration: none; color: inherit;
+}
+.frame img { width: 100%; height: 100%; object-fit: cover; transition: transform var(--dur-slow) var(--ease-out); }
+.frame__poster { position: absolute; inset: 0; }
+.frame:hover img, .frame:focus-visible img { transform: scale(1.05); }
+/* A frame strip, when one exists: N stills side by side, one shown at a time.
+   JS slides it under the pointer. Without JS or a strip, the poster stands. */
+.frame__strip {
+  position: absolute; inset: 0; height: 100%; width: auto; max-width: none;
+  object-fit: cover; opacity: 0; transition: none; transform: none;
+}
+.frame.is-scrubbing .frame__strip { opacity: 1; }
+.frame.is-scrubbing .frame__poster { opacity: 0; }
+.frame.is-scrubbing img { transform: none; }
+/* A keyboard user gets the same pill the pointer gets. */
+.frame:focus-visible { outline-offset: -4px; }
+.frame:focus-visible::after {
+  content: 'Play';
+  position: absolute; left: 50%; top: 50%; translate: -50% -50%;
+  padding: 0.7em 1.1em 0.7em 1.9em;
+  background: var(--c-text); color: var(--c-bg);
+  border-radius: var(--radius-full);
+  font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.16em; text-transform: uppercase;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 12'><path d='M0 0l10 6-10 6z' fill='%230e0d0c'/></svg>");
+  background-repeat: no-repeat; background-size: 0.55em; background-position: 0.95em center;
+}
+.frame__noposter { position: absolute; inset: 0; background: repeating-linear-gradient(45deg, var(--c-bg-elev-1) 0 10px, var(--c-bg-elev-2) 10px 20px); }
+
+.cap { display: flex; flex-direction: column; gap: 0.25rem; margin-block-start: var(--space-xs); }
+.cap__title { font-family: var(--font-display); font-weight: 700; font-stretch: 95%; font-size: 0.9375rem; letter-spacing: -0.01em; line-height: 1.2; }
+.cap__meta { font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--c-text-dim); }
+a.cap-link { text-decoration: none; display: block; }
+a.cap-link:hover .cap__title { color: var(--c-accent); }
+
+/* ── The reel: a horizontal strip of every film ─────────────────────────── */
+
+.reel { --reel-h: 12.5rem; }
+@media (min-width: 46rem) { .reel { --reel-h: 18.75rem; } }
+.reel__head {
+  display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-m);
+  margin-block-end: var(--space-m);
+}
+.reel__nav { display: none; gap: var(--space-2xs); }
+.js .reel__nav { display: flex; }
+.reel__btn {
+  width: 2.5rem; height: 2.5rem; border-radius: var(--radius-full);
+  border: 1px solid color-mix(in oklch, var(--c-text) 35%, transparent);
+  display: grid; place-items: center; color: var(--c-text);
+  transition: border-color var(--dur) var(--ease-out), background var(--dur) var(--ease-out);
+}
+.reel__btn:hover { border-color: var(--c-text); background: color-mix(in oklch, var(--c-text) 6%, transparent); }
+.reel__btn svg { width: 0.9rem; height: 0.9rem; }
+.reel__track {
+  display: flex; gap: var(--space-s);
+  overflow-x: auto; overscroll-behavior-x: contain;
+  /* proximity, not mandatory: a mandatory snap undoes the small scroll an
+     arrow key makes, so keyboard users could never move the track at all. */
+  scroll-snap-type: x proximity;
+  padding-inline: var(--gutter);
+  padding-block-end: var(--space-s);
+  scrollbar-width: thin;
+  scrollbar-color: var(--c-line-strong) transparent;
+}
+/* The track is a real scrolling region: tab to it, arrow keys move it. */
+.reel__track:focus-visible { outline-offset: -3px; }
+.reel__item { flex: none; scroll-snap-align: start; width: calc(var(--reel-h) * 16 / 9); }
+.reel__item--portrait { width: calc(var(--reel-h) * 9 / 16); }
+.reel__item .frame { height: var(--reel-h); aspect-ratio: auto; }
+.reel__item .cap__title { max-width: 100%; }
+
+/* ── Home: statement, recent, strip, commissions ───────────────────────── */
+
+.statement { display: grid; gap: var(--space-l); align-items: end; }
+.statement__text { font-size: var(--step-5); font-stretch: 85%; max-width: 20ch; }
+.statement__actions { display: flex; flex-wrap: wrap; gap: var(--space-xs); margin-block-start: var(--space-l); }
+.statement__aside {
+  font-family: var(--font-mono); font-size: 0.8125rem; line-height: 2; letter-spacing: 0.04em;
+  color: var(--c-text-dim);
+  border-inline-start: 1px solid var(--c-line-strong); padding-inline-start: var(--space-m);
+}
+.statement__aside b { font-weight: 500; color: var(--c-text); }
 @media (min-width: 60rem) {
-  /* Narrow column for the film, wide one for the words — the inverse of a
-     landscape entry. The first-child selector is repeated so a vertical film
-     opening the page does not inherit the full-width statement layout. */
-  .film-entry--portrait,
-  .film-list__item:first-child .film-entry--portrait {
-    grid-template-columns: minmax(0, 21rem) minmax(0, 1fr);
-    align-items: center;
+  .statement { grid-template-columns: minmax(0, 1fr) 20rem; gap: var(--space-xl); }
+}
+
+.recent { display: grid; gap: var(--space-s); }
+.recent__lead { position: relative; }
+.recent__lead .frame { aspect-ratio: 16 / 9; }
+.recent__lead-card {
+  position: absolute; z-index: 2; left: var(--space-m); bottom: var(--space-m); right: var(--space-m);
+  pointer-events: none; display: flex; flex-direction: column; gap: var(--space-2xs);
+}
+.recent__lead-card .display { font-size: var(--step-4); }
+.recent__lead .frame::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to top, color-mix(in oklch, var(--c-bg) 88%, transparent), transparent 55%);
+}
+.recent__side { display: grid; gap: var(--space-s); grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 60rem) {
+  .recent { grid-template-columns: minmax(0, 1.85fr) minmax(0, 1fr); align-items: end; }
+  .recent__side { grid-template-columns: 1fr; }
+}
+
+.strip {
+  background: var(--c-bg-elev-1);
+  padding-block: var(--space-xl);
+}
+.strip__head { display: flex; align-items: baseline; justify-content: space-between; margin-block-end: var(--space-l); }
+.strip__list { display: grid; gap: var(--space-l); border-block-start: 1px solid var(--c-line-strong); }
+.strip__item { padding-block-start: var(--space-m); display: flex; flex-direction: column; gap: var(--space-xs); }
+.strip__n { font-family: var(--font-mono); font-size: 0.75rem; color: var(--c-accent); }
+.strip__title { font-size: var(--step-2); font-stretch: 90%; }
+.strip__body { color: var(--c-text-muted); font-size: var(--step--1); max-width: 28rem; }
+@media (min-width: 60rem) {
+  .strip__list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+/* The contact band, set like a closing title card. .callout is what main.js
+   looks for to add the copy button; keep the class. */
+.callout { display: grid; gap: var(--space-l); align-items: end; }
+.callout__main { display: flex; flex-direction: column; gap: var(--space-m); }
+.callout__heading { font-size: var(--step-4); font-stretch: 85%; max-width: 20ch; }
+.callout__body { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-s); }
+.callout__email {
+  font-family: var(--font-mono); font-size: var(--step-2); color: var(--c-accent);
+  text-decoration: underline; text-underline-offset: 0.3em; text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in oklch, var(--c-accent) 50%, transparent);
+  word-break: break-all;
+}
+.callout__email:hover { color: var(--c-text); }
+.callout__note { color: var(--c-text-dim); font-size: var(--step--1); }
+.callout__aside {
+  font-family: var(--font-mono); font-size: 0.8125rem; line-height: 2; letter-spacing: 0.04em;
+  color: var(--c-text-dim);
+}
+.callout__aside span { display: block; color: var(--c-text-muted); }
+.callout__social { --gap: var(--space-m); font-size: var(--step--1); }
+@media (min-width: 60rem) {
+  .callout { grid-template-columns: minmax(0, 1fr) 24rem; gap: var(--space-xl); }
+}
+
+/* ── Page head / sections ───────────────────────────────────────────────── */
+
+.page-head { --stack-space: var(--space-m); }
+.page-head__title { font-size: var(--step-5); max-width: 14ch; }
+.page-head__intro { font-size: var(--step-1); color: var(--c-text-muted); max-width: var(--measure); }
+.page-head__note { color: var(--c-text-dim); font-size: var(--step--1); }
+
+.section { --stack-space: var(--space-l); }
+.section__heading {
+  font-family: var(--font-mono); font-weight: 400;
+  font-size: 0.6875rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--c-text-dim);
+  padding-block-end: var(--space-xs);
+  border-block-end: 1px solid var(--c-line);
+}
+.section__head-row { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-m); }
+.section__head-row .section__heading { flex: 1; }
+.section__more { font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.2em; text-transform: uppercase; text-decoration: none; color: var(--c-accent); white-space: nowrap; }
+
+/* Label-left / content-right editorial grid. */
+.section--split { border-block-start: 1px solid var(--c-line); padding-block-start: var(--space-l); }
+.section--split > * + * { margin-block-start: var(--space-m); }
+.section--split > .section__heading { border: 0; padding: 0; }
+@media (min-width: 60rem) {
+  .section--split {
+    display: grid;
+    grid-template-columns: minmax(12rem, 1fr) 3fr;
+    column-gap: var(--space-xl); row-gap: var(--space-m);
+    align-items: start;
   }
-  .embed--portrait .embed__frame { margin-inline: 0; }
+  .section--split > * { margin-block-start: 0; }
+  .section--split > .section__heading { grid-column: 1; grid-row: 1; }
+  .section--split > :not(.section__heading) { grid-column: 2; }
 }
 
-.film-entry__details { margin-block-start: var(--space-s); }
-.film-entry__details summary {
-  cursor: pointer; font-size: var(--step--1); color: var(--c-text-dim);
-  text-transform: uppercase; letter-spacing: 0.12em;
-  padding-block: var(--space-2xs);
-  border-radius: var(--radius-sm);
+.prose { max-width: var(--measure); color: var(--c-text-muted); }
+.prose > * + * { margin-block-start: var(--space-s); }
+.prose--lede > p:first-child { font-size: var(--step-1); color: var(--c-text); letter-spacing: -0.01em; }
+.prose--columns { max-width: 62rem; }
+@media (min-width: 60rem) {
+  .prose--columns { columns: 2; column-gap: var(--space-l); }
+  .prose--columns > * { break-inside: avoid; }
 }
-.film-entry__details summary:hover { color: var(--c-text); }
-.film-entry__details-body { --stack-space: var(--space-s); padding-block-start: var(--space-s); }
 
-.film-grid { --col-min: 16rem; --gap: var(--space-m); }
-.film-card__link {
-  display: grid; gap: var(--space-2xs);
-  text-decoration: none;
+/* ── Work: the contact sheet ────────────────────────────────────────────── */
+
+.filter-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-s); }
+.filter-bar ul { --gap: var(--space-2xs); }
+.filter-bar a {
+  display: inline-flex; align-items: center; gap: 0.6em;
+  min-height: 2.25rem; padding: 0 1em;
+  font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.14em; text-transform: uppercase;
+  text-decoration: none; color: var(--c-text);
+  border: 1px solid color-mix(in oklch, var(--c-text) 22%, transparent); border-radius: var(--radius-full);
+  transition: border-color var(--dur) var(--ease-out), color var(--dur) var(--ease-out);
 }
-.film-card__media {
-  aspect-ratio: 16 / 9; overflow: hidden;
-  border-radius: var(--radius-sm); background: var(--c-bg-elev-2);
+.filter-bar a b { font-weight: 500; color: var(--c-text-dim); }
+.filter-bar a:hover { border-color: var(--c-text); color: var(--c-text); }
+.filter-bar a[aria-current="page"] { color: var(--c-accent-ink); background: var(--c-accent); border-color: var(--c-accent); }
+.filter-bar a[aria-current="page"] b { color: color-mix(in oklch, var(--c-accent-ink) 65%, transparent); }
+
+.sheet {
+  --cols: 2; --gap: 4px;
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  /* Each cell is a 16:9 tile; a vertical film spans three, which lands within
+     a few percent of 9:16 so nothing important is cropped away. */
+  grid-auto-rows: calc((100vw - (var(--cols) - 1) * var(--gap)) / var(--cols) * 9 / 16);
+  grid-auto-flow: dense;
+  gap: var(--gap);
 }
-.film-card__media img { width: 100%; height: 100%; object-fit: cover;
-  transition: scale var(--dur-slow) var(--ease-out), filter var(--dur-slow) var(--ease-out); }
-.film-card__link { transition: translate var(--dur) var(--ease-out); }
-.film-card__link:hover { translate: 0 -4px; }
-.film-card__link:hover .film-card__media img { scale: 1.045; filter: brightness(1.06); }
-.film-card__media { transition: box-shadow var(--dur) var(--ease-out); }
-.film-card__link:hover .film-card__media {
-  box-shadow: 0 12px 32px -12px color-mix(in oklch, var(--c-accent) 25%, transparent);
+@media (min-width: 46rem) { .sheet { --cols: 3; } }
+@media (min-width: 72rem) { .sheet { --cols: 4; } }
+.sheet__item { display: block; }
+.sheet__item--portrait { grid-row: span 3; }
+.sheet__item[hidden] { display: none; }
+.tile { position: relative; display: block; width: 100%; height: 100%; overflow: hidden; background: var(--c-bg-elev-2); text-decoration: none; color: inherit; }
+.tile img { width: 100%; height: 100%; object-fit: cover; transition: transform var(--dur-slow) var(--ease-out); }
+.tile__poster { position: absolute; inset: 0; }
+.tile__cap {
+  position: absolute; z-index: 2; inset-inline: 0; bottom: 0;
+  padding: var(--space-l) var(--space-s) var(--space-s);
+  display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-s);
+  background: linear-gradient(to top, color-mix(in oklch, var(--c-bg) 92%, transparent), transparent);
+  opacity: 0; transition: opacity var(--dur) var(--ease-out);
 }
-.film-card__noposter { display: block; width: 100%; height: 100%;
-  background: repeating-linear-gradient(45deg, var(--c-bg-elev-1) 0 8px, var(--c-bg-elev-2) 8px 16px); }
-.film-card__title { font-family: var(--font-display); font-size: var(--step-1); font-weight: 600; letter-spacing: -0.01em; }
-.film-card__meta { font-size: var(--step--1); color: var(--c-text-dim); }
+.tile__title { font-family: var(--font-display); font-weight: 700; font-stretch: 95%; font-size: var(--step-0); letter-spacing: -0.01em; line-height: 1.1; }
+.tile__meta { font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-accent); margin-block-start: 0.3em; }
+.tile__go {
+  flex: none; width: 2.25rem; height: 2.25rem; border-radius: var(--radius-full);
+  background: var(--c-accent); color: var(--c-accent-ink); display: grid; place-items: center;
+}
+.tile__go svg { width: 0.6rem; height: 0.7rem; translate: 1px 0; }
+.tile:hover img, .tile:focus-visible img { transform: scale(1.05); }
+.tile:hover .tile__cap, .tile:focus-visible .tile__cap { opacity: 1; }
+.tile:focus-visible { outline-offset: -4px; }
+/* No hover on a touch screen: the caption is always there. */
+@media (hover: none) { .tile__cap { opacity: 1; } }
+.sheet .frame__strip { z-index: 1; }
+
+/* ── Film page ──────────────────────────────────────────────────────────── */
+
+.film-head { display: grid; gap: var(--space-l); align-items: start; }
+.film-head__main { display: flex; flex-direction: column; gap: var(--space-m); }
+.film-head__title { font-size: var(--step-6); font-stretch: 80%; }
+.film-head__lede { font-size: var(--step-2); font-stretch: 100%; font-weight: 400; line-height: 1.35; color: var(--c-text-muted); max-width: 30ch; letter-spacing: -0.01em; }
+.film-head__actions { display: flex; flex-wrap: wrap; gap: var(--space-xs); }
+@media (min-width: 60rem) {
+  .film-head { grid-template-columns: minmax(0, 1fr) 24rem; gap: var(--space-2xl); }
+}
+
+.credits { display: grid; font-family: var(--font-mono); font-size: 0.8125rem; letter-spacing: 0.04em; }
+.credits__row {
+  display: grid; grid-template-columns: 7.5rem minmax(0, 1fr); gap: var(--space-s);
+  padding-block: var(--space-xs);
+  border-block-start: 1px solid var(--c-line-strong);
+}
+.credits__row:last-child { border-block-end: 1px solid var(--c-line-strong); }
+.credits__row dt { color: var(--c-text-dim); font-size: 0.6875rem; letter-spacing: 0.16em; text-transform: uppercase; padding-block-start: 0.15em; }
+.credits__row dd { color: var(--c-text); }
+.credits__row dd a { text-decoration-color: color-mix(in oklch, currentColor 35%, transparent); }
+.credits__row dd.is-missing { color: var(--c-text-dim); }
+
+.related__list { display: grid; gap: var(--space-m); grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.related__item .frame { aspect-ratio: var(--frame-ratio, 16 / 9); }
+@media (max-width: 46rem) { .related__list { grid-template-columns: 1fr; } .related__item--portrait .frame { max-width: 14rem; } }
+
+.pager { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-l); border-block-start: 1px solid var(--c-line); padding-block-start: var(--space-l); }
+.pager a { display: flex; flex-direction: column; gap: var(--space-2xs); text-decoration: none; }
+.pager__title { font-size: var(--step-2); font-stretch: 85%; }
+.pager a:hover .pager__title { color: var(--c-accent); }
+.pager__next { text-align: right; align-items: flex-end; }
 
 /* ── Chips, laurels, meta ───────────────────────────────────────────────── */
 
 .chips { --gap: var(--space-2xs); }
 .chip {
-  font-size: var(--step--1); color: var(--c-text-dim);
-  padding: 0.15em 0.6em;
-  border: 1px solid var(--c-line); border-radius: var(--radius-full);
+  font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--c-text-dim);
+  padding: 0.35em 0.8em;
+  border: 1px solid var(--c-line-strong); border-radius: var(--radius-full);
   white-space: nowrap;
 }
 
@@ -483,159 +755,94 @@ main > :last-child { margin-block-end: var(--space-section); }
 .meta-list__row {
   display: grid; grid-template-columns: minmax(6rem, 9rem) 1fr; gap: var(--space-s);
   padding-block: var(--space-2xs);
-  border-block-start: 1px solid color-mix(in oklch, var(--c-line) 55%, transparent);
+  border-block-start: 1px solid var(--c-line);
   font-size: var(--step--1);
 }
-.meta-list__row dt { color: var(--c-text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
+.meta-list__row dt { color: var(--c-text-dim); text-transform: uppercase; letter-spacing: 0.08em; font-family: var(--font-mono); font-size: 0.6875rem; }
 .meta-list__row dd { color: var(--c-text-muted); }
 
-/* ── Filter bar ─────────────────────────────────────────────────────────── */
+/* ── Process: a timeline, not a list ────────────────────────────────────── */
 
-.filter-bar ul { --gap: var(--space-xs); }
-.filter-bar a {
-  display: inline-block;
-  font-family: var(--font-display);
-  font-size: var(--step--1); text-decoration: none; color: var(--c-text-dim);
-  text-transform: uppercase; letter-spacing: 0.1em;
-  padding: 0.5em 1em;
-  border: 1px solid var(--c-line); border-radius: var(--radius-full);
+.timeline { display: grid; border-block-start: 1px solid var(--c-line-strong); }
+.timeline__step {
+  display: grid; grid-template-columns: 4rem minmax(0, 1fr); gap: var(--space-m); align-items: start;
+  padding-block: var(--space-l);
+  border-block-end: 1px solid var(--c-line);
 }
-.filter-bar a:hover { color: var(--c-text); border-color: var(--c-line); }
-.filter-bar a[aria-current="page"] {
-  color: var(--c-accent-ink); background: var(--c-accent); border-color: var(--c-accent);
-}
-
-/* ── Process ────────────────────────────────────────────────────────────── */
-
-.process-steps { --stack-space: var(--space-l); counter-reset: step; }
-.process-step { display: grid; grid-template-columns: 3rem 1fr; gap: var(--space-m); align-items: start; }
-.process-step__n {
-  font-family: var(--font-mono); font-size: var(--step--1);
-  color: var(--c-accent); padding-block-start: 0.35em;
-}
-.process-step__title { font-size: var(--step-1); margin-block-end: var(--space-2xs); }
-.process-steps--compact { --stack-space: var(--space-s); }
-.process-steps--compact .process-step {
-  display: block;
-  border-block-start: 1px solid var(--c-line);
-  padding-block-start: var(--space-s);
-}
-.process-steps--compact .process-step__n { display: block; margin-block-end: var(--space-2xs); }
-.process-steps--compact .process-step__title { font-size: var(--step-1); margin-block-end: 0; }
+.timeline__n { font-family: var(--font-mono); font-size: var(--step-2); color: var(--c-accent); line-height: 1; padding-block-start: 0.1em; }
+.timeline__title { font-size: var(--step-3); font-stretch: 85%; margin-block-end: var(--space-s); }
 @media (min-width: 60rem) {
-  .process-steps--compact { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-l); }
-  .process-steps--compact > * + * { margin-block-start: 0; }
+  .timeline__step { grid-template-columns: 8rem minmax(0, 1fr); }
+  .timeline__n { font-size: var(--step-4); }
+  .timeline__body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: var(--space-xl); align-items: start; }
+  .timeline__title { margin: 0; }
 }
 
 .process-clip { --stack-space: var(--space-m); }
 .process-clip + .process-clip { margin-block-start: var(--space-2xl); }
 .process-clip__title { font-size: var(--step-2); }
 .process-clip__from { font-size: var(--step--1); color: var(--c-text-dim); }
-
 @media (min-width: 60rem) {
-  .process-clip { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
-                  gap: var(--space-l); align-items: start; }
+  .process-clip { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: var(--space-l); align-items: start; }
   .process-clip__body { margin-block-start: 0; }
 }
 
-/* ── Services / callout / buttons ───────────────────────────────────────── */
+/* ── Hire: offers as rows ───────────────────────────────────────────────── */
 
-.service-card {
-  --stack-space: var(--space-xs);
-  padding: var(--space-m);
-  background: var(--c-bg-elev-1);
-  border: 1px solid var(--c-line);
-  border-radius: var(--radius-md);
+.offers { display: grid; border-block-start: 1px solid var(--c-line-strong); }
+.offer {
+  display: grid; gap: var(--space-s);
+  padding-block: var(--space-l);
+  border-block-end: 1px solid var(--c-line);
 }
-.service-card__title { font-size: var(--step-1); }
-.service-card__summary { color: var(--c-text-muted); }
-.service-card__list { display: grid; gap: var(--space-3xs); font-size: var(--step--1); color: var(--c-text-muted); }
-.service-card__list li { padding-inline-start: var(--space-s); position: relative; }
-.service-card__list li::before { content: '—'; position: absolute; left: 0; color: var(--c-text-dim); }
-.service-card__meta { font-size: var(--step--1); color: var(--c-text-dim); }
-
-.callout {
-  --stack-space: var(--space-s);
-  padding: var(--space-l);
-  background: var(--c-bg-elev-1);
-  border: 1px solid var(--c-line);
-  border-radius: var(--radius-lg);
-  text-align: center;
+.offer__title { font-size: var(--step-3); font-stretch: 85%; }
+.offer__summary { color: var(--c-text-muted); max-width: 32ch; font-size: var(--step-1); }
+.offer__list { display: grid; gap: var(--space-3xs); font-family: var(--font-mono); font-size: 0.8125rem; color: var(--c-text-dim); letter-spacing: 0.02em; }
+.offer__list li { padding-inline-start: var(--space-s); position: relative; }
+.offer__list li::before { content: '—'; position: absolute; left: 0; }
+.offer__meta { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--c-text-dim); }
+@media (min-width: 60rem) {
+  .offer { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.4fr) minmax(0, 1fr); gap: var(--space-xl); align-items: start; }
 }
-.callout__heading { font-size: var(--step-2); }
-.callout__note { color: var(--c-text-dim); font-size: var(--step--1); }
-.callout__social { justify-content: center; --gap: var(--space-m); font-size: var(--step--1); }
-/* main.js adds .l-cluster around the email + copy pair; without this the pair
-   pinned left under a centred heading — a visible layout bug on every page. */
-.callout .l-cluster { justify-content: center; }
-
-.btn {
-  font-family: var(--font-display);
-  display: inline-flex; align-items: center; gap: var(--space-2xs);
-  padding: 0.65em 1.4em;
-  border-radius: var(--radius-full);
-  font-size: var(--step--1); font-weight: 600;
-  text-transform: uppercase; letter-spacing: 0.1em;
-  text-decoration: none;
-  border: 1px solid transparent;
-  transition: background var(--dur) var(--ease-out), color var(--dur) var(--ease-out),
-              border-color var(--dur) var(--ease-out);
-}
-/* The gradient ink belongs to the hero signature alone — spent on every
-   button it stops being a signature. Primary stays solid, disciplined amber. */
-.btn--primary { background: var(--c-accent); color: var(--c-accent-ink); }
-.btn--primary:hover { background: color-mix(in oklch, var(--c-accent) 84%, white); color: var(--c-accent-ink); }
-/* --c-line-strong is a divider colour; as the only boundary of an interactive
-   control it fell under the 3:1 non-text floor. Buttons get a stronger edge
-   than rules do. */
-.btn--ghost { border-color: color-mix(in oklch, var(--c-text) 55%, transparent); color: var(--c-text); }
-.btn--ghost:hover { border-color: var(--c-text); color: var(--c-text); background: var(--c-bg-elev-1); }
 
 /* ── About ──────────────────────────────────────────────────────────────── */
 
+.about-figure img { width: 100%; height: auto; background: var(--c-bg-elev-2); }
+.about-figure figcaption { margin-block-start: var(--space-xs); font-size: var(--step--1); color: var(--c-text-dim); max-width: var(--measure); }
 .about { display: grid; gap: var(--space-l); }
-/* Two columns ONLY when a side portrait sits in the section. A wide portrait
-   renders as a banner outside it, and without this the bio was left stranded
-   in the 18rem column with the rest of the row empty. */
 @media (min-width: 50rem) {
   .about--split { grid-template-columns: minmax(0, 18rem) minmax(0, 1fr); align-items: start; }
 }
-.about__portrait { border-radius: var(--radius-md); width: 100%; object-fit: cover; }
+.about__portrait { width: 100%; object-fit: cover; }
 
-/* With the wide banner, the bio lives in a label-left editorial split
-   (see .section--split) — no centring needed; the label column fills the row. */
-
-/* ── Founders ───────────────────────────────────────────────────────────── */
-
-.founders { --col-min: 16rem; --gap: var(--space-m); }
+.founders { display: grid; border-block-start: 1px solid var(--c-line-strong); }
 .founder {
-  --stack-space: var(--space-2xs);
-  padding: var(--space-m);
-  background: var(--c-bg-elev-1);
-  border: 1px solid var(--c-line);
-  border-radius: var(--radius-md);
+  display: grid; gap: var(--space-xs);
+  padding-block: var(--space-m);
+  border-block-end: 1px solid var(--c-line);
 }
-.founder__name { font-size: var(--step-1); }
-.founder__role {
-  font-size: var(--step--1); color: var(--c-accent);
-  text-transform: uppercase; letter-spacing: 0.1em;
+.founder__name { font-size: var(--step-2); font-stretch: 85%; }
+.founder__role { font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--c-accent); }
+.founder__bio { color: var(--c-text-muted); max-width: var(--measure); }
+@media (min-width: 60rem) {
+  .founder { grid-template-columns: minmax(0, 1fr) 10rem minmax(0, 2fr); gap: var(--space-xl); align-items: baseline; }
 }
-.founder__bio { color: var(--c-text-muted); }
 
 /* ── Footer ─────────────────────────────────────────────────────────────── */
 
 .site-footer {
   border-block-start: 1px solid var(--c-line);
-  padding-block: var(--space-l);
+  padding-block: var(--space-m) var(--space-l);
   margin-block-start: var(--space-section);
 }
 .site-footer__inner {
   display: flex; flex-wrap: wrap; gap: var(--space-m);
   align-items: center; justify-content: space-between;
-  font-size: var(--step--1); color: var(--c-text-dim);
+  font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--c-text-dim);
 }
 .site-footer__links { --gap: var(--space-m); }
-.site-footer__links a { text-decoration: none; }
+.site-footer__links a { text-decoration: none; color: var(--c-text-muted); }
 .site-footer__links a:hover { color: var(--c-accent); }
 
 /* ── Placeholder — deliberately loud, so gaps never ship silently ───────── */
@@ -652,35 +859,30 @@ main > :last-child { margin-block-end: var(--space-section); }
 }
 .placeholder b { color: var(--c-text); font-weight: 600; }
 
+/* ── The play cursor ────────────────────────────────────────────────────── */
+
+/* Added by main.js on fine-pointer devices only. Follows the pointer over any
+   [data-cursor="play"] element. Purely decorative — aria-hidden, and never a
+   replacement for the focus ring, which stays exactly as it is. */
+.cursor {
+  position: fixed; left: 0; top: 0; z-index: 300; pointer-events: none;
+  display: flex; align-items: center; gap: 0.5em;
+  padding: 0.7em 1.1em 0.7em 1em;
+  border-radius: var(--radius-full);
+  background: var(--c-text); color: var(--c-bg);
+  font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.16em; text-transform: uppercase;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  opacity: 0; scale: 0.8;
+  transition: opacity var(--dur) var(--ease-out), scale var(--dur) var(--ease-out);
+  will-change: transform;
+}
+.cursor svg { width: 0.6em; height: 0.75em; }
+.cursor.is-on { opacity: 1; scale: 1; }
+.has-cursor [data-cursor="play"] { cursor: none; }
+
 /* ── Utilities ──────────────────────────────────────────────────────────── */
 
 .u-accent { color: var(--c-accent); font-style: normal; }
-/* The one overt nod to generative work: a word whose ink slowly re-renders
-   itself. Falls back to solid amber where clip:text is unsupported; freezes
-   under reduced motion via the global block; solid again in forced colors. */
-@supports (-webkit-background-clip: text) {
-  .hero__headline .u-accent {
-    background: linear-gradient(100deg, var(--ink-a), var(--ink-b) 40%, var(--ink-c) 70%, var(--ink-a));
-    background-size: 300% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: var(--c-accent);
-    animation: ink-drift 14s linear infinite;
-  }
-}
-@media (min-width: 24rem) {
-  .hero__headline .u-accent { white-space: nowrap; }
-}
-@keyframes ink-drift {
-  from { background-position: 0% 50%; }
-  to   { background-position: 300% 50%; }
-}
-@media (forced-colors: active) {
-  .hero__headline .u-accent {
-    background: none; -webkit-text-fill-color: currentColor; color: CanvasText;
-  }
-}
 .u-muted { color: var(--c-text-muted); }
 .u-visually-hidden {
   position: absolute !important; width: 1px; height: 1px;
@@ -692,16 +894,20 @@ main > :last-child { margin-block-end: var(--space-section); }
 /* ── Scroll reveal ───────────────────────────────────────────────────────
    .reveal is applied by main.js, never by markup, so content is fully
    visible with JS off and under prefers-reduced-motion (the JS bails). */
-.reveal {
-  opacity: 0;
-  translate: 0 18px;
-}
+.reveal { opacity: 0; translate: 0 18px; }
 .reveal.in {
-  opacity: 1;
-  translate: 0 0;
+  opacity: 1; translate: 0 0;
   transition: opacity 0.65s var(--ease-out), translate 0.65s var(--ease-out);
   transition-delay: var(--reveal-delay, 0ms);
 }
+
+/* ── Page transitions ────────────────────────────────────────────────────
+   Cross-document, native, no library. A frame you click becomes the stage
+   on the film page; everything else crossfades. Browsers without the
+   feature simply navigate. */
+@view-transition { navigation: auto; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.32s; }
+::view-transition-group(*) { animation-duration: 0.42s; animation-timing-function: var(--ease-out); }
 
 /* ── Reduced motion ─────────────────────────────────────────────────────── */
 
@@ -714,15 +920,18 @@ main > :last-child { margin-block-end: var(--space-section); }
     transition-duration: .01ms !important;
     scroll-behavior: auto !important;
   }
+  @view-transition { navigation: none; }
+  .frame img, .tile img { transition: none; transform: none !important; }
 }
 
 /* ── Forced colours: backgrounds vanish, so restore the affordances ─────── */
 
 @media (forced-colors: active) {
-  .btn, .service-card, .callout, .film-card__media, .embed__frame, .chip { border: 1px solid ButtonBorder; }
-  .embed__icon { forced-color-adjust: none; }
+  .btn, .embed__frame, .chip, .frame, .tile, .filter-bar a, .reel__btn { border: 1px solid ButtonBorder; }
+  .embed__icon, .tile__go { forced-color-adjust: none; }
   :focus-visible { outline: 2px solid Highlight; }
   .site-nav__panel a[aria-current="page"] { text-decoration: underline; }
+  .stage .embed__frame::before, .stage .embed__frame::after, .stage--portrait::after { display: none; }
 }
 
 /* ── Print: a festival programmer will print the Hire page ──────────────── */
@@ -731,26 +940,15 @@ main > :last-child { margin-block-end: var(--space-section); }
   :root {
     --c-bg: #fff; --c-bg-elev-1: #fff; --c-bg-elev-2: #eee;
     --c-text: #000; --c-text-muted: #333; --c-text-dim: #555;
-    --c-line: #bbb; --c-accent: #000;
+    --c-line: #bbb; --c-line-strong: #999; --c-accent: #000;
   }
   body { background: #fff; color: #000; }
-  .site-header, .site-footer, .skip-link, .filter-bar, .embed__play, .hero__actions { display: none; }
+  .site-header, .site-footer, .skip-link, .filter-bar, .embed__play, .reel__nav, .cursor,
+  .title-card__actions, .statement__actions { display: none; }
   .embed__frame { border: 1px solid #999; }
+  .stage .embed__frame::before, .stage .embed__frame::after { display: none; }
   .embed::after { content: "Watch: " attr(data-watch-url); font-size: 10pt; color: #333; }
   a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 9pt; word-break: break-all; }
-  .film-entry, .process-clip { break-inside: avoid; }
-}
-
-/* Wide About image — a landscape frame reads as a banner, not a headshot column.
-   No `margin: 0` here: it would outrank both l-container's margin-inline:auto
-   and the `main > * + *` section spacing, un-centering the figure. */
-.about-figure img {
-  width: 100%; height: auto;
-  border-radius: var(--radius-md);
-  background: var(--c-bg-elev-2);
-}
-.about-figure figcaption {
-  margin-block-start: var(--space-xs);
-  font-size: var(--step--1); color: var(--c-text-dim);
-  max-width: var(--measure);
+  .process-clip, .offer, .timeline__step { break-inside: avoid; }
+  .reel__track { overflow: visible; flex-wrap: wrap; }
 }

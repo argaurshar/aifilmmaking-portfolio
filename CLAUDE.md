@@ -52,7 +52,7 @@ content/process.json   the four craft breakdown clips
         ↓
    build.mjs           the generator, page templates live here
         ↓
-   *.html + sitemap.xml + robots.txt + llms.txt
+   *.html + films/*.html + sitemap.xml + robots.txt + llms.txt
 ```
 
 **Never edit the generated `.html` files.** They are overwritten on every build. Change content in JSON. Change structure or markup in `build.mjs`.

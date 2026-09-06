@@ -66,9 +66,8 @@
   ],
   "pages": {
     "index": {
-      "heroKicker": "Narrative \u00b7 Brand \u00b7 Animation",
       "heroHeadline": "Films made [[frame by frame]], on a small budget and a short clock.",
-      "heroSub": [],
+      "statement": "{count} short films. Narrative, documentary and animation. Most of them about India.",
       "metaDescription": "Narrative shorts, brand films and animation by Xelion Labs."
     },
     "work": {

@@ -539,6 +539,25 @@ async function resolvePoster(poster, ctx, whereForErrors) {
   return { src: ctx.u.url(poster.src), srcset, width, height, alt: poster.alt ?? '' };
 }
 
+/**
+ * A frame strip: N stills of the film side by side in one JPEG at
+ * assets/strips/<id>.jpg. main.js slides it under the pointer, so a poster
+ * plays without a byte of video being hosted. Frame count is read off the
+ * image itself — a 16:9 strip of 24 frames is 24 × (16/9) wide for its height.
+ */
+async function resolveStrip(film, ctx) {
+  for (const ext of ['jpg', 'jpeg', 'png']) {
+    const rel = `assets/strips/${film.id}.${ext}`;
+    if (!(await assetExists(rel))) continue;
+    const { width, height } = await imageSize(rel);
+    const [rw, rh] = String(film.aspectRatio ?? '16:9').split(':').map(Number);
+    const frames = Math.round((width / height) / (rw / rh));
+    if (frames < 2) { ctx.rep.warn(`films[${film.id}].strip`, `${rel} holds fewer than two frames — ignored`); return null; }
+    return { src: ctx.u.url(rel), frames };
+  }
+  return null;
+}
+
 async function hashFile(rel) {
   const buf = await readFile(path.join(ROOT, rel));
   return createHash('sha256').update(buf).digest('hex').slice(0, 10);
@@ -636,19 +655,22 @@ function ogVideoSize(ratio) {
   return { width: Math.round(w * scale), height: Math.round(h * scale) };
 }
 
-function embed({ video, poster, title, ratio, runtimeSeconds, eager = false, caption = null, noteGaps = false }) {
+function embed({ video, poster, title, ratio, runtimeSeconds, eager = false, caption = null, noteGaps = false, sizes = null, overlay = null, vtName = null }) {
   const { css: ratioCss, portrait } = parseRatio(ratio);
   const spoken = spokenRuntime(runtimeSeconds);
+  // The only two things that may reach a style attribute; the audit enforces it.
+  const styleAttr = `--embed-ratio: ${ratioCss}` + (vtName ? `; view-transition-name: ${vtName}` : '');
+  const sizesAttr = sizes ?? (portrait ? '(min-width: 40rem) 21rem, 92vw' : '(min-width: 60rem) 60rem, 100vw');
   return html`<figure class="embed${portrait ? ' embed--portrait' : ''}" data-embed
     data-embed-src="${embedSrc(video)}"
     data-embed-origin="${embedOrigin(video.platform)}"
     data-embed-title="${title}"
     data-watch-url="${watchUrl(video)}"
-    style="--embed-ratio: ${ratioCss}">
+    style="${styleAttr}">
     <div class="embed__frame">
       ${poster
         ? html`<img class="embed__poster" src="${poster.src}"
-            ${poster.srcset ? attrs({ srcset: poster.srcset, sizes: portrait ? '(min-width: 40rem) 21rem, 92vw' : '(min-width: 60rem) 60rem, 100vw' }) : ''}
+            ${poster.srcset ? attrs({ srcset: poster.srcset, sizes: sizesAttr }) : ''}
             width="${poster.width}" height="${poster.height}" alt=""
             ${attrs({ loading: eager ? 'eager' : 'lazy', fetchpriority: eager ? 'high' : false, decoding: 'async' })}>`
         : html`<span class="embed__noposter" aria-hidden="true"></span>`}
@@ -659,6 +681,7 @@ function embed({ video, poster, title, ratio, runtimeSeconds, eager = false, cap
         <span class="embed__label">Play <i>${title}</i></span>
         <span class="u-visually-hidden">${spoken ? `, ${spoken}` : ''}<span class="embed__nojs"> (opens on ${video.platform === 'youtube' ? 'YouTube' : 'Vimeo'})</span></span>
       </a>
+      ${overlay ?? ''}
     </div>
     ${!poster && noteGaps ? placeholder(html`poster — cut one with <b>scripts/make-posters.sh</b>`) : ''}
     ${caption ? html`<figcaption class="embed__caption">${inline(caption)}</figcaption>` : ''}
@@ -727,33 +750,104 @@ function filmEntry(film, ctx, { eager = false, headingLevel = 'h2' } = {}) {
   </article>`;
 }
 
-function filmCard(film, ctx) {
-  return html`<li class="film-card">
-    <a class="film-card__link" href="${ctx.u.url('work.html')}#film-${film.id}">
-      <div class="film-card__media">
-        ${film.resolvedPoster
-          ? html`<img src="${film.resolvedPoster.src}" width="${film.resolvedPoster.width}"
-              height="${film.resolvedPoster.height}" alt="" loading="lazy" decoding="async">`
-          : html`<span class="film-card__noposter" aria-hidden="true"></span>`}
-      </div>
-      <span class="film-card__title">${film.title}</span>
-      <span class="film-card__meta">${TYPE_LABEL[film.type]} · ${film.year}</span>
-    </a>
-  </li>`;
+/** Where a film lives. One URL per film; every link to a film goes through this. */
+const filmPath = (film) => `films/${film.id}.html`;
+
+/** Zero to ninety-nine, for copy that states a count without rotting. */
+function numberWord(n) {
+  const ones = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten',
+    'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
+  const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+  if (n < 20) return ones[n];
+  if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 ? '-' + ones[n % 10] : '');
+  return String(n);
+}
+const capitalise = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
+const playGlyph = () => html`<svg viewBox="0 0 10 12" aria-hidden="true" focusable="false"><path d="M0 0l10 6-10 6z" fill="currentColor"/></svg>`;
+
+/**
+ * A poster that behaves like a film: a link to the film's page, the play
+ * cursor over it, a frame strip under the pointer when one exists, and a
+ * view-transition name so the click grows into the film page's stage.
+ *
+ * The accessible name lives inside the link; the caption beside it is plain
+ * text, so a screen reader hears one link per film, not two.
+ */
+function frame(film, ctx, { sizes = '(min-width: 60rem) 34rem, 90vw', eager = false, vt = true } = {}) {
+  const { u } = ctx;
+  const portrait = parseRatio(film.aspectRatio).portrait;
+  const p = film.resolvedPoster;
+  return html`<a class="frame${portrait ? ' frame--portrait' : ''}" href="${u.url(filmPath(film))}" data-cursor="play"
+      ${film.strip ? attrs({ 'data-strip': film.strip.src, 'data-frames': String(film.strip.frames) }) : ''}
+      ${vt ? new Html(` style="view-transition-name: film-${film.id}"`) : ''}>
+    ${p
+      ? html`<img class="frame__poster" src="${p.src}" ${p.srcset ? attrs({ srcset: p.srcset, sizes }) : ''}
+          width="${p.width}" height="${p.height}" alt=""
+          ${attrs({ loading: eager ? 'eager' : 'lazy', fetchpriority: eager ? 'high' : false, decoding: 'async' })}>`
+      : html`<span class="frame__noposter" aria-hidden="true"></span>`}
+    <span class="u-visually-hidden">${film.title}</span>
+  </a>`;
 }
 
-function contactBand(ctx, { heading = 'Get in touch' } = {}) {
+function caption(film) {
+  const bits = [TYPE_LABEL[film.type], formatRuntime(film.runtimeSeconds)];
+  if (parseRatio(film.aspectRatio).portrait) bits.push('Vertical');
+  return html`<div class="cap">
+    <div class="cap__title">${film.title}</div>
+    <div class="cap__meta">${bits.filter(Boolean).join(' · ')}</div>
+  </div>`;
+}
+
+/** A tile on the Work sheet: the poster, with the title revealed on intent. */
+function filmTile(film, ctx) {
+  const { u } = ctx;
+  const portrait = parseRatio(film.aspectRatio).portrait;
+  const p = film.resolvedPoster;
+  const bits = [TYPE_LABEL[film.type], formatRuntime(film.runtimeSeconds)].filter(Boolean).join(' · ');
+  return html`<div class="sheet__item${portrait ? ' sheet__item--portrait' : ''}" data-type="${film.type}"
+      data-orientation="${portrait ? 'portrait' : 'landscape'}" id="film-${film.id}">
+    <a class="tile" href="${u.url(filmPath(film))}" data-cursor="play"
+        ${film.strip ? attrs({ 'data-strip': film.strip.src, 'data-frames': String(film.strip.frames) }) : ''}
+        ${new Html(` style="view-transition-name: film-${film.id}"`)}>
+      ${p
+        ? html`<img class="tile__poster" src="${p.src}" ${p.srcset ? attrs({ srcset: p.srcset, sizes: '(min-width: 72rem) 25vw, (min-width: 46rem) 34vw, 50vw' }) : ''}
+            width="${p.width}" height="${p.height}" alt="" loading="lazy" decoding="async">`
+        : html`<span class="frame__noposter" aria-hidden="true"></span>`}
+      <span class="tile__cap" aria-hidden="true">
+        <span><span class="tile__title">${film.title}</span><span class="tile__meta">${bits}</span></span>
+        <span class="tile__go">${playGlyph()}</span>
+      </span>
+      <span class="u-visually-hidden">${film.title}${bits ? `, ${bits}` : ''}</span>
+    </a>
+  </div>`;
+}
+
+/**
+ * The contact band, set like a closing title card. `.callout` and the
+ * mailto link are what main.js looks for to add the copy button.
+ */
+function contactBand(ctx, { heading = 'Get in touch', eyebrow = 'Contact', aside = true } = {}) {
   const { site, u } = ctx;
-  return html`<section class="callout l-stack" aria-labelledby="contact-heading">
-    <h2 class="callout__heading" id="contact-heading">${heading}</h2>
-    <p class="callout__body">
-      <a class="btn btn--primary" href="${u.extUrl(`mailto:${site.contact.email}`)}">${site.contact.email}</a>
-    </p>
-    ${site.contact.responseTime ? html`<p class="callout__note">${inline(site.contact.responseTime)}</p>` : ''}
-    ${site.social?.length
-      ? html`<ul class="l-cluster callout__social">
-          ${site.social.map((s) => html`<li><a href="${u.extUrl(s.url)}" rel="me noopener">${s.label}</a></li>`)}
-        </ul>`
+  return html`<section class="callout" aria-labelledby="contact-heading">
+    <div class="callout__main">
+      <p class="eyebrow">${eyebrow}</p>
+      <h2 class="callout__heading" id="contact-heading">${inline(heading)}</h2>
+      <p class="callout__body">
+        <a class="callout__email" href="${u.extUrl(`mailto:${site.contact.email}`)}">${site.contact.email}</a>
+      </p>
+      ${site.contact.responseTime ? html`<p class="callout__note">${inline(site.contact.responseTime)}</p>` : ''}
+      ${site.social?.length
+        ? html`<ul class="l-cluster callout__social">
+            ${site.social.map((s) => html`<li><a href="${u.extUrl(s.url)}" rel="me noopener">${s.label}</a></li>`)}
+          </ul>`
+        : ''}
+    </div>
+    ${aside && site.services?.length
+      ? html`<div class="callout__aside">
+        ${site.services.map((s) => html`<span>${s.title}</span>`)}
+        <br>${[...new Set(site.services.flatMap((s) => s.deliverables ?? []))].slice(0, 2).map((d) => html`${inline(d)}<br>`)}
+      </div>`
       : ''}
   </section>`;
 }
@@ -789,7 +883,7 @@ ${page.ogVideo
 <meta property="og:video:height" content="${String(page.ogVideo.height)}">`
     : ''}
 <meta name="twitter:card" content="summary_large_image">
-<link rel="preload" as="font" type="font/woff2" href="${u.url('assets/fonts/space-grotesk-var.woff2')}" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="${u.url('assets/fonts/archivo-var.woff2')}" crossorigin>
 <link rel="icon" href="${u.url('assets/favicon.svg')}" type="image/svg+xml">
 <link rel="stylesheet" href="${u.url(`assets/css/style.css?v=${assets.cssHash}`)}">
 ${jsonLdScript(page.jsonLd ?? [])}`;
@@ -801,7 +895,7 @@ function header(page, ctx) {
   <div class="site-header__inner l-container">
     <a class="site-header__brand" href="${u.url('')}"${page.id === 'index' ? new Html(' aria-current="page"') : ''}>
       <span class="site-header__name">${site.identity.name}</span>
-      <span class="site-header__role">${site.identity.role}</span>
+      <span class="site-header__role u-visually-hidden">${site.identity.role}</span>
     </a>
     <nav class="site-nav" aria-label="Main">
       <button class="site-nav__toggle" type="button" aria-expanded="false" aria-controls="site-nav-panel">
@@ -934,11 +1028,11 @@ function videoObject(film, ctx) {
   const { u } = ctx;
   const node = {
     '@type': 'VideoObject',
-    '@id': u.absUrl('work.html') + `#film-${film.id}`,
+    '@id': u.absUrl(filmPath(film)),
     name: film.title,
     description: film.logline,
     embedUrl: embedSrc(film.video).split('?')[0],
-    url: u.absUrl('work.html') + `#film-${film.id}`,
+    url: u.absUrl(filmPath(film)),
     genre: TYPE_LABEL[film.type],
     inLanguage: ctx.site.site.locale ?? 'en',
     creator: identityRef(ctx),   // the studio produced it
@@ -951,13 +1045,14 @@ function videoObject(film, ctx) {
   return node;
 }
 
-function breadcrumb(page, ctx) {
+/** Home, then each step of the trail: [{ name, path }, ...]. */
+function breadcrumb(trail, ctx) {
   const { u } = ctx;
   return {
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Home', item: u.absUrl('') },
-      { '@type': 'ListItem', position: 2, name: page.breadcrumbName ?? page.title, item: u.absUrl(page.path) },
+      ...trail.map((t, i) => ({ '@type': 'ListItem', position: i + 2, name: t.name, item: u.absUrl(t.path) })),
     ],
   };
 }
@@ -970,8 +1065,12 @@ function pageIndex(ctx) {
   const { site, films, clips, u } = ctx;
   const featured = films.filter((f) => f.featured);
   const hero = featured[0] ?? films[0] ?? null;
-  const rest = films.filter((f) => f !== hero).slice(0, 3);
+  const heroIndex = films.indexOf(hero);
+  const next = hero ? films[(heroIndex + 1) % films.length] : null;
+  const recent = films.filter((f) => f !== hero).slice(0, 3);
   const p = site.pages.index;
+  const director = (site.identity.founders ?? []).find((f) => f.director) ?? null;
+  const pad = (n) => String(n).padStart(2, '0');
 
   const jsonLd = [
     { '@type': 'WebSite', '@id': u.absUrl('') + '#website', url: u.absUrl(''), name: site.site.title, publisher: identityRef(ctx) },
@@ -979,6 +1078,24 @@ function pageIndex(ctx) {
     ...[personNode(ctx)].flat(),
     ...(hero ? [videoObject(hero, ctx)] : []),
   ];
+
+  const heroMeta = [TYPE_LABEL[hero?.type], hero?.year, formatRuntime(hero?.runtimeSeconds),
+    director ? `Directed by ${director.name}` : null].filter(Boolean).join(' · ');
+
+  const titleCard = hero ? html`<div class="title-card">
+      <div class="title-card__main">
+        <p class="eyebrow eyebrow--accent">Now showing · ${pad(heroIndex + 1)} / ${pad(films.length)}</p>
+        <h1 class="title-card__title display">${hero.title}</h1>
+        <p class="title-card__meta">${heroMeta}</p>
+        <div class="title-card__actions">
+          <span class="btn btn--primary btn--play" aria-hidden="true">${playGlyph()}Play</span>
+          <a class="btn btn--ghost" href="${u.url(filmPath(hero))}">Film page</a>
+        </div>
+      </div>
+      ${next ? html`<a class="title-card__next meta" href="${u.url(filmPath(next))}">Next<span>${next.title} →</span></a>` : ''}
+    </div>` : null;
+
+  const statement = (p.statement ?? '').replace('{count}', capitalise(numberWord(films.length)));
 
   return {
     id: 'index', path: '', navMatch: null,
@@ -989,59 +1106,104 @@ function pageIndex(ctx) {
     ogImagePath: hero?.poster?.src ?? null,
     jsonLd,
     body: html`
-<section class="hero l-container l-stack">
-  <p class="hero__kicker">${p.heroKicker}</p>
-  <h1 class="hero__headline">${inline(p.heroHeadline)}</h1>
-  ${prose(p.heroSub, 'hero__sub')}
-  <p class="hero__actions l-cluster">
-    <a class="btn btn--primary" href="${u.url('work.html')}">See the work</a>
-    <a class="btn btn--ghost" href="${u.url('hire.html')}">Work with us</a>
-  </p>
+${hero
+      ? html`<section class="stage stage--hero" aria-label="Featured film">
+  ${embed({ video: hero.video, poster: hero.resolvedPoster, title: hero.title, ratio: hero.aspectRatio, runtimeSeconds: hero.runtimeSeconds, eager: true, sizes: '100vw', noteGaps: hero.status === 'draft', overlay: titleCard })}
+</section>`
+      : html`<header class="page-head l-container l-stack"><h1 class="page-head__title">${site.identity.name}</h1></header>`}
+
+<section class="statement l-container" aria-label="The studio">
+  <div>
+    <p class="statement__text display">${inline(statement)}</p>
+    <p class="statement__actions">
+      <a class="btn btn--primary" href="${u.url('work.html')}">See all work</a>
+      <a class="btn btn--ghost" href="${u.url('hire.html')}">Work with us</a>
+    </p>
+  </div>
+  <div class="statement__aside">
+    ${inline(p.heroHeadline)}<br><br>
+    ${(site.identity.founders ?? []).map((f) => html`<b>${f.name}</b> · ${f.role}<br>`)}
+  </div>
 </section>
 
-${hero
-      ? html`<section class="hero-reel u-bleed" aria-label="Featured film">
-    <div class="l-container">
-      ${embed({ video: hero.video, poster: hero.resolvedPoster, title: hero.title, ratio: hero.aspectRatio, runtimeSeconds: hero.runtimeSeconds, eager: true, noteGaps: hero.status === 'draft' })}
-      <p class="hero-reel__caption">
-        <strong>${hero.title}</strong> — ${inline(hero.logline)}
-      </p>
+${films.length
+      ? html`<section class="reel" aria-labelledby="reel-heading">
+  <div class="l-container reel__head">
+    <h2 class="eyebrow" id="reel-heading">The reel · all ${numberWord(films.length)}</h2>
+    <div class="reel__nav" data-reel-nav>
+      <button class="reel__btn" type="button" data-reel-prev aria-label="Previous films"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 2L4 8l6 6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>
+      <button class="reel__btn" type="button" data-reel-next aria-label="Next films"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 2l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>
     </div>
-  </section>`
+  </div>
+  <div class="reel__track" tabindex="0" role="region" aria-label="All films, scrolls sideways" data-reel>
+    ${films.map((f) => html`<div class="reel__item${parseRatio(f.aspectRatio).portrait ? ' reel__item--portrait' : ''}">
+      ${frame(f, ctx, { sizes: '(min-width: 46rem) 34rem, 22rem' })}
+      ${caption(f)}
+    </div>`)}
+  </div>
+</section>`
       : ''}
 
-${rest.length
-      ? html`<section class="section l-container l-stack" aria-labelledby="selected-heading">
-    <h2 class="section__heading" id="selected-heading">Selected work</h2>
-    <ul class="film-grid l-grid">${rest.map((f) => filmCard(f, ctx))}</ul>
-    <p><a class="btn btn--ghost" href="${u.url('work.html')}">All work</a></p>
-  </section>`
-      : html`<section class="section l-container l-stack">
-    <p class="u-muted">${site.pages.work.emptyState}</p>
-  </section>`}
+${recent.length
+      ? html`<section class="section l-container" aria-labelledby="recent-heading">
+  <div class="section__head-row">
+    <h2 class="section__heading" id="recent-heading">Recent</h2>
+    <a class="section__more" href="${u.url('work.html')}">All work →</a>
+  </div>
+  <div class="recent">
+    <div class="recent__lead">
+      ${frame(recent[0], ctx, { sizes: '(min-width: 60rem) 56rem, 100vw', vt: false })}
+      <div class="recent__lead-card">
+        <p class="display">${recent[0].title}</p>
+        <p class="meta">${[TYPE_LABEL[recent[0].type], recent[0].year, formatRuntime(recent[0].runtimeSeconds)].filter(Boolean).join(' · ')}</p>
+      </div>
+    </div>
+    <div class="recent__side">
+      ${recent.slice(1).map((f) => html`<div>${frame(f, ctx, { sizes: '(min-width: 60rem) 30rem, 45vw', vt: false })}${caption(f)}</div>`)}
+    </div>
+  </div>
+</section>`
+      : ''}
 
-<section class="section section--split l-container" aria-labelledby="process-teaser">
-  <h2 class="section__heading" id="process-teaser">How it gets made</h2>
-  ${prose(site.pages.process.intro, 'prose prose--lede')}
-  <p><a class="btn btn--ghost" href="${u.url('process.html')}">${clips.length ? 'Read the breakdowns' : 'How we work'}</a></p>
+<section class="strip" aria-labelledby="how-heading">
+  <div class="l-container">
+    <div class="strip__head">
+      <h2 class="eyebrow" id="how-heading">How it gets made</h2>
+      <a class="section__more" href="${u.url('process.html')}">${clips.length ? 'Read the breakdowns →' : 'Process →'}</a>
+    </div>
+    <ol class="strip__list">
+      ${site.processSteps.map((s) => html`<li class="strip__item">
+        <span class="strip__n" aria-hidden="true">${String(s.n).padStart(2, '0')}</span>
+        <h3 class="strip__title">${s.title}</h3>
+        <p class="strip__body">${inline((s.body?.[0] ?? '').split(/(?<=[.!?])\s/)[0])}</p>
+      </li>`)}
+    </ol>
+  </div>
 </section>
 
-<section class="section section--split l-container" aria-labelledby="services-teaser">
-  <h2 class="section__heading" id="services-teaser">Commissions</h2>
-  <ul class="l-cluster chips">${site.services.map((s) => chip(s.title))}</ul>
-  <p><a class="btn btn--ghost" href="${u.url('hire.html')}">What it costs and how long</a></p>
-</section>
-
-<div class="l-container">${contactBand(ctx)}</div>`,
+<div class="l-container">${contactBand(ctx, { eyebrow: 'Commissions', heading: site.pages.hire.intro?.[0] ?? 'Get in touch' })}</div>`,
   };
 }
 
-function workBody(ctx, list, activeType) {
-  const { site, u, films } = ctx;
-  const p = site.pages.work;
+/* ── Work: the contact sheet ────────────────────────────────────────────── */
+
+const isPortrait = (f) => parseRatio(f.aspectRatio).portrait;
+
+function workFilters(ctx) {
+  const { films } = ctx;
   const types = [...new Set(films.map((f) => f.type))]
     .filter((t) => films.filter((f) => f.type === t).length >= 2)
     .sort();
+  const filters = types.map((t) => ({ key: t, label: TYPE_LABEL[t], path: `work-${t}.html`, count: films.filter((f) => f.type === t).length }));
+  const vertical = films.filter(isPortrait).length;
+  if (vertical >= 2) filters.push({ key: 'vertical', label: 'Vertical', path: 'work-vertical.html', count: vertical });
+  return filters;
+}
+
+function workBody(ctx, list, active) {
+  const { site, u, films } = ctx;
+  const p = site.pages.work;
+  const filters = workFilters(ctx);
 
   return html`
 <header class="page-head l-container l-stack">
@@ -1049,23 +1211,23 @@ function workBody(ctx, list, activeType) {
   ${prose(p.intro, 'page-head__intro')}
 </header>
 
-${types.length
+${filters.length
       ? html`<nav class="filter-bar l-container" aria-label="Filter by type">
   <ul class="l-cluster" data-filter-bar>
-    <li><a href="${u.url('work.html')}" data-filter="all"${!activeType ? new Html(' aria-current="page"') : ''}>All</a></li>
-    ${types.map((t) => html`<li><a href="${u.url(`work-${t}.html`)}" data-filter="${t}"${activeType === t ? new Html(' aria-current="page"') : ''}>${TYPE_LABEL[t]}</a></li>`)}
+    <li><a href="${u.url('work.html')}" data-filter="all"${!active ? new Html(' aria-current="page"') : ''}>All <b>${films.length}</b></a></li>
+    ${filters.map((f) => html`<li><a href="${u.url(f.path)}" data-filter="${f.key}"${active === f.key ? new Html(' aria-current="page"') : ''}>${f.label} <b>${f.count}</b></a></li>`)}
   </ul>
   <p class="filter-bar__status u-visually-hidden" role="status" data-filter-status></p>
 </nav>`
       : ''}
 
 ${list.length
-      ? html`<div class="film-list l-container l-stack" data-film-list>
-  ${list.map((f, i) => html`<div class="film-list__item" data-type="${f.type}">${filmEntry(f, ctx, { eager: i === 0 })}</div>`)}
+      ? html`<div class="sheet u-bleed" data-film-list>
+  ${list.map((f) => filmTile(f, ctx))}
 </div>`
       : html`<div class="l-container"><p class="u-muted">${p.emptyState}</p></div>`}
 
-<div class="l-container">${contactBand(ctx, { heading: 'Want something like this?' })}</div>`;
+<div class="l-container">${contactBand(ctx, { eyebrow: 'Commissions', heading: 'Want something like this?' })}</div>`;
 }
 
 function pageWork(ctx) {
@@ -1080,29 +1242,147 @@ function pageWork(ctx) {
       identityNode(ctx), ...[personNode(ctx)].flat(),
       {
         '@type': 'ItemList',
-        itemListElement: films.map((f, i) => ({
-          '@type': 'ListItem', position: i + 1, url: u.absUrl('work.html') + `#film-${f.id}`,
-        })),
+        itemListElement: films.map((f, i) => ({ '@type': 'ListItem', position: i + 1, url: u.absUrl(filmPath(f)) })),
       },
-      ...films.map((f) => videoObject(f, ctx)),
-      breadcrumb({ path: 'work.html', title: 'Work' }, ctx),
+      breadcrumb([{ name: 'Work', path: 'work.html' }], ctx),
     ],
     body: workBody(ctx, films, null),
   };
 }
 
-function pageWorkFiltered(ctx, type) {
+function pageWorkFiltered(ctx, filter) {
   const { site, films } = ctx;
-  const list = films.filter((f) => f.type === type);
+  const list = filter.key === 'vertical' ? films.filter(isPortrait) : films.filter((f) => f.type === filter.key);
   return {
-    id: 'work', path: `work-${type}.html`, navMatch: 'work.html',
-    title: `${TYPE_LABEL[type]} — ${site.identity.name}`,
-    description: `${TYPE_LABEL[type]} work by ${site.identity.name}.`,
+    id: 'work', path: filter.path, navMatch: 'work.html',
+    title: `${filter.label} — ${site.identity.name}`,
+    description: filter.key === 'vertical'
+      ? `Vertical films by ${site.identity.name}, made for the phone.`
+      : `${filter.label} work by ${site.identity.name}.`,
     ogImagePath: list[0]?.poster?.src ?? null,
-    jsonLd: [identityNode(ctx), ...[personNode(ctx)].flat(), ...list.map((f) => videoObject(f, ctx))],
-    body: workBody(ctx, list, type),
+    jsonLd: [
+      identityNode(ctx), ...[personNode(ctx)].flat(),
+      { '@type': 'ItemList', itemListElement: list.map((f, i) => ({ '@type': 'ListItem', position: i + 1, url: ctx.u.absUrl(filmPath(f)) })) },
+      breadcrumb([{ name: 'Work', path: 'work.html' }, { name: filter.label, path: filter.path }], ctx),
+    ],
+    body: workBody(ctx, list, filter.key),
   };
 }
+
+/* ── Film page: one per film ────────────────────────────────────────────── */
+
+function pageFilm(ctx, film) {
+  const { site, films, u } = ctx;
+  const i = films.indexOf(film);
+  const prev = films[(i - 1 + films.length) % films.length];
+  const next = films[(i + 1) % films.length];
+  const portrait = isPortrait(film);
+  const director = (site.identity.founders ?? []).find((f) => f.director) ?? null;
+  const pad = (n) => String(n).padStart(2, '0');
+
+  // Related: the same strand first — vertical explainers keep company with
+  // each other — then the same type, never itself, three at most.
+  const others = films.filter((f) => f !== film);
+  const related = [
+    ...others.filter((f) => f.type === film.type && isPortrait(f) === portrait),
+    ...others.filter((f) => f.type === film.type && isPortrait(f) !== portrait),
+    ...others.filter((f) => f.type !== film.type),
+  ].filter((f, k, arr) => arr.indexOf(f) === k).slice(0, 3);
+  const relatedLabel = others.some((f) => f.type === film.type)
+    ? `More ${TYPE_LABEL[film.type].toLowerCase()}${portrait && others.some((f) => f.type === film.type && isPortrait(f)) ? ', vertical' : ''}`
+    : 'More films';
+
+  const credits = [];
+  if (director) credits.push({ k: 'Director', v: html`<a href="${u.url('about.html')}#${slugify(director.name)}">${director.name}</a>` });
+  if (film.roles?.length) credits.push({ k: film.roles.length > 1 ? 'Roles' : 'Role', v: film.roles.join(', ') });
+  if (film.client) credits.push({ k: 'Client', v: film.client });
+  for (const c of film.collaborators ?? []) credits.push({ k: c.role, v: c.name });
+  credits.push({ k: 'Studio', v: site.identity.name });
+  credits.push({ k: 'Year', v: String(film.year) });
+  credits.push({ k: 'Format', v: `${film.aspectRatio ?? '16:9'}${portrait ? ' · vertical' : ''}` });
+  if (film.runtimeSeconds) credits.push({ k: 'Runtime', v: `${formatRuntime(film.runtimeSeconds)} · ${spokenRuntime(film.runtimeSeconds)}` });
+  if (film.published) credits.push({ k: 'Published', v: film.published });
+
+  const eyebrow = [TYPE_LABEL[film.type], portrait ? 'Vertical' : null, film.year].filter(Boolean).join(' · ');
+  const stageEmbed = embed({
+    video: film.video, poster: film.resolvedPoster, title: film.title, ratio: film.aspectRatio,
+    runtimeSeconds: film.runtimeSeconds, eager: true, sizes: portrait ? '30rem' : '100vw',
+    noteGaps: film.status === 'draft', vtName: `film-${film.id}`,
+  });
+
+  return {
+    id: 'film', path: filmPath(film), navMatch: 'work.html',
+    title: `${film.title} — ${site.identity.name}`,
+    description: film.logline,
+    ogType: 'video.other',
+    ogVideo: { url: embedSrc(film.video), ...ogVideoSize(film.aspectRatio) },
+    ogImagePath: film.poster?.src ?? null,
+    lastmod: film.published ?? null,
+    jsonLd: [
+      identityNode(ctx), ...[personNode(ctx)].flat(),
+      videoObject(film, ctx),
+      breadcrumb([{ name: 'Work', path: 'work.html' }, { name: film.title, path: filmPath(film) }], ctx),
+    ],
+    body: html`
+${portrait
+      ? html`<section class="stage stage--portrait" aria-label="The film">
+  ${film.resolvedPoster ? html`<img class="stage__bg" src="${film.resolvedPoster.src}" alt="" aria-hidden="true" loading="eager" decoding="async">` : ''}
+  ${stageEmbed}
+  <p class="stage__note stage__note--start">Film ${pad(i + 1)} / ${pad(films.length)}</p>
+  <p class="stage__note stage__note--end">${film.aspectRatio} · Made for the phone</p>
+</section>`
+      : html`<section class="stage stage--plain" aria-label="The film">
+  ${stageEmbed}
+</section>`}
+
+<section class="film-head l-container">
+  <div class="film-head__main">
+    <p class="eyebrow eyebrow--accent">${eyebrow}</p>
+    <h1 class="film-head__title display">${film.title}</h1>
+    <p class="film-head__lede">${inline(film.logline)}</p>
+    ${laurelRow(film.laurels, site)}
+    <div class="film-head__actions">
+      <a class="btn btn--primary" href="${watchUrl(film.video)}" rel="noopener" data-play-embed>${playGlyph()}Play</a>
+      <a class="btn btn--ghost" href="${watchUrl(film.video)}" rel="noopener">Watch on ${film.video.platform === 'youtube' ? 'YouTube' : 'Vimeo'}</a>
+    </div>
+  </div>
+  <dl class="credits" aria-label="Credits">
+    ${credits.map((c) => html`<div class="credits__row"><dt>${c.k}</dt><dd>${c.v}</dd></div>`)}
+  </dl>
+</section>
+
+${film.synopsis?.length
+      ? html`<section class="section section--split l-container" aria-labelledby="about-film-heading">
+  <h2 class="section__heading" id="about-film-heading">About the film</h2>
+  ${prose(film.synopsis, 'prose prose--columns')}
+</section>`
+      : ''}
+
+${related.length
+      ? html`<section class="section l-container related" aria-labelledby="related-heading">
+  <div class="section__head-row">
+    <h2 class="section__heading" id="related-heading">${relatedLabel}</h2>
+    <a class="section__more" href="${u.url('work.html')}">All work →</a>
+  </div>
+  <div class="related__list">
+    ${related.map((f) => html`<div class="related__item${isPortrait(f) ? ' related__item--portrait' : ''}">
+      ${frame(f, ctx, { sizes: '(min-width: 46rem) 28rem, 90vw' })}
+      ${caption(f)}
+    </div>`)}
+  </div>
+</section>`
+      : ''}
+
+<nav class="pager l-container" aria-label="Previous and next film">
+  <a href="${u.url(filmPath(prev))}"><span class="eyebrow">← Previous</span><span class="pager__title display">${prev.title}</span></a>
+  <a class="pager__next" href="${u.url(filmPath(next))}"><span class="eyebrow">Next →</span><span class="pager__title display">${next.title}</span></a>
+</nav>
+
+<div class="l-container">${contactBand(ctx, { eyebrow: 'Commissions', heading: 'Want something like this?' })}</div>`,
+  };
+}
+
+/* ── Process, Hire, About, 404 ──────────────────────────────────────────── */
 
 function pageProcess(ctx) {
   const { site, clips, films, u } = ctx;
@@ -1112,20 +1392,20 @@ function pageProcess(ctx) {
     title: `Process — ${site.identity.name}`,
     description: p.metaDescription,
     ogImagePath: clips[0]?.poster?.src ?? null,
-    jsonLd: [identityNode(ctx), ...[personNode(ctx)].flat(), breadcrumb({ path: 'process.html', title: 'Process' }, ctx)],
+    jsonLd: [identityNode(ctx), ...[personNode(ctx)].flat(), breadcrumb([{ name: 'Process', path: 'process.html' }], ctx)],
     body: html`
 <header class="page-head l-container l-stack">
   <h1 class="page-head__title">${inline(p.heading)}</h1>
   ${prose(p.intro, 'page-head__intro')}
 </header>
 
-<section class="section l-container l-stack" aria-labelledby="steps-heading">
-  <h2 class="section__heading" id="steps-heading">The shape of a job</h2>
-  <ol class="process-steps l-stack">
-    ${site.processSteps.map((s) => html`<li class="process-step">
-      <span class="process-step__n" aria-hidden="true">${String(s.n).padStart(2, '0')}</span>
-      <div class="process-step__body">
-        <h3 class="process-step__title">${s.title}</h3>
+<section class="section l-container" aria-labelledby="steps-heading">
+  <h2 class="u-visually-hidden" id="steps-heading">The four stages</h2>
+  <ol class="timeline">
+    ${site.processSteps.map((s) => html`<li class="timeline__step">
+      <span class="timeline__n" aria-hidden="true">${String(s.n).padStart(2, '0')}</span>
+      <div class="timeline__body">
+        <h3 class="timeline__title">${s.title}</h3>
         ${prose(s.body)}
       </div>
     </li>`)}
@@ -1147,19 +1427,19 @@ ${clips.length
             ${c.beats.map((b) => html`<div class="meta-list__row"><dt>${b.label}</dt><dd>${inline(b.body)}</dd></div>`)}
           </dl>`
           : ''}
-        ${film ? html`<p class="process-clip__from">From <a href="${u.url('work.html')}#film-${film.id}">${film.title}</a></p>` : ''}
+        ${film ? html`<p class="process-clip__from">From <a href="${u.url(filmPath(film))}">${film.title}</a></p>` : ''}
       </div>
     </article>`;
       })}
 </section>`
       : ''}
 
-<div class="l-container">${contactBand(ctx)}</div>`,
+<div class="l-container">${contactBand(ctx, { eyebrow: 'Commissions' })}</div>`,
   };
 }
 
 function pageHire(ctx) {
-  const { site, u } = ctx;
+  const { site } = ctx;
   const p = site.pages.hire;
   const offers = site.services.map((s) => {
     const offer = { '@type': 'Offer', itemOffered: { '@type': 'Service', name: s.title, description: s.summary } };
@@ -1176,7 +1456,7 @@ function pageHire(ctx) {
     title: `Hire — ${site.identity.name}`,
     description: p.metaDescription,
     ogImagePath: null,
-    jsonLd: [seller, ...[personNode(ctx)].flat(), breadcrumb({ path: 'hire.html', title: 'Hire' }, ctx)],
+    jsonLd: [seller, ...[personNode(ctx)].flat(), breadcrumb([{ name: 'Hire', path: 'hire.html' }], ctx)],
     body: html`
 <header class="page-head l-container l-stack">
   <h1 class="page-head__title">${inline(p.heading)}</h1>
@@ -1186,30 +1466,32 @@ function pageHire(ctx) {
 
 <section class="section l-container l-stack" aria-labelledby="services-heading">
   <h2 class="section__heading" id="services-heading">What we make</h2>
-  <ul class="l-grid l-grid--services">
-    ${site.services.map((s) => html`<li class="service-card l-stack">
-      <h3 class="service-card__title">${s.title}</h3>
-      <p class="service-card__summary">${inline(s.summary)}</p>
-      ${s.deliverables?.length
-        ? html`<ul class="service-card__list">${s.deliverables.map((d) => html`<li>${inline(d)}</li>`)}</ul>`
-        : ''}
-      ${s.timeline ? html`<p class="service-card__meta">${inline(s.timeline)}</p>` : ''}
-      ${s.startingAt ? html`<p class="service-card__meta">From ${s.startingAt.currency} ${s.startingAt.amount}</p>` : ''}
+  <ul class="offers">
+    ${site.services.map((s) => html`<li class="offer">
+      <h3 class="offer__title">${s.title}</h3>
+      <p class="offer__summary">${inline(s.summary)}</p>
+      <div>
+        ${s.deliverables?.length ? html`<ul class="offer__list">${s.deliverables.map((d) => html`<li>${inline(d)}</li>`)}</ul>` : ''}
+        ${s.timeline ? html`<p class="offer__meta">${inline(s.timeline)}</p>` : ''}
+        ${s.startingAt ? html`<p class="offer__meta">From ${s.startingAt.currency} ${s.startingAt.amount}</p>` : ''}
+      </div>
     </li>`)}
   </ul>
 </section>
 
-<section class="section l-container l-stack" aria-labelledby="how-heading">
-  <h2 class="section__heading" id="how-heading">How it goes</h2>
-  <ol class="process-steps process-steps--compact l-stack">
-    ${site.processSteps.map((s) => html`<li class="process-step">
-      <span class="process-step__n" aria-hidden="true">${String(s.n).padStart(2, '0')}</span>
-      <div class="process-step__body"><h3 class="process-step__title">${s.title}</h3></div>
-    </li>`)}
-  </ol>
+<section class="strip" aria-labelledby="how-heading">
+  <div class="l-container">
+    <div class="strip__head"><h2 class="eyebrow" id="how-heading">How it goes</h2></div>
+    <ol class="strip__list">
+      ${site.processSteps.map((s) => html`<li class="strip__item">
+        <span class="strip__n" aria-hidden="true">${String(s.n).padStart(2, '0')}</span>
+        <h3 class="strip__title">${s.title}</h3>
+      </li>`)}
+    </ol>
+  </div>
 </section>
 
-<div class="l-container">${contactBand(ctx, { heading: 'Start a project' })}</div>`,
+<div class="l-container">${contactBand(ctx, { eyebrow: 'Start a project', heading: 'Tell us what you need and roughly when.', aside: false })}</div>`,
   };
 }
 
@@ -1221,7 +1503,7 @@ function pageAbout(ctx) {
     title: `About — ${site.identity.name}`,
     description: p.metaDescription,
     ogImagePath: site.identity.portrait?.src ?? null,
-    jsonLd: [identityNode(ctx), ...[personNode(ctx)].flat(), breadcrumb({ path: 'about.html', title: 'About' }, ctx)],
+    jsonLd: [identityNode(ctx), ...[personNode(ctx)].flat(), breadcrumb([{ name: 'About', path: 'about.html' }], ctx)],
     body: html`
 <header class="page-head l-container l-stack">
   <h1 class="page-head__title">${inline(p.heading)}</h1>
@@ -1258,8 +1540,8 @@ ${site.identity.portrait && !site.identity.portraitWide
 ${site.identity.founders?.length
       ? html`<section class="section l-container l-stack" aria-labelledby="founders-heading">
   <h2 class="section__heading" id="founders-heading">Founders</h2>
-  <ul class="founders l-grid">
-    ${site.identity.founders.map((f) => html`<li class="founder l-stack" id="${slugify(f.name)}">
+  <ul class="founders">
+    ${site.identity.founders.map((f) => html`<li class="founder" id="${slugify(f.name)}">
       <h3 class="founder__name">${f.name}</h3>
       <p class="founder__role">${f.role}</p>
       ${f.bio ? html`<p class="founder__bio">${inline(f.bio)}</p>` : ''}
@@ -1284,7 +1566,7 @@ ${site.laurels?.length
 </section>`
       : ''}
 
-<div class="l-container">${contactBand(ctx)}</div>`,
+<div class="l-container">${contactBand(ctx, { eyebrow: 'Commissions' })}</div>`,
   };
 }
 
@@ -1347,7 +1629,7 @@ function llmsTxt(ctx) {
     L.push('## Work', '');
     for (const f of films) {
       const bits = [f.year, TYPE_LABEL[f.type], formatRuntime(f.runtimeSeconds)].filter(Boolean).join(', ');
-      L.push(`- [${f.title} (${bits})](${u.absUrl('work.html')}#film-${f.id}): ${f.logline}`);
+      L.push(`- [${f.title} (${bits})](${u.absUrl(filmPath(f))}): ${f.logline}`);
     }
     L.push('');
   }
@@ -1395,8 +1677,15 @@ function auditPage(id, out, ctx) {
   for (const [, v] of out.matchAll(SRCSET_ATTR)) {
     for (const part of v.split(',')) checkUrl(part.trim().split(/\s+/)[0], 'srcset');
   }
+  // Two declarations may reach a style attribute, alone or together: the
+  // embed's aspect ratio, and a view-transition name built from a film slug.
+  // Anything else is content leaking into presentation.
+  const STYLE_OK = [/^--embed-ratio: [\d./ ]+$/, /^view-transition-name: film-[a-z0-9-]+$/];
   for (const [, v] of out.matchAll(STYLE_ATTR)) {
-    if (!/^--embed-ratio: [\d./ ]+$/.test(v)) bad.push(`style="${v}" — only --embed-ratio may reach a style attribute`);
+    const parts = v.split(/;\s*/).filter(Boolean);
+    if (!parts.length || !parts.every((p) => STYLE_OK.some((re) => re.test(p)))) {
+      bad.push(`style="${v}" — only --embed-ratio and view-transition-name: film-<slug> may reach a style attribute`);
+    }
   }
 
   // JSON-LD must be unicode-escaped, never HTML-escaped, and must never break out.
@@ -1485,6 +1774,7 @@ async function buildOnce({ base, includeDrafts, strict, quiet }) {
     // and url(), so a BASE-prefixed resolvedPoster.src would silently fail.
     f.poster = poster;
     f.resolvedPoster = await resolvePoster(poster, ctx, `films[${f.id}].poster`);
+    f.strip = await resolveStrip(f, ctx);
   }
   for (const c of clips) {
     const poster = c.poster ?? await autoPoster(c.id, 'assets/process');
@@ -1541,12 +1831,9 @@ async function buildOnce({ base, includeDrafts, strict, quiet }) {
   // Pages. The registry drives rendering AND the sitemap, so a page cannot be built but unlisted.
   const registry = [pageIndex, pageWork, pageProcess, pageHire, pageAbout];
   const descriptors = registry.map((fn) => fn(ctx));
-
-  const filterTypes = [...new Set(films.map((f) => f.type))]
-    .filter((t) => films.filter((f) => f.type === t).length >= 2)
-    .sort();
-  for (const t of filterTypes) descriptors.push(pageWorkFiltered(ctx, t));
-
+  for (const filter of workFilters(ctx)) descriptors.push(pageWorkFiltered(ctx, filter));
+  // One page per film. The registry drives the sitemap, so every film page is listed.
+  for (const f of films) descriptors.push(pageFilm(ctx, f));
   descriptors.push(pageNotFound(ctx));
 
   const newestFilm = films.map((f) => f.published).filter(Boolean).sort().at(-1);
@@ -1610,7 +1897,9 @@ async function main() {
     await writeFile(path.join(OUT, '.nojekyll'), '', 'utf8');
   }
   for (const { d, out } of rendered) {
-    await writeFile(path.join(OUT, d.path || 'index.html'), out, 'utf8');
+    const dest = path.join(OUT, d.path || 'index.html');
+    await mkdir(path.dirname(dest), { recursive: true });
+    await writeFile(dest, out, 'utf8');
   }
   await writeFile(path.join(OUT, 'sitemap.xml'), sitemap(descriptors, ctx), 'utf8');
   await writeFile(path.join(OUT, 'robots.txt'), robots(ctx), 'utf8');

@@ -31,6 +31,45 @@ test('every page was generated', async () => {
   }
 });
 
+const publishedFilms = async () => {
+  const doc = JSON.parse(await read('content/films.json'));
+  return doc.films.filter((f) => (f.status ?? 'published') === 'published' && f.video?.id);
+};
+
+test('every published film has its own page, with one h1, a canonical, and its VideoObject', async () => {
+  for (const f of await publishedFilms()) {
+    const rel = `films/${f.id}.html`;
+    let html;
+    try { html = await read(rel); } catch { assert.fail(`${rel} is missing — run node build.mjs`); }
+    assert.equal((html.match(/<h1[\s>]/g) ?? []).length, 1, `${rel}: expected exactly one <h1>`);
+    assert.match(html, new RegExp(`<link rel="canonical" href="[^"]*/films/${f.id}\\.html"`), `${rel}: canonical missing`);
+    assert.match(html, /"@type":"VideoObject"/, `${rel}: no VideoObject`);
+    assert.match(html, /"@type":"BreadcrumbList"/, `${rel}: no BreadcrumbList`);
+    assert.ok(html.includes('data-embed'), `${rel}: no embed facade`);
+  }
+});
+
+test('the Work sheet links to every film page, and the sitemap lists them', async () => {
+  const work = await read('work.html');
+  const sitemap = await read('sitemap.xml');
+  for (const f of await publishedFilms()) {
+    assert.ok(work.includes(`/films/${f.id}.html"`), `work.html does not link to films/${f.id}.html`);
+    assert.ok(sitemap.includes(`/films/${f.id}.html</loc>`), `sitemap.xml does not list films/${f.id}.html`);
+  }
+});
+
+test('only the two permitted declarations reach a style attribute', async () => {
+  for (const p of await pages()) {
+    const html = await read(p);
+    for (const [, v] of html.matchAll(/\sstyle="([^"]*)"/g)) {
+      for (const part of v.split(/;\s*/).filter(Boolean)) {
+        assert.ok(/^--embed-ratio: [\d./ ]+$/.test(part) || /^view-transition-name: film-[a-z0-9-]+$/.test(part),
+          `${p}: unexpected style declaration "${part}"`);
+      }
+    }
+  }
+});
+
 test('exactly one <h1> and one <main> per page', async () => {
   for (const p of await pages()) {
     const html = await read(p);

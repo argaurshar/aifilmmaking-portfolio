@@ -23,8 +23,9 @@ File tree, generator design, and every page section by section.
 ├── assets/
 │   ├── css/style.css         hand-written, single file
 │   ├── js/main.js            hand-written, single file
-│   ├── fonts/*.woff2         self-hosted, OFL-licensed
-│   ├── stills/               film posters: <film-id>-{960,1440,1920}.jpg
+│   ├── fonts/*.woff2         self-hosted, OFL-licensed: Archivo (variable), IBM Plex Mono
+│   ├── stills/               film posters: <film-id>-<width>.jpg, any widths
+│   ├── strips/               hover-scrub frame strips: <film-id>.jpg, N frames in a row (created by --strip)
 │   ├── process/              process clip posters
 │   ├── laurels/              festival laurel SVGs
 │   └── og/nitish-jain-card-v2.jpg        social share image, ≥ 1200×630
@@ -40,6 +41,8 @@ File tree, generator design, and every page section by section.
 GENERATED — never hand-edit:
   index.html work.html process.html hire.html about.html 404.html
   work-<type>.html            one per film type with ≥ 2 films
+  work-vertical.html          when ≥ 2 films are portrait
+  films/<film-id>.html        one per published film
   sitemap.xml robots.txt llms.txt
 ```
 
@@ -125,21 +128,42 @@ Every page: `<html lang>`, skip link, `<header>` with nav, `<main id="main" tabi
 
 ### `index.html` — Index
 
-1. **Hero.** Kicker, headline, sub-copy, and the featured film's embed facade. Primary CTA to Work,
-   secondary to Hire. No autoplaying video.
-2. **Selected work.** Three to four featured films as full-width entries. Link to Work.
-3. **Process teaser.** One line on how the work gets made, link to Process.
-4. **Services strip.** Titles only, link to Hire.
-5. **Contact band.** Email, one line.
+1. **The stage.** The featured film edge to edge with a title card over it: "Now showing · 04 / 16",
+   the title, a mono credits line, Play and Film page pills, and Next. The frame is the play
+   control. No autoplaying video.
+2. **The statement.** `pages.index.statement` with `{count}` filled from the number of published
+   films, two pills, and a mono aside carrying `heroHeadline` and the founders.
+3. **The reel.** Every published film as a horizontal filmstrip, each frame linking to its film
+   page, with prev/next buttons and keyboard scrolling.
+4. **Recent.** The first three films in site order after the hero: one large with an overlaid
+   title, two small.
+5. **Process strip.** The four steps across, first sentence of each, link to Process.
+6. **Commissions.** The contact band, headed by the Hire intro.
 
 ### `work.html` — Work
 
 1. Page head: heading, intro.
-2. Filter bar — real links to `work-<type>.html`, enhanced by JS into in-page filtering.
-3. Film entries, full-width and stacked: embed facade, title, year, type, runtime, logline,
-   laurels, and a `<details>` holding synopsis and credits. Each carries `id="film-<id>"` so
-   `work.html#film-<id>` is a shareable deep link.
+2. Filter bar with counts — real links to `work-<type>.html` and `work-vertical.html`, enhanced
+   by JS into in-page filtering. "Vertical" is an orientation filter, not a type.
+3. **The sheet.** Every film as a tile in an edge-to-edge grid, portraits spanning three rows.
+   Each tile links to the film's page and reveals title and runtime on hover, focus, or touch.
+   Each carries `id="film-<id>"` so old `work.html#film-<id>` links still land nearby.
 4. Empty state when no published films exist — honest, not fake.
+
+### `films/<film-id>.html` — one per film
+
+1. **The stage.** Landscape: the embed facade edge to edge. Portrait: the 9:16 frame centred on a
+   dark stage with its own poster blurred behind, and "Film 16 / 16" in the corner.
+2. **Title card.** Eyebrow (type · orientation · year), the title, the logline as a lede, laurels,
+   Play (drives the stage's embed) and Watch-on-YouTube pills.
+3. **Credits.** A `<dl>`: Director (the founder flagged `director`, linked to About), roles,
+   client, collaborators, studio, year, format, runtime (omitted when unknown), published.
+4. **About the film.** The synopsis in two columns, when there is one.
+5. **Related.** Up to three: same type and orientation first, then same type, then the rest.
+6. **Previous / next** by site order, wrapping.
+7. Contact band.
+
+JSON-LD: the film's `VideoObject` with the page as its `@id`, and a three-step `BreadcrumbList`.
 
 ### `process.html` — Process
 
@@ -159,9 +183,10 @@ Every page: `<html lang>`, skip link, `<header>` with nav, `<main id="main" tabi
 
 1. Page head, portrait if supplied.
 2. Long bio.
-3. Credits list — real credits only, may be empty.
-4. Laurels.
-5. Contact band.
+3. Founders as rows: name, role, bio.
+4. Credits list — real credits only, may be empty.
+5. Laurels.
+6. Contact band.
 
 ### `404.html`
 

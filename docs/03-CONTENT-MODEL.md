@@ -42,7 +42,9 @@ the inline micro-markup: `[[emphasis]]` → accent `<em>`, `**strong**` → `<st
   "social": [{ "label": "Vimeo", "url": "https://vimeo.com/…" }],
   "nav": [{ "label": "Work", "path": "work.html" }, …],
   "pages": {
-    "index":    { "heroKicker": "…", "heroHeadline": "…", "heroSub": ["…"], "metaDescription": "…" },
+    "index":    { "heroHeadline": "…",                      // the mono aside beside the statement
+                  "statement": "{count} short films. …",     // {count} → "Sixteen", from published films
+                  "metaDescription": "…" },
     "work":     { "heading": "…", "intro": ["…"], "metaDescription": "…", "emptyState": "…" },
     "process":  { "heading": "…", "intro": ["…"], "metaDescription": "…" },
     "hire":     { "heading": "…", "intro": ["…"], "metaDescription": "…" },
